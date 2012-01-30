@@ -1,0 +1,8 @@
+a.out.dSYM/
+config.log
+config.status
+src/config.h
+src/Inference.o
+src/Makevars
+src/NormalizeProbes.o
+src/pepStat.so
