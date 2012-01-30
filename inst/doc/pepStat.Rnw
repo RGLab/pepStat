@@ -1,0 +1,33 @@
+%\VignetteIndexEntry{The petStat users guide}
+%\VignetteDepends{}
+%\VignetteKeywords{Preprocessing, Affymetrix}
+%\VignettePackage{pepStat}
+\documentclass[11pt]{article}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{color, pdfcolmk}
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{plainnat}
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\author{Charles Cheung\footnote{cykc@interchange.ubc.ca} and Raphael
+  Gottardo\footnote{raphael.gottardo@ircm.qc.ca} and Arnaud Droit\footnote{arnaud.droit@ircm.qc.ca}}
+
+\begin{document}
+\title{Model Based Analysis of Tiling Arrays\\ The rMAT package.}
+\maketitle
+
+
+
+\textnormal {\normalfont}
+A step-by-step guide in the analysis of tiling array data using the Digested package in R
+
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+
+\part{Licensing}
+\end{document}

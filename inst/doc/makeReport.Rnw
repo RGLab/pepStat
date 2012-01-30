@@ -1,0 +1,224 @@
+\documentclass[letter]{article}
+\title{Report} 
+\author{Raphael Gottardo}
+\begin{document} 
+\maketitle
+
+%% Set the figure width
+\setkeys{Gin}{width=1\textwidth}
+
+<<Load all necessary packages and data,echo=FALSE>>=
+# Here I assume that all the objects are store in a proper database
+library(xtable)
+library(pepStat)
+library(pepViz)
+library(HIV.db)
+data(pep_hxb2)
+library(filehash)
+filehashOption(defaultType = "RDS")
+@
+
+
+\noindent You are using the data stored in the following database:
+<<Load up all necessary object from a database,echo=TRUE>>=
+# Here I assume that all the objects are store in a proper database
+db<-dbInit("~/Dropbox/Work/FileHash/RV144cc")
+@
+with the following options:
+<<Options,echo=TRUE>>=
+# Control name (subset of the filename)
+cName<-"100vst"
+# The first one here should correspond to Pre
+treatmentNames<-c("Pre","Post")
+paired<-TRUE
+hotspot.cutoff<-.1
+call.cutoff<-1.1
+@
+<<Plotting options,echo=FALSE>>=
+# Plotting options
+library(RColorBrewer)
+sizeAnno<-2
+sizeTrack<-8
+trackGapAnno<-.5
+colorAnno<-brewer.pal(9, "Pastel1")
+colorTrack<-brewer.pal(8, "Set2")
+@
+
+\section{Quality Assessment}
+\subsection{Spot saturation}
+In this section, we look at the number of saturated spots across samples and peptides. A spot is saturated if its have a foreground intensity equal to 65535 ($2^{16}$-1). 65535 is the maximum value that can be recorded in a 16 bit image. So if a spot has an intensity equal to 65535, all pixels within the spot are saturated and the resulting estimated peptide intensity is likely upper censored. 
+Figure \ref{fig:SaturationHXB2} shows the percentage of saturated peptides by treatment group (\Sexpr{treatmentNames[1]}, \Sexpr{treatmentNames[2]}) vs. HXB2 positions. Table \ref{tab:SatPeptides} gives the list of saturated peptides with the proportion of saturation while \ref{tab:SatSamples} gives the list of samples with at least one saturated peptide.
+
+<<Calculating frequency of saturation, echo=FALSE>>=
+psSetRaw.clade<-split(db$psSetRaw,clade(db$psSetRaw))
+# I break it down by control group
+ind<-grepl(cName,sampleNames(db$psSetRaw))
+freq.sat.clade.cont<-lapply(psSetRaw.clade,function(x,ind){x<-x[,ind];apply(exprs(x),1,function(x)mean(x==16))},ind)
+freq.sat.clade<-lapply(psSetRaw.clade,function(x,ind){x<-x[,ind];apply(exprs(x),1,function(x)mean(x==16))},!ind)
+@
+
+<<Plotting options, echo=FALSE>>=
+HIV_db<-loadFeatures()
+envBase<-getFeature(HIV_db,name=c("env"))##get feature by name
+envStart<-start(envBase)
+envEnd<-end(envBase)
+
+##make a track for AA seqence
+AA_anno<-makePepAxis(envBase,addNC=TRUE,littleTicks=F,dp = DisplayPars(cex=.7))
+AA_anno2<-makePepAxis(envBase,addNC=FALSE,littleTicks=F,dp = DisplayPars(cex=.7,showSeq=FALSE))
+
+proteins<-getFeature(HIV_db,category="protein",start=envStart,end=envEnd,frame=getFrame(envBase))
+pro_anno<-makeGenericAnno(proteins,envStart,dp=DisplayPars(color=colorAnno[1],fill=colorAnno[1], alpha=.5, idRotation=0, idCex=.85, showID = TRUE, size=sizeAnno, lwd=2))
+
+landmarks<-getFeature(HIV_db,name=c("V1","V2","V3","V4","V5","ID","MPER"))
+landmarks_anno<-makeGenericAnno(landmarks,envStart,dp=DisplayPars(color=colorAnno[2],fill=colorAnno[2], alpha=.5, idRotation=0, idCex=.65, showID = TRUE, size=sizeAnno, lwd=2))
+
+@
+
+\begin{figure}
+\begin{center}
+<<SaturationHXb2, echo=FALSE,fig=TRUE,width=10,height=8>>=
+data.list<-lapply(1:7,function(i,x1,x2,y,dp,size,color,treatmentNames){mat<-cbind(x1[[i]],x2[[i]]);colnames(mat)<-treatmentNames;makeGenericArray(mat,probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[1:2], type="line",lwd=2,cex=.2,axisCex=.7,isLegend=TRUE))},x1=freq.sat.clade.cont,x2=freq.sat.clade,y=psSetRaw.clade, size=sizeTrack, color = colorTrack,treatmentNames=treatmentNames)
+
+all.plot<-vector("list",14)
+all.plot[seq(1,14,2)]<-data.list
+all.plot[seq(2,14,2)]<-AA_anno2
+names(all.plot)<-rep("",14)
+names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
+
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=860
+, labelRot=0
+, labelCex=.8
+)
+@
+\end{center}
+\caption{Percentage of saturated spots by treatment group as a function of HXB2.}
+\label{fig:SaturationHXB2}
+\end{figure}
+
+<<Calculating frequency of saturation per peptide, echo=FALSE>>=
+ind<-grepl(cName,sampleNames(db$psSetRaw))
+freq.sat.cont<-rowMeans(exprs(db$psSetRaw)[,ind]==16)
+freq.sat<-rowMeans(exprs(db$psSetRaw)[,!ind]==16)
+table<-data.frame(peptide(db$psSetRaw),freq.sat.cont,freq.sat,position(db$psSetRaw),featureID(db$psSetRaw))[freq.sat.cont >.01 | freq.sat>.01,]
+names(table)<-c("Peptide",paste("% Sat."," (",treatmentNames[1],")",sep=""),paste("% Sat."," (",treatmentNames[2],")",sep=""),"HXB2 pos.","Annotation")
+rownames(table)<-NULL
+@
+
+<<Table of saturation by peptides, echo=FALSE,results=tex>>=
+print(xtable(table,digits=c(0,0,2,2,0,0),caption="Percentage of saturated spots across samples by peptide and treatment group, only peptides with 1 percent saturation are shown.",label="tab:SatPeptides"))
+@
+
+<<Calculating frequency of saturation per peptide, echo=FALSE>>=
+freq.sat<-rowMeans(t(exprs(db$psSetRaw))==16)
+table<-data.frame(sampleNames(db$psSetRaw),freq.sat)[freq.sat>.001,]
+table<-table[order(-table[,2]),]
+names(table)<-c("Sample","% Sat.")
+rownames(table)<-NULL
+@
+
+<<Table of saturation by samples, echo=FALSE,results=tex>>=
+print(xtable(table,digits=c(0,0,4),caption="Table of percentage of saturated peptides across samples, only sample with 1 percent saturation across all peptides are shown.",label="tab:SatSamples"))
+@
+
+\subsetion{Intensity distribution before and after normalization}
+
+
+\section{Statistical analysis}
+\subsection{Agreggate response across subtypes}
+The aggregate response accross all 7 subtypes is given by Figure \ref{fig:ResponseHXB2}. Using this a
+<<Calculating aggregate response rate, echo=FALSE>>=
+calls<-makeCalls(db$pnmSet,paired=TRUE,cName=cName,cutoff=call.cutoff,method="absolute")
+freq<-rowMeans(calls)
+@
+
+
+\begin{figure}
+\begin{center}
+<<ResponseHXB2, echo=FALSE,fig=TRUE,width=10,height=8>>=
+freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(db$pnSet),dp=DisplayPars(size=sizeTrack, color = colorTrack[1], type="line",lwd=2,cex=.2,axisCex=.7))
+
+if(!paired)
+  {
+  y<-exprs(db$pnmSet)[,!grepl(cName,sampleNames(db$pnmSet))]-rowMeans(exprs(db$pnmSet)[,grepl(cName,sampleNames(db$pnmSet))])
+  }else
+  {
+    y<-exprs(db$pnmSet)[,!grepl(cName,sampleNames(db$pnmSet))]-exprs(db$pnmSet)[,grepl(cName,sampleNames(db$pnmSet))]
+  }
+y.smooth<-makeSmoothing(position(db$pnmSet), rowMeans(y), dp = DisplayPars(color = colorTrack[3], type="line",lwd=4))
+y.track<-makeGenericArray(as.matrix(y), probeStart=position(db$pnmSet), dp = DisplayPars(size=sizeTrack,color = "#00000050", type="line",lwd=.1,ylim=c(-5,7)),trackOverlay=list(y.smooth))
+
+
+all.plot<-vector("list",4)
+all.plot[1]<-freq.track
+all.plot[2]<-AA_anno2
+all.plot[3]<-y.track
+all.plot[4]<-AA_anno2
+names(all.plot)[1:4]<-c("% responders","","Response \n values","")
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=860
+, labelRot=0
+, labelCex=.8
+)
+@
+\end{center}
+\caption{Aggregate response rate (\% Responders) and subject expression values vs. peptide HXB2 positions.}
+\label{fig:ResponseHXB2}
+\end{figure}
+
+
+\subsection{Subtype specific responses}
+The subtype specific responses accross all 7 subtypes are displayed in Figure \ref{fig:SubtypeResponseHXB2}.
+
+<<Calculating subtype specific response rate, echo=FALSE>>=
+pnSet.clade<-split(db$pnSet,clade(db$pnSet))
+# I break it down by control group
+pnmSet.clade<-lapply(pnSet.clade,slidingMean,width=9)
+calls.clade<-lapply(pnmSet.clade,makeCalls,paired=TRUE,cName=cName,cutoff=call.cutoff,method="absolute")
+freq.clade<-lapply(calls.clade,function(x){apply(x,1,mean)})
+@
+
+
+\begin{figure}
+\begin{center}
+<<ResponseSubtypeHXB2, echo=FALSE,fig=TRUE,width=10,height=8>>=
+data.list<-lapply(1:7,function(i,x,y,dp,size,color,treatmentNames){makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[i], type="line",lwd=2,cex=.2,axisCex=.7))},x=freq.clade,y=pnSet.clade, size=sizeTrack, color = colorTrack)
+
+all.plot<-vector("list",14)
+all.plot[seq(1,14,2)]<-data.list
+all.plot[seq(2,14,2)]<-AA_anno2
+names(all.plot)<-rep("",14)
+names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
+
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=860
+, labelRot=0
+, labelCex=.8
+)
+@
+\end{center}
+\caption{Subtype specific response rate (\% Responders) vs. peptide HXB2 positions.}
+\label{fig:SubtypeResponseHXB2}
+\end{figure}
+
+
+\end{document}
