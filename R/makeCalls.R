@@ -1,4 +1,4 @@
-makeCalls<-function(peptideSet, cutoff=.1, method="local", average=TRUE, group=NULL,verbose=FALSE)
+makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE, verbose=FALSE)
 {
   if(class(peptideSet)!="peptideSet")
   {
@@ -41,7 +41,29 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", average=TRUE, group=N
   #   I<-as.matrix(y)
   # }
   
-  pData(peptideSet)$ptid
+  ptid<-pData(peptideSet)$ptid
+  t0<-grepl("[Pp][Rr][Ee]",pData(peptideSet)$visit)
+  t1<-grepl("[Pp][Oo][Ss][Tt]",pData(peptideSet)$visit)
+  ### Paired
+  if(all.equal(sort(ptid[t0]),sort(ptid[t1])))
+  {
+	  if(verbose)
+	  {
+	  	cat("You have paired PRE/POST samples\n")
+	  }
+	  I<-as.matrix(y[,t1])-as.matrix(y[,t0])
+  }
+  else
+  {
+	  if(verbose)
+	  {
+	  	cat("You don't have paired PRE/POST samples\n")
+	  }	  
+	  I<-as.matrix(y[,t1])-as.matrix(rowMeans(y[,t0]))  	
+  }
+  
+  colnames(I)<-ptid[t1]
+  rownames(I)<-peptide(peptideSet)
   
   if(method=="local")
   {
@@ -53,11 +75,23 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", average=TRUE, group=N
     FDR<-sapply(seqY,function(x,I){sum(I< -x)/sum(I>x)},as.double(I))
     Dmin<-seqY[which.min(abs(FDR-cutoff))]
     # print(cbind(FDR,seqY))
-    Calls<-I>Dmin    
+    Calls<-I>Dmin
   }
   else if(method=="absolute")
   {
     Calls<-I>cutoff
+  }
+  
+  if(group && nlevels(group)>1 && freq)
+  {
+	  group<-as.factor(pData(peptideSet)$treatment)[t1]
+	  freq<-as.data.frame(sapply(levels(group),function(x,Calls,group){rowMeans(Calls[,group==x])},Calls,group))
+	  names(freq)<-levels(group)
+	  return(freq)
+  }
+  else if(freq)
+  {
+	  return(rowMeans(Calls))
   }
   Calls
 }
