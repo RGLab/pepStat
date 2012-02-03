@@ -1,5 +1,6 @@
-makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"),bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
+makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"),bgCorrect.method="normexp", log=TRUE, verbose=FALSE,annotation.file=NULL)
 {
+	anno<-read.csv(annotation.file)
 	# There is some ambiguity with respect to what is Name and ID
 	# ID -> peptide
 	# Name -> annotation
