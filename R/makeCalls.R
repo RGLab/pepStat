@@ -1,65 +1,19 @@
-makeCalls<-function(peptideSet, pos=NULL, cName=NULL, cutoff=.1, verbose=FALSE, method="local",paired=FALSE)
+makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE, verbose=FALSE)
 {
   if(class(peptideSet)!="peptideSet")
   {
     stop("peptideSet must be an object of class peptideSet")
   }
-  if(preproc(peptideSet@experimentData)$transformation!="log" & preproc(peptideSet@experimentData)$transformation!="vsn")
+  if(preproc(peptideSet@experimentData)$transformation!="log")
   {
-    stop("The probe measurements need to be log/vsn transformed!")
+    warning("The probe measurements should be log transformed!")
   }
   if(preproc(peptideSet@experimentData)$normalization=="none")
   {
     warning("You should probably normalize your data before using this function")
   }
   
-  #whether the Control array is available
-  y<-exprs(peptideSet)
-  
-  if(!is.null(cName))
-  {
-    sNames<-sampleNames(peptideSet)
-    if(length(grep(cName,sNames))==0)
-    {
-      stop("The variable 'cName' must be a subset of the control sample name")
-    }
-    if(verbose)
-    {
-      cat("You are using: ",sNames[grep(cName,sNames)], " as the control\n" )
-    }
-    if(!paired)
-    {
-      C<-rowMeans(as.matrix(y[,grep(cName,sNames)]))
-    }
-    else
-    {
-      C<-as.matrix(y[,grep(cName,sNames)])
-    }
-    I<-as.matrix(y[,-grep(cName,sNames)])-C
-  }
-  else
-  {
-    I<-as.matrix(y)
-  }
-
-#browser()
-  if(is.null(pos))
-  {
-    nProbes<-nrow(I)
-    position<-1:nProbes
-  }
-  else
-  {
-	  #TODO:remove pos from argument list ?
-#    pos<-pos[!duplicated(pos),]
-#    match.seq<-match(peptide(peptideSet),pos$Sequence)
-#    position<-pos$Position[match.seq]
-#    df<-as.data.frame(I)
-#  	tmp<-split(df,as.factor(position))
-#    I<-t(sapply(tmp,function(x){apply(x,2,"mean")}))
-#    position<-sapply(split(position,as.factor(position)),unique)
-  }
-
+  I<-.bgCorrect.pSet(peptideSet,verbose=verbose)
   
   if(method=="local")
   {
@@ -71,11 +25,23 @@ makeCalls<-function(peptideSet, pos=NULL, cName=NULL, cutoff=.1, verbose=FALSE, 
     FDR<-sapply(seqY,function(x,I){sum(I< -x)/sum(I>x)},as.double(I))
     Dmin<-seqY[which.min(abs(FDR-cutoff))]
     # print(cbind(FDR,seqY))
-    Calls<-I>Dmin    
+    Calls<-I>Dmin
   }
   else if(method=="absolute")
   {
     Calls<-I>cutoff
+  }
+  
+  if(group && nlevels(group)>1 && freq)
+  {
+	  group<-as.factor(pData(peptideSet)$treatment)[t1]
+	  freq<-as.data.frame(sapply(levels(group),function(x,Calls,group){rowMeans(Calls[,group==x])},Calls,group))
+	  names(freq)<-levels(group)
+	  return(freq)
+  }
+  else if(freq)
+  {
+	  return(rowMeans(Calls))
   }
   Calls
 }

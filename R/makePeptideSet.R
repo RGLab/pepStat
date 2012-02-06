@@ -1,4 +1,4 @@
-makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"),bgCorrect.method="normexp", log=TRUE, verbose=FALSE,annotation.file=NULL)
+makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
 {
 	anno<-read.csv(annotation.file)
 	# There is some ambiguity with respect to what is Name and ID
@@ -12,10 +12,13 @@ makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=
 
 	myDesc <- new("MIAME")
 
+	## Put NA instead of flags
 	if(use.flags)
 	{
 		RG$E[RG$weights==0]<-NA
 	}
+	
+	## Fill in the details of the preprocessing
 	if(log)
 	{
 		RG$E<-log2(RG$E)
@@ -25,6 +28,9 @@ makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=
 	{
 		preproc(myDesc)<-list(transformation="none", normalization="none")
 	}
+    preproc(myDesc)$bgCorrect.method<-bgCorrect.method
+    preproc(myDesc)$norm.empty<-norm.empty
+
 
 	if(norm.empty)
 	{
@@ -53,7 +59,7 @@ makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=
 	featureID<-as.character(RG$genes$Name)[ind.keep]
 	nPep<-length(which(ind.keep))
 	#browser()
-	new('peptideSet'
+	pSet<-new('peptideSet'
 	,featureRange=RangedData(IRanges(rep(0,nPep),rep(0,nPep))
 	,featureID
 	,peptide=featureSequence
@@ -61,6 +67,17 @@ makePeptideSet<-function(files=NULL, path=NULL, use.flags=TRUE, rm.control.list=
 	,exprs=as.matrix(RG$E-mean.empty)[ind.keep,]
 	,experimentData=myDesc
 	)
-			
+	
+	## Check if there is a mapping file
+	## TODO Add some checks to see if the mapping
+	if(!is.null(mapping.file))
+	{
+		if(is.character(mapping.file))
+		{
+			mapping.file<-read.csv(mapping.file)
+		}
+		pData(pSet)<-mapping.file[match(sampleNames(pSet),mapping$filename),]
+	}
+	return(pSet)
 }
 

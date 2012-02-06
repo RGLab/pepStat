@@ -64,19 +64,11 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 	noMatch<-which(!featureSequence%in%rownames(position))
 	if(length(noMatch)>0)
 	{
-		message(featureSequence[noMatch]," have no position provided and are removed from the peptideSet!")
+		message("Some peptides have no match in the RangedData object and are removed from the peptideSet!")
 	}
 
   }
-  
-#  if(!is.null(annotation))
-#  {
-#    annotation<-annotation[!duplicated(as.character(annotation$Sequence)),]
-#    match.seq<-match(newSet@featureSequence,annotation$Sequence)
-#    annotation<-annotation[match.seq,]
-#    newSet@featureAnnotation<-annotation
-#  }
-
-#	newSet[is.finite(newSet@featurePosition),]
+  pData(newSet)<-pData(peptideSet)
+  preproc(newSet)$summary<-summary
 	newSet
 }

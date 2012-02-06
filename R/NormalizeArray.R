@@ -132,7 +132,7 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
   }
   colnames(exprs(peptideSet))<-sampleNames(peptideSet)
   ### Setting the normalization parameters
-  normalization<-"SeqBinned"
+  normalization<-"Z-scale"
   if(robust)
   {
     normalization<-paste(normalization, "robust",sep=" ")
