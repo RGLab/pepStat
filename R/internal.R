@@ -19,22 +19,30 @@
     t0<-grepl("[Pp][Rr][Ee]",pData(pSet)$visit)
     t1<-grepl("[Pp][Oo][Ss][Tt]",pData(pSet)$visit)
     ### Paired
-    if(all.equal(sort(ptid[t0]),sort(ptid[t1])))
-    {
-  	  if(verbose)
-  	  {
-  	  	cat("You have paired PRE/POST samples\n")
-  	  }
-  	  I<-as.matrix(y[,t1])-as.matrix(y[,t0])
-    }
-    else
-    {
-  	  if(verbose)
-  	  {
-  	  	cat("You don't have paired PRE/POST samples\n")
-  	  }	  
-  	  I<-as.matrix(y[,t1])-as.matrix(rowMeans(y[,t0]))  	
-    }
+#	browser()
+	if(length(ptid[t0])==0||length(ptid[t1])==0)
+	{
+		I<-as.matrix(y[,t1])
+		
+	}else
+	{
+		if(all.equal(sort(ptid[t0]),sort(ptid[t1])))
+		{
+			if(verbose)
+			{
+				cat("You have paired PRE/POST samples\n")
+			}
+			I<-as.matrix(y[,t1])-as.matrix(y[,t0])
+		}
+		else
+		{
+			if(verbose)
+			{
+				cat("You don't have paired PRE/POST samples\n")
+			}	  
+			I<-as.matrix(y[,t1])-as.matrix(rowMeans(y[,t0]))  	
+		}
+	}
 	colnames(I)<-ptid[t1]
     rownames(I)<-peptide(pSet)
 	I	
