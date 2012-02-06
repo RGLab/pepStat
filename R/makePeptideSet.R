@@ -1,6 +1,5 @@
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
 {
-	anno<-read.csv(annotation.file)
 	# There is some ambiguity with respect to what is Name and ID
 	# ID -> peptide
 	# Name -> annotation
@@ -70,13 +69,14 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRU
 	
 	## Check if there is a mapping file
 	## TODO Add some checks to see if the mapping
+#	browser()
 	if(!is.null(mapping.file))
 	{
 		if(is.character(mapping.file))
 		{
-			mapping.file<-read.csv(mapping.file)
+			mapping.file<-read.csv(mapping.file,row.names="filename")
 		}
-		pData(pSet)<-mapping.file[match(sampleNames(pSet),mapping$filename),]
+		pData(pSet)<-mapping.file[match(sampleNames(pSet),rownames(mapping.file)),]
 	}
 	return(pSet)
 }
