@@ -43,6 +43,7 @@ setMethod("[","peptideSet",
 							,exprs=as.matrix(sdata)
 							,featureRange=featureRange
 							,experimentData=x@experimentData)
+			pData(newSet)<-pData(x)[j,]
 			sampleNames(newSet)<-sampleNames(x)[j]
 		    newSet
 			

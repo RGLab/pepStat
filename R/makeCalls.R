@@ -13,57 +13,7 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE
     warning("You should probably normalize your data before using this function")
   }
   
-  y<-exprs(peptideSet)
-  
-  # if(!is.null(cName))
-  # {
-  #   sNames<-sampleNames(peptideSet)
-  #   if(length(grep(cName,sNames))==0)
-  #   {
-  #     stop("The variable 'cName' must be a subset of the control sample name")
-  #   }
-  #   if(verbose)
-  #   {
-  #     cat("You are using: ",sNames[grep(cName,sNames)], " as the control\n" )
-  #   }
-  #   if(!paired)
-  #   {
-  #     C<-rowMeans(as.matrix(y[,grep(cName,sNames)]))
-  #   }
-  #   else
-  #   {
-  #     C<-as.matrix(y[,grep(cName,sNames)])
-  #   }
-  #   I<-as.matrix(y[,-grep(cName,sNames)])-C
-  # }
-  # else
-  # {
-  #   I<-as.matrix(y)
-  # }
-  
-  ptid<-pData(peptideSet)$ptid
-  t0<-grepl("[Pp][Rr][Ee]",pData(peptideSet)$visit)
-  t1<-grepl("[Pp][Oo][Ss][Tt]",pData(peptideSet)$visit)
-  ### Paired
-  if(all.equal(sort(ptid[t0]),sort(ptid[t1])))
-  {
-	  if(verbose)
-	  {
-	  	cat("You have paired PRE/POST samples\n")
-	  }
-	  I<-as.matrix(y[,t1])-as.matrix(y[,t0])
-  }
-  else
-  {
-	  if(verbose)
-	  {
-	  	cat("You don't have paired PRE/POST samples\n")
-	  }	  
-	  I<-as.matrix(y[,t1])-as.matrix(rowMeans(y[,t0]))  	
-  }
-  
-  colnames(I)<-ptid[t1]
-  rownames(I)<-peptide(peptideSet)
+  I<-.bgCorrect.pSet(peptideSet,verbose=verbose)
   
   if(method=="local")
   {
