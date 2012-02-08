@@ -52,11 +52,11 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=NULL
 					rowMeans(curCall)
 				})
 	
-	  return(res)
+	  return(res*100)
   }
   else if(freq)
   {
-	  return(rowMeans(Calls))
+	  return(rowMeans(Calls)*100)
   }
   Calls
 }
