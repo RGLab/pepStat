@@ -26,7 +26,7 @@
 		
 	}else
 	{
-		if(all.equal(sort(ptid[t0]),sort(ptid[t1])))
+		if(isTRUE(all.equal(sort(ptid[t0]),sort(ptid[t1]))))
 		{
 			if(verbose)
 			{
@@ -40,7 +40,7 @@
 			{
 				cat("You don't have paired PRE/POST samples\n")
 			}	  
-			I<-as.matrix(y[,t1])-as.matrix(rowMeans(y[,t0]))  	
+			I<-as.matrix(y[,t1])-rowMeans(y[,t0])#the vector to be subtracted from matrix need to be the same length as nrow of the matrix  	
 		}
 	}
 	colnames(I)<-ptid[t1]

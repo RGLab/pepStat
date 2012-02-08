@@ -1,4 +1,4 @@
-makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE, verbose=FALSE)
+makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=NULL, verbose=FALSE)
 {
   if(class(peptideSet)!="peptideSet")
   {
@@ -31,13 +31,28 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE
   {
     Calls<-I>cutoff
   }
+  	  
+#  browser()
   
-  if(group && nlevels(group)>1 && freq)
+  if(!is.null(group)&& freq) 
   {
-	  group<-as.factor(pData(peptideSet)$treatment)[t1]
-	  freq<-as.data.frame(sapply(levels(group),function(x,Calls,group){rowMeans(Calls[,group==x])},Calls,group))
-	  names(freq)<-levels(group)
-	  return(freq)
+	  	#parse the grouping variable 
+		groupBy<-.parseCond(group)
+		pd<-pData(peptideSet)
+		#generate the factor list based on multipe grouping vairable
+		factors<-lapply(groupBy,function(x){
+					eval(substitute(pd$v,list(v=x)))
+				})
+		#split the ptid into groups
+		ptidGroups<-split(pd$ptid,factors)
+		#apply the rowMeans to each group
+		res<-lapply(ptidGroups,function(curPtid){
+#					browser()
+					curCall<-Calls[,curPtid]
+					rowMeans(curCall)
+				})
+	
+	  return(res)
   }
   else if(freq)
   {
@@ -46,8 +61,24 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=TRUE
   Calls
 }
 
+.parseCond <-
+		function(model)
+{
+	## WAS: model <- eval(parse(text = paste("~", deparse(model))))[[2]]
+	## but that's not good (PR#7395)
+	model <- substitute(~m, list(m = model))[[2]]
+	model.vars <- list()
+	while (length(model) == 3 && (model[[1]] == as.name("*")
+				|| model[[1]] == as.name("+"))) {
+		model.vars <- c(model.vars, model[[3]])
+		model <- model[[2]]
+	}
+	rev(c(model.vars, model))
+}
+
 .findFDR<-function(I,cutoff,position)
 {
+#	browser()
   seqY<-seq(range(abs(I))[1],range(abs(I))[2],.1)
   tmp<-split(as.data.frame(I),position)
   D<-unlist(sapply(tmp,function(x){rep(apply(x,2,mean),nrow(x))}))
