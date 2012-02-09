@@ -1,0 +1,309 @@
+\documentclass[letter]{article}
+
+%% Set some options
+%% Set the figure width
+\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.9\textwidth,fig.align=center}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{endfloat}
+
+<<set-data-path,cache=FALSE,echo=TRUE>>=
+source("./options.R")
+@
+
+\title{Analysis report\\ \Sexpr{reportName}} 
+\author{Raphael Gottardo}
+\begin{document}
+
+\maketitle
+
+
+% opts_knit$set(progress = TRUE, verbose = FALSE)
+
+<<Load-all-necessary-packages,cache=FALSE>>=
+# Here I assume that all the objects are store in a proper database
+library(xtable)
+library(pepStat)
+library(pepViz)
+library(HIV.db)
+data(pep_hxb2)
+library(lattice)
+library(RColorBrewer)
+library(reshape2)
+@
+
+<<set-general-options,cache=FALSE>>=
+sizeAnno<-2
+sizeTrack<-8
+trackGapAnno<-.5
+colorAnno<-brewer.pal(9, "Pastel1")
+colorTrack<-brewer.pal(8, "Set2")
+@
+
+<<DataDB,cache=TRUE>>=
+## Read mapping file
+mapping<-paste(path,"mapping.csv",sep="")
+## Raw data (no background subtraction)
+pSetRaw<-makePeptideSet(files=NULL,path=pathData,mapping.file=mapping,log=TRUE,bgCorrect.method="none",norm.empty=FALSE)
+## Read mapping file
+psSetRaw<-summarizePeptides(pSetRaw,summary="median",position=pep_hxb2)
+## All analysis
+pSet<-makePeptideSet(files=NULL,path=pathData,mapping.file=mapping,log=TRUE,norm.empty=TRUE)
+psSet<-summarizePeptides(pSet,summary="median",position=pep_hxb2)
+pnSet<-NormalizeArray(psSet, robust=TRUE, standard=FALSE, method="Zpep")
+pnmSet<-slidingMean(pnSet, width=width)
+freq<-makeCalls(pnmSet,cutoff=call.cutoff, method="absolute")
+hotspots<-reduce(ranges(pnmSet)[freq>hotspot.cutoff,])
+## Clade specific frequencies and calls
+pnSet.clade<-split(pnSet,clade(pnSet))
+## I break it down by control clade
+pnmSet.clade<-lapply(pnSet.clade,slidingMean,width=width)
+freq.clade<-lapply(pnmSet.clade,makeCalls,cutoff=call.cutoff,method="absolute")
+@
+
+
+\section{Quality Assessment}
+\subsection{Spot saturation}
+In this section, we look at the number of saturated spots across samples and peptides. A spot is saturated if its have a foreground intensity equal to 65535 ($2^{16}$-1). 65535 is the maximum value that can be recorded in a 16 bit image. So if a spot has an intensity equal to 65535, all pixels within the spot are saturated and the resulting estimated peptide intensity is likely upper censored. 
+Figure \ref{fig:SaturationHXB2} shows the percentage of saturated peptides by visit (Pre/Post) vs. HXB2 positions. Table \ref{tab:SatPeptides} gives the list of saturated peptides with the proportion of saturation while \ref{tab:SatSamples} gives the list of samples with at least one saturated peptide.
+
+<<Frequency-of-saturation,dependson=DataDB>>=
+psSetRaw.clade<-split(psSetRaw,clade(psSetRaw))
+# I break it down by control group
+ind<-grepl("[Pp][Rr][Ee]",pData(psSetRaw)$visit)
+freq.sat.clade.cont<-lapply(psSetRaw.clade,function(x,ind){x<-x[,ind];apply(exprs(x),1,function(x)mean(x==16))}*100,ind)
+freq.sat.clade<-lapply(psSetRaw.clade,function(x,ind){x<-x[,ind];apply(exprs(x),1,function(x)mean(x==16))}*100,!ind)
+@
+
+<<Plotting-tracks>>=
+HIV_db<-loadFeatures()
+envBase<-getFeature(HIV_db,name=c("env"))##get feature by name
+envStart<-start(envBase)
+envEnd<-end(envBase)
+
+#make a track for AA seqence
+AA_anno<-makePepAxis(envBase,addNC=TRUE,littleTicks=F,dp = DisplayPars(cex=.7))
+AA_anno2<-makePepAxis(envBase,addNC=FALSE,littleTicks=F,dp = DisplayPars(cex=.7,showSeq=FALSE))
+
+proteins<-getFeature(HIV_db,category="protein",start=envStart,end=envEnd,frame=getFrame(envBase))
+pro_anno<-makeGenericAnno(proteins,envStart,dp=DisplayPars(color=colorAnno[1],fill=colorAnno[1], alpha=.5, idRotation=0, idCex=.85, showID = TRUE, size=sizeAnno, lwd=2))
+
+landmarks<-getFeature(HIV_db,name=c("V1","V2","V3","V4","V5","ID","MPER"))
+landmarks_anno<-makeGenericAnno(landmarks,envStart,dp=DisplayPars(color=colorAnno[2],fill=colorAnno[2], alpha=.5, idRotation=0, idCex=.65, showID = TRUE, size=sizeAnno, lwd=2))
+@
+
+\begin{figure}
+<<SaturationHXb2, fig.keep=high, fig.width=10, fig.height=8, cache=FALSE,background=1;1;1>>=
+data.list<-lapply(1:7,function(i,x1,x2,y,dp,size,color,treatmentNames){mat<-cbind(x1[[i]],x2[[i]]);colnames(mat)<-treatmentNames;makeGenericArray(mat,probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[1:2], type="line",lwd=2,cex=.2,axisCex=.7,isLegend=TRUE))},x1=freq.sat.clade.cont,x2=freq.sat.clade,y=psSetRaw.clade, size=sizeTrack, color = colorTrack,treatmentNames=c("Pre","Post"))
+
+all.plot<-vector("list",14)
+all.plot[seq(1,14,2)]<-data.list
+all.plot[seq(2,14,2)]<-AA_anno2
+names(all.plot)<-rep("",14)
+names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
+
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=857
+, labelRot=0
+, labelCex=.8
+)
+@
+\caption{Percentage of saturated spots by visit (Pre/Post) as a function of HXB2.}
+\label{fig:SaturationHXB2}
+\end{figure}
+
+<<Frequency-of-saturation-per-peptide, dependson=DataDB>>=
+ind<-grepl("[Pp][Rr][Ee]",pData(psSetRaw)$visit)
+freq.sat.cont<-rowMeans(exprs(psSetRaw)[,ind]==16)*100
+freq.sat<-rowMeans(exprs(psSetRaw)[,!ind]==16)*100
+table<-data.frame(peptide(psSetRaw),freq.sat.cont,freq.sat,position(psSetRaw),ranges(psSetRaw)$annotation)[freq.sat>5,]
+# table<-table[order(freq.sat,decreasing=TRUE),]
+table<-table[1:min(nrow(table),20),]
+names(table)<-c("Peptide",paste("% Sat."," (Pre)",sep=""),paste("% Sat."," (Post)",sep=""),"HXB2 pos.","Annotation")
+rownames(table)<-NULL
+@
+
+
+<<Table-of-saturation-by-peptides, results=tex, echo=FALSE, cache=FALSE>>=
+print(xtable(table,digits=c(0,0,1,1,0,0),caption="Percentage of saturated spots across samples by peptide and visit group, only peptides with 5 percent saturation are shown.",label="tab:SatPeptides"))
+@
+
+<<Frequency-of-saturation-per-sample, dependson=DataDB>>=
+freq.sat<-rowMeans(t(exprs(psSetRaw))==16)*100
+table<-data.frame(sampleNames(psSetRaw),freq.sat)[freq.sat>1,]
+if(nrow(table)==0)
+  {
+  table[1,]<-c(NA,NA)
+  }
+# table<-table[order(-table[,2]),]
+names(table)<-c("Sample","% Sat.")
+rownames(table)<-NULL
+@
+
+<<Table-of-saturation-by-samples, results=tex, cache=FALSE>>=
+print(xtable(table,digits=c(0,0,2),caption="Percentage of saturated peptides across samples, only sample with 1 percent saturation across all peptides are shown.",label="tab:SatSamples"))
+@
+
+\subsection{Intensity distribution before and after normalization}
+Figure \ref{fig:boxplotunnormalized} shows boxplots of raw intensities accross ptids and visit groups.
+Figure \ref{fig:boxplotnormalized} shows boxplots of normalized intensities accross ptids and visit groups.
+
+\begin{figure}
+<<BoxplotUnnormalized, fig.keep=high, dependson=DataDB>>=
+y.long.raw<-pepStat:::.reshape.pSet(psSetRaw)
+# ## If more than 16, just look at 16
+palette<-brewer.pal(7,"Set3")
+## If more than 20, just look at 16
+par <- trellis.par.get("box.dot")
+par$pch <- 19
+par$cex <- .3
+par$alpha <- .5
+trellis.par.set("box.dot", par)
+par <- trellis.par.get("box.rectangle")
+par$lwd<-1.5
+trellis.par.set("box.rectangle", par)
+par <- trellis.par.get("plot.symbol")
+par$pch <- 19
+par$cex <- .3
+par$alpha <- .5
+trellis.par.set("plot.symbol", par)
+par <- trellis.par.get("strip.background")
+par$col <- brewer.pal(7,"Greys")
+par$alpha=.9
+trellis.par.set("strip.background", par)
+u.ptid<-unique(y.long.raw$ptid)
+bwplot(Intensity ~ visit | ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long.raw[y.long.raw$ptid%in%u.ptid[1:min(16,length(u.ptid))],])
+@
+\caption{\label{fig:boxplotunnormalized}Boxplots of un-normalized intensities accross ptids and visit groups. Only the first 16 ptids are shown for clarity.}
+\end{figure}
+
+
+\begin{figure}
+<<BoxplotNormalized, fig.keep=high, dependson=DataDB>>=
+y.long<-pepStat:::.reshape.pSet(pnSet)
+palette<-brewer.pal(7,"Set3")
+## If more than 20, just look at 16
+par <- trellis.par.get("box.dot")
+par$pch <- 19
+par$cex <- .3
+par$alpha <- .5
+trellis.par.set("box.dot", par)
+par <- trellis.par.get("box.rectangle")
+par$lwd<-1.5
+trellis.par.set("box.rectangle", par)
+par <- trellis.par.get("plot.symbol")
+par$pch <- 19
+par$cex <- .3
+par$alpha <- .5
+trellis.par.set("plot.symbol", par)
+par <- trellis.par.get("strip.background")
+par$col <- brewer.pal(7,"Greys")
+par$alpha=.9
+trellis.par.set("strip.background", par)
+
+bwplot(Intensity ~ visit | ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette,pch="|",data=y.long[y.long$ptid%in%u.ptid[1:min(16,length(u.ptid))],])
+@
+\caption{\label{fig:boxplotnormalized}Boxplots of normalized intensities accross ptids and visit groups. Only the first 16 ptids are shown for clarity.}
+\end{figure}
+
+\section{Statistical analysis}
+\subsection{Agreggate response across subtypes}
+The aggregate response accross all 7 subtypes is given by Figure \ref{fig:ResponseHXB2}. Using this \Sexpr{nrow(hotspots)} hotspots are detected with frequency above \Sexpr{hotspot.cutoff}\%. The \Sexpr{nrow(hotspots)} hotspots with frequency above \Sexpr{hotspot.cutoff} are summarized in table \ref{tab:hotspots}.
+
+<<hotspots, echo=FALSE, results=tex, cache=FALSE>>=
+table<-data.frame(start=start(hotspots),end=end(hotspots))
+caption<-paste("HxB2 positions of the", nrow(hotspots), "hotspot regions with frequency above",hotspot.cutoff)
+print(xtable(table,digits=c(1,1,1),caption=caption,label="tab:hotspots"))
+@
+
+
+\begin{figure}
+<<ResponseHXB2, fig.keep=high, fig.width=10, fig.height=8, dependson=DataDB>>=
+freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pnSet),dp=DisplayPars(size=sizeTrack, color = colorTrack[1], type="line",lwd=2,cex=.2,axisCex=.7))
+all.plot<-vector("list",2)
+all.plot[1]<-freq.track
+all.plot[2]<-AA_anno2
+names(all.plot)[1:2]<-c("% responders","")
+hotspots.highlight<-makeRectangleOverlay(start = start(hotspots), end = end(hotspots), region=c(1,5), dp = DisplayPars(color = "#FFFFBF90",alpha = 0.2))
+
+  
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=857
+, labelRot=0
+, labelCex=.8
+, highlightRegions=hotspots.highlight
+)
+@
+\caption{Aggregate response rate (\% Responders) and subject expression values vs. peptide HXB2 positions. Hotspot regions are highlighted in light yellow.}
+\label{fig:ResponseHXB2}
+\end{figure}
+
+
+\subsection{Subtype specific responses}
+The subtype specific responses accross all 7 subtypes are displayed in Figure \ref{fig:SubtypeResponseHXB2}.
+
+<<Subtype-specific-response-rate, dependson=DataDB>>=
+pnSet.clade<-split(pnSet,clade(pnSet))
+# I break it down by control group
+pnmSet.clade<-lapply(pnSet.clade,slidingMean,width=9)
+freq.clade<-lapply(pnmSet.clade,makeCalls,cutoff=call.cutoff,method="absolute")
+@
+
+
+\begin{figure}
+<<ResponseSubtypeHXB2, fig.keep=high, fig.width=10, fig.height=8, cache=FALSE>>=
+data.list<-lapply(1:7,function(i,x,y,dp,size,color,treatmentNames){makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[i], type="line",lwd=2,cex=.2,axisCex=.7))},x=freq.clade,y=pnSet.clade, size=sizeTrack, color = colorTrack)
+
+all.plot<-vector("list",14)
+all.plot[seq(1,14,2)]<-data.list
+all.plot[seq(2,14,2)]<-AA_anno2
+names(all.plot)<-rep("",14)
+names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
+
+pdPlot(c(
+  "HXB2"=AA_anno
+  ,"Protein"=pro_anno
+  ,"Landmarks"=landmarks_anno
+   ,all.plot
+  )
+, minBase=1
+, maxBase=857
+, labelRot=0
+, labelCex=.8
+)
+@
+\caption{Subtype specific response rate (\% Responders) vs. peptide HXB2 positions.}
+\label{fig:SubtypeResponseHXB2}
+\end{figure}
+
+\section{R and package version}
+You are using the following version of R and packages:
+<<Rsession,echo=TRUE,cache=FALSE>>=
+sessionInfo()
+@
+\noindent with the following data:
+<<Data-used,cache=FALSE,echo=TRUE>>=
+path<-"~/Dropbox/Work/PeptideArray/Vax003/"
+head(pData(pSet))
+@
+\noindent and the following analysis options:
+<<General-options,cache=FALSE,echo=TRUE>>=
+width
+call.cutoff
+hotspot.cutoff
+levels(pData(pSet)$treatment)
+@
+
+\end{document}
