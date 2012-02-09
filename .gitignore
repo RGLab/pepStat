@@ -6,3 +6,4 @@ src/Inference.o
 src/Makevars
 src/NormalizeProbes.o
 src/pepStat.so
+.DS_Store
