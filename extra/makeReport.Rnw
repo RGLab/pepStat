@@ -2,12 +2,13 @@
 
 %% Set some options
 %% Set the figure width
-\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.9\textwidth,fig.align=center}
+\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.85\textwidth,fig.align=center}
 
 \usepackage[margin=1in]{geometry}
 \usepackage{endfloat}
+\usepackage{comment}
 
-<<set-data-path,cache=FALSE,echo=TRUE>>=
+<<set-data-path,cache=FALSE,echo=FALSE>>=
 source("./options.R")
 @
 
@@ -16,7 +17,6 @@ source("./options.R")
 \begin{document}
 
 \maketitle
-
 
 % opts_knit$set(progress = TRUE, verbose = FALSE)
 
@@ -30,6 +30,7 @@ data(pep_hxb2)
 library(lattice)
 library(RColorBrewer)
 library(reshape2)
+library(imputation)
 @
 
 <<set-general-options,cache=FALSE>>=
@@ -62,10 +63,11 @@ freq.clade<-lapply(pnmSet.clade,makeCalls,cutoff=call.cutoff,method="absolute")
 @
 
 
+
 \section{Quality Assessment}
 \subsection{Spot saturation}
-In this section, we look at the number of saturated spots across samples and peptides. A spot is saturated if its have a foreground intensity equal to 65535 ($2^{16}$-1). 65535 is the maximum value that can be recorded in a 16 bit image. So if a spot has an intensity equal to 65535, all pixels within the spot are saturated and the resulting estimated peptide intensity is likely upper censored. 
-Figure \ref{fig:SaturationHXB2} shows the percentage of saturated peptides by visit (Pre/Post) vs. HXB2 positions. Table \ref{tab:SatPeptides} gives the list of saturated peptides with the proportion of saturation while \ref{tab:SatSamples} gives the list of samples with at least one saturated peptide.
+In this section, we look at the number of saturated spots across samples and peptides. A spot is saturated if it has a foreground intensity equal to 65535 ($2^{16}$-1). 65535 is the maximum value that can be recorded in a 16 bit image. So if a spot has an intensity equal to 65535, all pixels within the spot are saturated and the resulting estimated peptide intensity is right censored. 
+Figure \ref{fig:SaturationHXB2} shows the percentage of saturated peptides vs. HXB2 positions group by visit (Pre/Post). Table \ref{tab:SatPeptides} gives the list of saturated peptides with their proportions of saturation while Table \ref{tab:SatSamples} gives the list of samples with at least 1\% of saturated peptide.
 
 <<Frequency-of-saturation,dependson=DataDB>>=
 psSetRaw.clade<-split(psSetRaw,clade(psSetRaw))
@@ -82,37 +84,21 @@ envStart<-start(envBase)
 envEnd<-end(envBase)
 
 #make a track for AA seqence
-AA_anno<-makePepAxis(envBase,addNC=TRUE,littleTicks=F,dp = DisplayPars(cex=.7))
-AA_anno2<-makePepAxis(envBase,addNC=FALSE,littleTicks=F,dp = DisplayPars(cex=.7,showSeq=FALSE))
+AA_anno<-makePepAxis(envBase,addNC=TRUE,littleTicks=T,dp = DisplayPars(cex=.7))
 
 proteins<-getFeature(HIV_db,category="protein",start=envStart,end=envEnd,frame=getFrame(envBase))
 pro_anno<-makeGenericAnno(proteins,envStart,dp=DisplayPars(color=colorAnno[1],fill=colorAnno[1], alpha=.5, idRotation=0, idCex=.85, showID = TRUE, size=sizeAnno, lwd=2))
 
 landmarks<-getFeature(HIV_db,name=c("V1","V2","V3","V4","V5","ID","MPER"))
 landmarks_anno<-makeGenericAnno(landmarks,envStart,dp=DisplayPars(color=colorAnno[2],fill=colorAnno[2], alpha=.5, idRotation=0, idCex=.65, showID = TRUE, size=sizeAnno, lwd=2))
+anno.list<-list(HXB2=AA_anno,Proteins=pro_anno,Landmarks=landmarks_anno)
 @
 
 \begin{figure}
-<<SaturationHXb2, fig.keep=high, fig.width=10, fig.height=8, cache=FALSE,background=1;1;1>>=
-data.list<-lapply(1:7,function(i,x1,x2,y,dp,size,color,treatmentNames){mat<-cbind(x1[[i]],x2[[i]]);colnames(mat)<-treatmentNames;makeGenericArray(mat,probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[1:2], type="line",lwd=2,cex=.2,axisCex=.7,isLegend=TRUE))},x1=freq.sat.clade.cont,x2=freq.sat.clade,y=psSetRaw.clade, size=sizeTrack, color = colorTrack,treatmentNames=c("Pre","Post"))
+<<SaturationHXb2, fig.keep=high, cache=FALSE>>=
+data.list<-sapply(1:7,function(i,x,y){m<-cbind(x[[i]],y[[i]]);colnames(m)<-c("Pre","Post");m},freq.sat.clade.cont,freq.sat.clade)
 
-all.plot<-vector("list",14)
-all.plot[seq(1,14,2)]<-data.list
-all.plot[seq(2,14,2)]<-AA_anno2
-names(all.plot)<-rep("",14)
-names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
-
-pdPlot(c(
-  "HXB2"=AA_anno
-  ,"Protein"=pro_anno
-  ,"Landmarks"=landmarks_anno
-   ,all.plot
-  )
-, minBase=1
-, maxBase=857
-, labelRot=0
-, labelCex=.8
-)
+pepStat:::.plot.clade(psSetRaw.clade,data.list,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
 @
 \caption{Percentage of saturated spots by visit (Pre/Post) as a function of HXB2.}
 \label{fig:SaturationHXB2}
@@ -163,7 +149,7 @@ palette<-brewer.pal(7,"Set3")
 par <- trellis.par.get("box.dot")
 par$pch <- 19
 par$cex <- .3
-par$alpha <- .5
+par$alpha <- .2
 trellis.par.set("box.dot", par)
 par <- trellis.par.get("box.rectangle")
 par$lwd<-1.5
@@ -171,7 +157,7 @@ trellis.par.set("box.rectangle", par)
 par <- trellis.par.get("plot.symbol")
 par$pch <- 19
 par$cex <- .3
-par$alpha <- .5
+par$alpha <- .2
 trellis.par.set("plot.symbol", par)
 par <- trellis.par.get("strip.background")
 par$col <- brewer.pal(7,"Greys")
@@ -192,7 +178,7 @@ palette<-brewer.pal(7,"Set3")
 par <- trellis.par.get("box.dot")
 par$pch <- 19
 par$cex <- .3
-par$alpha <- .5
+par$alpha <- .2
 trellis.par.set("box.dot", par)
 par <- trellis.par.get("box.rectangle")
 par$lwd<-1.5
@@ -200,7 +186,7 @@ trellis.par.set("box.rectangle", par)
 par <- trellis.par.get("plot.symbol")
 par$pch <- 19
 par$cex <- .3
-par$alpha <- .5
+par$alpha <- .2
 trellis.par.set("plot.symbol", par)
 par <- trellis.par.get("strip.background")
 par$col <- brewer.pal(7,"Greys")
@@ -214,37 +200,18 @@ bwplot(Intensity ~ visit | ptid, groups=visit, panel = panel.superpose, panel.gr
 
 \section{Statistical analysis}
 \subsection{Agreggate response across subtypes}
-The aggregate response accross all 7 subtypes is given by Figure \ref{fig:ResponseHXB2}. Using this \Sexpr{nrow(hotspots)} hotspots are detected with frequency above \Sexpr{hotspot.cutoff}\%. The \Sexpr{nrow(hotspots)} hotspots with frequency above \Sexpr{hotspot.cutoff} are summarized in table \ref{tab:hotspots}.
+The aggregate response accross all 7 subtypes is given by Figure \ref{fig:ResponseHXB2}. Using this, \Sexpr{nrow(hotspots)} hotspots are detected with frequency above \Sexpr{hotspot.cutoff}\%. The \Sexpr{nrow(hotspots)} hotspots are summarized in table \ref{tab:hotspots}.
 
 <<hotspots, echo=FALSE, results=tex, cache=FALSE>>=
 table<-data.frame(start=start(hotspots),end=end(hotspots))
-caption<-paste("HxB2 positions of the", nrow(hotspots), "hotspot regions with frequency above",hotspot.cutoff)
+caption<-paste("HxB2 positions of the", nrow(hotspots), "hotspot regions with frequency above",hotspot.cutoff,"percent.")
 print(xtable(table,digits=c(1,1,1),caption=caption,label="tab:hotspots"))
 @
 
 
 \begin{figure}
-<<ResponseHXB2, fig.keep=high, fig.width=10, fig.height=8, dependson=DataDB>>=
-freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pnSet),dp=DisplayPars(size=sizeTrack, color = colorTrack[1], type="line",lwd=2,cex=.2,axisCex=.7))
-all.plot<-vector("list",2)
-all.plot[1]<-freq.track
-all.plot[2]<-AA_anno2
-names(all.plot)[1:2]<-c("% responders","")
-hotspots.highlight<-makeRectangleOverlay(start = start(hotspots), end = end(hotspots), region=c(1,5), dp = DisplayPars(color = "#FFFFBF90",alpha = 0.2))
-
-  
-pdPlot(c(
-  "HXB2"=AA_anno
-  ,"Protein"=pro_anno
-  ,"Landmarks"=landmarks_anno
-   ,all.plot
-  )
-, minBase=1
-, maxBase=857
-, labelRot=0
-, labelCex=.8
-, highlightRegions=hotspots.highlight
-)
+<<ResponseHXB2, fig.keep=high, cache=FALSE>>=
+pepStat:::.plot.aggregate(pnmSet,freq,anno.list,minimalist=minimalist,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
 @
 \caption{Aggregate response rate (\% Responders) and subject expression values vs. peptide HXB2 positions. Hotspot regions are highlighted in light yellow.}
 \label{fig:ResponseHXB2}
@@ -257,36 +224,85 @@ The subtype specific responses accross all 7 subtypes are displayed in Figure \r
 <<Subtype-specific-response-rate, dependson=DataDB>>=
 pnSet.clade<-split(pnSet,clade(pnSet))
 # I break it down by control group
-pnmSet.clade<-lapply(pnSet.clade,slidingMean,width=9)
+pnmSet.clade<-lapply(pnSet.clade,slidingMean,width=width)
 freq.clade<-lapply(pnmSet.clade,makeCalls,cutoff=call.cutoff,method="absolute")
 @
 
 
 \begin{figure}
-<<ResponseSubtypeHXB2, fig.keep=high, fig.width=10, fig.height=8, cache=FALSE>>=
-data.list<-lapply(1:7,function(i,x,y,dp,size,color,treatmentNames){makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(size=size, color = color[i], type="line",lwd=2,cex=.2,axisCex=.7))},x=freq.clade,y=pnSet.clade, size=sizeTrack, color = colorTrack)
-
-all.plot<-vector("list",14)
-all.plot[seq(1,14,2)]<-data.list
-all.plot[seq(2,14,2)]<-AA_anno2
-names(all.plot)<-rep("",14)
-names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
-
-pdPlot(c(
-  "HXB2"=AA_anno
-  ,"Protein"=pro_anno
-  ,"Landmarks"=landmarks_anno
-   ,all.plot
-  )
-, minBase=1
-, maxBase=857
-, labelRot=0
-, labelCex=.8
-)
+<<ResponseSubtypeHXB2, fig.keep=high, cache=FALSE>>=
+pepStat:::.plot.clade(pnSet.clade,freq.clade,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
 @
 \caption{Subtype specific response rate (\% Responders) vs. peptide HXB2 positions.}
 \label{fig:SubtypeResponseHXB2}
 \end{figure}
+
+
+
+<<Start-Imputation,cache=FALSE,results=tex>>=
+if (!imputeSaturated) cat('\\begin{comment}')
+@
+\subsection{Addressing saturation via data imputation}
+Figure \ref{fig:effectImputation} shows the effect of the data imputation using k--nearest neighbors for the saturated peptides across all samples. Using the imputed value, one can recompute the aggregate response and subtype specific responses; see Figure \ref{fig:ResponseHXB2Imp}--\ref{fig:SubtypeResponseHXB2Imp}.
+
+
+
+\begin{figure}
+<<Effect-of-imputation, fig.keep=high, dependson=DataDB,cache=TRUE>>=
+## Only impute the post
+ind.post<-grepl("[Pp][Oo][Ss][Tt]",pData(psSetRaw)$visit)
+y<-exprs(pnSet)[,ind.post]*(!(exprs(psSetRaw)[,ind.post]==16))
+y[y==0]<-NA
+pnSetImp<-pnSet
+exprs(pnSetImp)[,ind.post]<-y
+pnSetImp<-pepStat:::.impute.pSet(pnSetImp,cv=FALSE,k=10,verbose=FALSE)
+y1<-pepStat:::.bgCorrect.pSet(pnSet,verbose=FALSE)
+y1.imp<-pepStat:::.bgCorrect.pSet(pnSetImp,verbose=FALSE)
+diff<-!as.double(y1.imp-y1)==0
+y1<-as.double(y1.imp)[diff]
+y2<-as.double(pepStat:::.bgCorrect.pSet(pnSet))[diff]
+plot(y1,y2,xlab="Before",ylab="After",pch=19,cex=1,col="#66C2A590",xlim=c(0,12),ylim=c(0,12))
+abline(0,1,lty=2,lwd=4,col="#00000050")
+@
+\caption{\label{fig:effectImputation}Log fold change ($\log_2$(Pre/Post)) intensities before and after imputation for saturated peptides across all samples using k-nearest neighbors ($k=10$).}
+\end{figure}
+
+<<freq-after-imputation>>=
+pnmSetImp<-slidingMean(pnSetImp,width=width)
+freqImp<-makeCalls(pnmSetImp,cutoff=call.cutoff, method="absolute")
+hotspotsImp<-reduce(ranges(pnmSetImp)[freqImp>hotspot.cutoff,])
+@
+
+\begin{figure}
+<<ResponseHXB2Imp, fig.keep=high, cache=FALSE>>=
+pepStat:::.plot.aggregate(pnmSetImp,freqImp,anno.list,minimalist=minimalist,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspotsImp)
+@
+\caption{Aggregate response rate (\% Responders) and subject expression values vs. peptide HXB2 positions after data imputation. Hotspot regions are highlighted in light yellow.}
+\label{fig:ResponseHXB2Imp}
+\end{figure}
+
+
+
+<<Subtype-specific-response-rate-imputed, dependson=DataDB>>=
+pnSetImp.clade<-split(pnSetImp,clade(pnSetImp))
+# I break it down by control group
+pnmSetImp.clade<-lapply(pnSetImp.clade,slidingMean,width=width)
+freqImp.clade<-lapply(pnmSetImp.clade,makeCalls,cutoff=call.cutoff,method="absolute")
+@
+
+
+\begin{figure}
+<<ResponseSubtypeHXB2-imputed, fig.keep=high, cache=FALSE>>=
+pepStat:::.plot.clade(pnSetImp.clade,freqImp.clade,anno.list,minimalist=minimalist,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
+@
+\caption{Subtype specific response rate (\% Responders) vs. peptide HXB2 positions after data imputation.}
+\label{fig:SubtypeResponseHXB2Imp}
+\end{figure}
+<<End-Imputation,cache=FALSE,results=tex>>=
+if (!imputeSaturated) cat('\\end{comment}')
+@
+
+
 
 \section{R and package version}
 You are using the following version of R and packages:
@@ -295,7 +311,7 @@ sessionInfo()
 @
 \noindent with the following data:
 <<Data-used,cache=FALSE,echo=TRUE>>=
-path<-"~/Dropbox/Work/PeptideArray/Vax003/"
+pathData
 head(pData(pSet))
 @
 \noindent and the following analysis options:
