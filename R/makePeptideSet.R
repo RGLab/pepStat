@@ -1,4 +1,4 @@
-makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
+makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
 {
 	# There is some ambiguity with respect to what is Name and ID
 	# ID -> peptide
@@ -45,7 +45,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRU
 	{
 		mean.empty<-rep(0,ncol(as.matrix(RG$E)))
 	}
-
+	
+	ind.keep<-rep(TRUE,nrow(RG$E))
 	if(!is.null(rm.control.list))
 	{
 		ind.keep<-lapply(rm.control.list,function(x,Name,ID){!grepl(x,Name) & !grepl(x,ID)},as.character(RG$genes$Name),as.character(RG$genes$ID))
