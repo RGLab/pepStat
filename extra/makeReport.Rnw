@@ -1,8 +1,11 @@
 \documentclass[letter]{article}
 
+%% system('cp ~/Dropbox/git/pepStat/extra/makeReport.Rnw ./')
+%% system('cp ./makeReport.Rnw ~/Dropbox/git/pepStat/extra/makeReport.Rnw')
+
 %% Set some options
 %% Set the figure width
-\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.85\textwidth,fig.align=center}
+\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.9\textwidth,fig.align=center}
 
 \usepackage[margin=1in]{geometry}
 \usepackage{endfloat}
@@ -53,8 +56,9 @@ pSet<-makePeptideSet(files=NULL,path=pathData,mapping.file=mapping,log=TRUE,norm
 psSet<-summarizePeptides(pSet,summary="median",position=pep_hxb2)
 pnSet<-NormalizeArray(psSet, robust=TRUE, standard=FALSE, method="Zpep")
 pnmSet<-slidingMean(pnSet, width=width)
-freq<-makeCalls(pnmSet,cutoff=call.cutoff, method="absolute")
-hotspots<-reduce(ranges(pnmSet)[freq>hotspot.cutoff,])
+freq<-makeCalls(pnmSet,cutoff=call.cutoff, group=quote(treatment), method="absolute")
+freq.global<-makeCalls(pnmSet,cutoff=call.cutoff, method="absolute")
+hotspots<-reduce(ranges(pnmSet)[freq.global>hotspot.cutoff,])
 ## Clade specific frequencies and calls
 pnSet.clade<-split(pnSet,clade(pnSet))
 ## I break it down by control clade
@@ -311,7 +315,7 @@ sessionInfo()
 @
 \noindent with the following data:
 <<Data-used,cache=FALSE,echo=TRUE>>=
-pathData
+path
 head(pData(pSet))
 @
 \noindent and the following analysis options:

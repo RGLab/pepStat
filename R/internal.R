@@ -93,8 +93,9 @@
 {
     t0<-grepl("[Pp][Rr][Ee]",pData(pSet)$visit)
     t1<-grepl("[Pp][Oo][Ss][Tt]",pData(pSet)$visit)
-			
-	freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = colorTrack[1], type="line",lwd=4,cex=.2,axisCex=.7))
+	
+	
+	freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = paste(colorTrack[1:2],95,sep=""), type="line",lwd=4,cex=.2,axisCex=.7,isLegend=is.matrix(freq)))
 	y<-pepStat:::.bgCorrect.pSet(pSet,verbose=FALSE)
 	y.smooth<-makeSmoothing(position(pSet), rowMeans(y), dp = DisplayPars(color = "#80808090", type="line", lwd=4))
 	y.track<-makeGenericArray(as.matrix(y), probeStart=position(pSet), dp = DisplayPars(size=sizeTrack, color = "#00000080", type="line",lwd=1),trackOverlay=list(y.smooth))
@@ -111,8 +112,8 @@
 	all.plot[2]<-anno.list[[1]]
 	all.plot[3]<-y.track
 	all.plot[4]<-anno.list[[1]]
-	names(all.plot)[1:2]<-c("% responders","")
-	names(all.plot)[3:4]<-c("Normalized\n Intensities\n log2(Post-Pre)","")
+	names(all.plot)[1:2]<-c("% Resp.","")
+	names(all.plot)[3:4]<-c("Normalized\n Intensities\n log2(Post/Pre)","")
 	
 	if(!minimalist)
 	{
@@ -155,6 +156,6 @@
 	, minBase=1
 	, maxBase=857
 	, labelRot=0
-	, labelCex=.8
+	, labelCex=.6
 	)
 }

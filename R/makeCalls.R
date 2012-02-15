@@ -1,64 +1,67 @@
 makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=NULL, verbose=FALSE)
 {
-  if(class(peptideSet)!="peptideSet")
-  {
-    stop("peptideSet must be an object of class peptideSet")
-  }
-  if(preproc(peptideSet@experimentData)$transformation!="log")
-  {
-    warning("The probe measurements should be log transformed!")
-  }
-  if(preproc(peptideSet@experimentData)$normalization=="none")
-  {
-    warning("You should probably normalize your data before using this function")
-  }
+	if(class(peptideSet)!="peptideSet")
+	{
+		stop("peptideSet must be an object of class peptideSet")
+	}
+	if(preproc(peptideSet@experimentData)$transformation!="log")
+	{
+		warning("The probe measurements should be log transformed!")
+	}
+	if(preproc(peptideSet@experimentData)$normalization=="none")
+	{
+		warning("You should probably normalize your data before using this function")
+	}
   
-  I<-.bgCorrect.pSet(peptideSet,verbose=verbose)
+	I<-.bgCorrect.pSet(peptideSet,verbose=verbose)
   
-  if(method=="local")
-  {
-    Calls<-apply(I,2,.findFDR,cutoff,position)
-  }
-  else if(method=="global")
-  {
-    seqY<-seq(range(abs(I))[1],range(abs(I))[2],.1)
-    FDR<-sapply(seqY,function(x,I){sum(I< -x)/sum(I>x)},as.double(I))
-    Dmin<-seqY[which.min(abs(FDR-cutoff))]
-    # print(cbind(FDR,seqY))
-    Calls<-I>Dmin
-  }
-  else if(method=="absolute")
-  {
-    Calls<-I>cutoff
-  }
+	if(method=="local")
+	{
+		Calls<-apply(I,2,.findFDR,cutoff,position)
+	}
+	else if(method=="global")
+	{
+		seqY<-seq(range(abs(I))[1],range(abs(I))[2],.1)
+		FDR<-sapply(seqY,function(x,I){sum(I< -x)/sum(I>x)},as.double(I))
+		Dmin<-seqY[which.min(abs(FDR-cutoff))]
+		# print(cbind(FDR,seqY))
+		Calls<-I>Dmin
+	}
+	else if(method=="absolute")
+	{
+		Calls<-I>cutoff
+	}
   	  
-#  browser()
+	#  browser()
   
-  if(!is.null(group)&& freq) 
-  {
-	  	#parse the grouping variable 
+	if(!is.null(group) && freq)
+	{
+		#parse the grouping variable 
 		groupBy<-.parseCond(group)
-		pd<-pData(peptideSet)
+		t1<-grepl("[Pp][Oo][Ss][Tt]",pData(peptideSet)$visit)
+		#Only select the Post
+		pd<-pData(peptideSet)[t1,]
 		#generate the factor list based on multipe grouping vairable
-		factors<-lapply(groupBy,function(x){
-					eval(substitute(pd$v,list(v=x)))
-				})
-		#split the ptid into groups
-		ptidGroups<-split(pd$ptid,factors)
-		#apply the rowMeans to each group
-		res<-lapply(ptidGroups,function(curPtid){
-#					browser()
-					curCall<-Calls[,curPtid]
-					rowMeans(curCall)
-				})
-	
-	  return(res*100)
-  }
-  else if(freq)
-  {
-	  return(rowMeans(Calls)*100)
-  }
-  Calls
+		factors<-lapply(groupBy,function(x,pd){eval(substitute(pd$v,list(v=x)))},pd)[[1]]
+		if(nlevels(factors)>1)
+		{
+			#split the ptid into groups
+			ptidGroups<-split(pd$ptid,factors)
+			#apply the rowMeans to each group
+			res<-lapply(ptidGroups,function(curPtid,Calls,ptid){curCall<-Calls[,ptid%in%curPtid];rowMeans(curCall);},Calls,pd$ptid)
+			res<-do.call(cbind,res)
+		}
+		else
+		{
+			return(rowMeans(Calls)*100)		
+		}
+		return(res*100)
+	}
+	else if(freq)
+	{
+		return(rowMeans(Calls)*100)
+	}
+	Calls
 }
 
 .parseCond <-
