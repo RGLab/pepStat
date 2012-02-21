@@ -1,0 +1,105 @@
+\documentclass[letter]{article}
+
+%% system('cp ~/Dropbox/git/pepStat/extra/makeReport.Rnw ./')
+%% system('cp ./makeReport.Rnw ~/Dropbox/git/pepStat/extra/makeReport.Rnw')
+
+%% Set some options
+%% Set the figure width
+\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.9\textwidth,fig.align=center}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{endfloat}
+\usepackage{comment}
+
+<<set-data-path,cache=FALSE,echo=FALSE>>=
+# Always copy the latest version of the file
+source("~/Dropbox/git/pepStat/extra/options.R")
+system("cp ~/Dropbox/git/pepStat/extra/template.Rnw ./")
+source("./primaryinferences_main_090111.r")
+
+@
+\title{Analysis report\\ \Sexpr{reportName}} 
+\author{Raphael Gottardo}
+\begin{document}
+
+\maketitle
+
+
+<<DataDB,cache=TRUE>>=
+## Read mapping file
+mapping<-paste(path,"mapping.csv",sep="")
+## Raw data (no background subtraction)
+pSet<-makePeptideSet(files=NULL,path=pathData,mapping.file=mapping,log=TRUE,norm.empty=TRUE)
+psSet<-summarizePeptides(pSet,summary="median",position=pep_hxb2)
+pnSet<-NormalizeArray(psSet, robust=TRUE, standard=FALSE, method="Zpep")
+pnmSet<-slidingMean(pnSet, width=width)
+pnSet.clade<-split(pnSet,clade(pnSet))
+freq<-makeCalls(pnmSet,cutoff=call.cutoff, group=NULL, method="absolute")
+hotspots<-reduce(ranges(pnmSet)[freq>hotspot.cutoff,])
+data.hotspots<-sapply(1:nrow(hotspots),function(i,start,end,position,freq){index<-position>start[i]&position<end[i];pos<-position[index];freq<-freq[index];
+return(c(pos[which.max(freq)],freq[which.max(freq)]))},start(hotspots),end(hotspots),position(pnSet),freq.global)
+hotspots<-data.frame(start=start(hotspots),end=end(hotspots),center=as.integer(data.hotspots[1,]),frequency=data.hotspots[2,])
+@
+
+<<Reshape,cache=TRUE,dependson=DataDB>>=
+yN<-t(pepStat:::.bgCorrect.pSet(pnSet,verbose=FALSE))
+pnmSet1<-slidingMean(pnSet, width=1)
+yNM1<-t(pepStat:::.bgCorrect.pSet(pnmSet1,verbose=FALSE))
+pnmSet3<-slidingMean(pnSet, width=3)
+yNM3<-t(pepStat:::.bgCorrect.pSet(pnmSet3,verbose=FALSE))
+pnmSet9<-slidingMean(pnSet, width=9)
+yNM9<-t(pepStat:::.bgCorrect.pSet(pnmSet9,verbose=FALSE))
+@
+
+<<tps-function,cache=FALSE,eval=TRUE>>=
+my.tps.function<-function(y,category=FALSE,scale=TRUE,dat)
+{
+	if(scale)
+	{
+		y<-scale(y)
+	}
+	if(category)
+	{
+		y<-apply(y,2,function(x){x<-factor(cut(x,breaks=quantile(x,c(0,1/3,2/3,3/3))));levels(x)<-c(L,M,H)})
+	}
+		
+	res<-matrix(0,ncol(y),5)
+	colnames(res)<-c("risk","CI.low","CI.up","p-value","t-stat")
+	for(i in 1:ncol(y))
+	{
+		outcome<-y[,i]
+  
+		kp <- dat$trt=="VACCINE" #& !is.na(IgAprim)
+  
+		fit.tps <- try(tps(flrstatus[kp] ~ outcome[kp] + sex[kp] + risk.medium[kp] + risk.high[kp],nn0=nn0, nn1=nn1,group=stratuminds[kp],method="ML",cohort=TRUE),silent=TRUE)
+		if(class(fit.tps)!="try-error")
+		{
+			res[i,] <- as.matrix(cbind(round(exp(fit.tps$coef[2]),2),round(exp(fit.tps$coef[2] - sqrt(fit.tps$covm[2,2])*1.96),2),
+			round(exp(fit.tps$coef[2] + sqrt(fit.tps$covm[2,2])*1.96),2),round(min(2*(1-pnorm(abs(fit.tps$coef[2]/sqrt(fit.tps$covm[2,2])))),1.0)
+			,4),fit.tps$coef[2]/sqrt(fit.tps$covm[2,2])))
+		}
+		else
+		{
+			res[i,]<-rep(1,5)
+		}
+	}
+	rownames(res)<-colnames(y)
+	res
+}
+@
+
+<<tps-result,cache=TRUE,dependson=DataDB;Reshape,results=tex>>=
+y<-yNM1[,position(pnSet)%in%hotspots$center]
+names(y)<-c("C1","V2","V3","C5")
+res<-my.tps.function(y,category=FALSE,scale=TRUE,dat)
+caption<-c("Infection risk by hotspots. The outcome variable is defined as an aggregate over sub-types.")
+print(xtable(table,digits=c(1,2,2,3,2),caption=caption,label="tab:hotspots"))
+@
+
+
+
+
+
+\SweaveInput{template.Rnw} 
+
+\end{document}

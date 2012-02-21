@@ -6,8 +6,11 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
 	f <- function(x) as.numeric(x$Flags > -99)
 	# Only read the red channel
 	RG<-read.maimages(files=files,source="genepix", path=path, ext="gpr", columns=list(R="F635 Median",Rb="B635 Median"), wt.fun=f,verbose=verbose)
-
-	RG<-backgroundCorrect(RG, method=bgCorrect.method, offset=1, verbose=verbose)
+	
+	offset<-0.5
+	if(bgCorrect.method=="half") offset<-.5 else offset<-1
+	RG<-try(backgroundCorrect(RG, method=bgCorrect.method, offset=offset, verbose=verbose))
+#	RG<-backgroundCorrect(RG, method="half", offset=1, verbose=verbose)
 
 	myDesc <- new("MIAME")
 
