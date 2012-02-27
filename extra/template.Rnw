@@ -144,7 +144,12 @@ par$col <- brewer.pal(7,"Greys")
 par$alpha=.9
 trellis.par.set("strip.background", par)
 u.ptid<-unique(y.long.raw$ptid)
+if(paired)
+{
 bwplot(Intensity ~ visit | ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long.raw[y.long.raw$ptid%in%u.ptid[1:min(49,length(u.ptid))],])
+}else{
+bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long.raw[y.long.raw$ptid%in%u.ptid[1:min(49,length(u.ptid))],])	
+}
 @
 \caption{\label{fig:boxplotunnormalized}Boxplots of un-normalized intensities accross ptids and visit groups. Only the first 49 ptids are shown for clarity.}
 \end{figure}
@@ -171,8 +176,12 @@ par <- trellis.par.get("strip.background")
 par$col <- brewer.pal(7,"Greys")
 par$alpha=.9
 trellis.par.set("strip.background", par)
-
+if(paired)
+{
 bwplot(Intensity ~ visit | ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette,pch="|",data=y.long[y.long$ptid%in%u.ptid[1:min(49,length(u.ptid))],])
+}else{
+bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette,pch="|",data=y.long[y.long$ptid%in%u.ptid[1:min(49,length(u.ptid))],])	
+}
 @
 \caption{\label{fig:boxplotnormalized}Boxplots of normalized intensities accross ptids and visit groups. Only the first 49 ptids are shown for clarity.}
 \end{figure}
@@ -190,7 +199,7 @@ print(xtable(table,digits=c(1,1,1,1,1),caption=caption,label="tab:hotspots"))
 
 \begin{figure}
 <<ResponseHXB2, fig.keep=high, cache=FALSE>>=
-pepStat:::.plot.aggregate(pnmSet,freq,anno.list,minimalist=minimalist,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
+pepStat:::.plot.aggregate(pnmSet,freq,anno.list,minimalist=minimalist,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots,  ylim.freq=c(0,100))
 @
 \caption{Aggregate response rate (\% Responders) and subject expression values vs. peptide HXB2 positions. Hotspot regions are highlighted in light yellow.}
 \label{fig:ResponseHXB2}
@@ -202,7 +211,7 @@ The subtype specific responses accross all 7 subtypes are displayed in Figure \r
 
 \begin{figure}
 <<ResponseSubtypeHXB2, fig.keep=high, cache=FALSE>>=
-pepStat:::.plot.clade(pnSet.clade,freq.clade,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
+pepStat:::.plot.clade(pnSet.clade,freq.clade,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots,  ylim.freq=c(0,100))
 @
 \caption{Subtype specific response rate (\% Responders) vs. peptide HXB2 positions.}
 \label{fig:SubtypeResponseHXB2}

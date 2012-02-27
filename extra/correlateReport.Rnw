@@ -13,12 +13,12 @@
 
 <<set-data-path,cache=FALSE,echo=FALSE>>=
 # Always copy the latest version of the file
-source("~/Dropbox/git/pepStat/extra/options.R")
-system("cp ~/Dropbox/git/pepStat/extra/template.Rnw ./")
+# source("~/Dropbox/git/pepStat/extra/options.R")
+# system("cp ~/Dropbox/git/pepStat/extra/template.Rnw ./")
 source("./primaryinferences_main_090111.r")
 
 @
-\title{Analysis report\\ \Sexpr{reportName}} 
+\title{Correlate study\\ \Sexpr{reportName}} 
 \author{Raphael Gottardo}
 \begin{document}
 
@@ -95,9 +95,6 @@ res<-my.tps.function(y,category=FALSE,scale=TRUE,dat)
 caption<-c("Infection risk by hotspots. The outcome variable is defined as an aggregate over sub-types.")
 print(xtable(table,digits=c(1,2,2,3,2),caption=caption,label="tab:hotspots"))
 @
-
-
-
 
 
 \SweaveInput{template.Rnw} 

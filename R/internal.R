@@ -89,13 +89,13 @@
 	pSet
 }
 
-.plot.aggregate<-function(pSet,freq,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
+.plot.aggregate<-function(pSet,freq,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots,ylim.freq=NULL)
 {
     t0<-grepl("[Pp][Rr][Ee]",pData(pSet)$visit)
     t1<-grepl("[Pp][Oo][Ss][Tt]",pData(pSet)$visit)
 	
 	
-	freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = paste(colorTrack[1:2],95,sep=""), type="line",lwd=4,cex=.2,axisCex=.7,legendCex=.7,isLegend=is.matrix(freq)))
+	freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = paste(colorTrack[1:5],95,sep=""), type="line",lwd=4,cex=.2,axisCex=.7,legendCex=.7,isLegend=is.matrix(freq),ylim=ylim.freq))
 	y<-pepStat:::.bgCorrect.pSet(pSet,verbose=FALSE)
 	y.smooth<-makeSmoothing(position(pSet), rowMeans(y), dp = DisplayPars(color = "#80808090", type="line", lwd=4))
 	y.track<-makeGenericArray(as.matrix(y), probeStart=position(pSet), dp = DisplayPars(size=sizeTrack, color = "#00000080", type="line",lwd=1),trackOverlay=list(y.smooth))
@@ -134,10 +134,10 @@
 	, highlightRegions=hotspots.highlight)
 }
 
-.plot.clade<-function(pSet,freq,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots)
+.plot.clade<-function(pSet,freq,anno.list,minimalist=TRUE,colorTrack,colorAnno,sizeTrack,sizeAnno,hotspots,ylim.freq=NULL)
 {
 	
-	data.list<-lapply(1:7,function(i,x,y,dp,size,color){if(is.matrix(x[[i]])){color<-c("#00000090",paste(color[i],90,sep=""))}else{color<-color[i]};makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(legendCex=.7,size=size, color=color, type="line",lwd=4,cex=.2,axisCex=.7,isLegend=is.matrix(freq[[1]])))},x=freq,y=pSet, size=sizeTrack, color = colorTrack,isLegend)
+	data.list<-lapply(1:7,function(i,x,y,dp,size,color,...){if(is.matrix(x[[i]])){color<-c("#00000090",paste(color[i],90,sep=""))}else{color<-color[i]};makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(legendCex=.7,size=size, color=color, type="line",lwd=4,cex=.2,axisCex=.7,isLegend=is.matrix(freq[[1]]),...))},x=freq,y=pSet, size=sizeTrack, color = colorTrack,ylim=ylim.freq)
 
 	all.plot<-vector("list",14)
 	all.plot[seq(1,14,2)]<-data.list
@@ -195,4 +195,45 @@
 	}
 
 	pdPlot(c(anno.list,all.plot), minBase=1, maxBase=857, labelRot=0, labelCex=.7,highlightRegions=hotspots.highlight)
+}
+
+.plot.aggregate.freq<-function(pSet,freq,anno.list,colorTrack,colorAnno,sizeTrack,sizeAnno,ylim.freq=NULL)
+{
+    t0<-grepl("[Pp][Rr][Ee]",pData(pSet)$visit)
+    t1<-grepl("[Pp][Oo][Ss][Tt]",pData(pSet)$visit)
+
+	freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = paste(colorTrack[1:ncol(as.matrix(freq))],90,sep=""), type="line",lwd=6,cex=.2,axisCex=.7,legendCex=.7,isLegend=FALSE,ylim=ylim.freq))
+	# freq.track<-makeGenericArray(as.matrix(freq),probeStart=position(pSet),dp=DisplayPars(size=sizeTrack, color = paste(colorTrack[1:2],95,sep=""), type="line",lwd=4,cex=.2,axisCex=.7,legendCex=.7,isLegend=FALSE,ylim=ylim.freq))
+
+	n.track<-2
+	all.plot<-vector("list",n.track)
+	all.plot[1]<-freq.track
+	names(all.plot)[1]<-"%\nresponders"
+	all.plot[2]<-anno.list[[1]]
+	names(all.plot)[2]<-""
+
+	pdPlot(c(anno.list, all.plot)
+	, minBase=1, maxBase=857
+	, labelRot=0
+	, labelCex=.9,
+	highlightRegions=NULL)
+}
+
+.plot.clade.freq<-function(pSet,freq,anno.list,colorTrack,colorAnno,sizeTrack,sizeAnno,ylim.freq=NULL)
+{
+	
+	data.list<-lapply(1:7,function(i,x,y,dp,size,color,...){color <- paste(color[1:ncol(as.matrix(x[[i]]))],90,sep="");makeGenericArray(as.matrix(x[[i]]),probeStart=position(y[[i]]),dp=DisplayPars(legendCex=.7,size=size, color=color, type="line",lwd=4,cex=.2,axisCex=.7,isLegend=F,...))},x=freq,y=pSet, size=sizeTrack, color = colorTrack,ylim=ylim.freq)
+
+	all.plot<-vector("list",14)
+	all.plot[seq(1,14,2)]<-data.list
+	all.plot[seq(2,14,2)]<-anno.list[[1]]
+	names(all.plot)<-rep("",14)
+	names(all.plot)[seq(1,14,2)]<-c("M","A","B","C","D","CRF01","CRF02")
+
+	pdPlot(c(anno.list,all.plot)
+	, minBase=1
+	, maxBase=857
+	, labelRot=0
+	, labelCex=.9
+	)
 }

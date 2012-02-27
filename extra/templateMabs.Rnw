@@ -149,7 +149,7 @@ par$col <- brewer.pal(7,"Greys")
 par$alpha=.9
 trellis.par.set("strip.background", par)
 u.ptid<-unique(y.long.raw$ptid)
-bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long.raw[y.long.raw$ptid%in%u.ptid[1:min(16,length(u.ptid))],])
+bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long.raw[y.long.raw$ptid%in%u.ptid[1:min(49,length(u.ptid))],],scales=list(x=list(rot=45)))
 @
 \caption{\label{fig:boxplotunnormalized}Boxplots of un-normalized intensities accross ptids and visit groups. Only the first 16 ptids are shown for clarity.}
 \end{figure}
@@ -159,7 +159,6 @@ bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=pan
 <<BoxplotNormalized, fig.keep=high, dependson=DataDB>>=
 y.long<-pepStat:::.reshape.pSet(pnSet)
 palette<-brewer.pal(7,"Set3")
-## If more than 20, just look at 16
 par <- trellis.par.get("box.dot")
 par$pch <- 19
 par$cex <- .3
@@ -178,7 +177,7 @@ par$col <- brewer.pal(7,"Greys")
 par$alpha=.9
 trellis.par.set("strip.background", par)
 
-bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long[y.long$ptid%in%u.ptid[1:min(16,length(u.ptid))],])
+bwplot(Intensity ~ ptid, groups=visit, panel = panel.superpose, panel.groups=panel.bwplot, alpha=.5, cex=.3, fill=palette, pch="|", data=y.long[y.long$ptid%in%u.ptid[1:min(49,length(u.ptid))],],scales=list(x=list(rot=45)))
 @
 \caption{\label{fig:boxplotnormalized}Boxplots of normalized intensities accross ptids and visit groups. Only the first 16 ptids are shown for clarity.}
 \end{figure}

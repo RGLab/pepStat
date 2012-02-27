@@ -8,3 +8,4 @@ imputeSaturated<-FALSE
 minimalist<-TRUE
 
 group<-quote(treatment)
+paired<-TRUE
