@@ -50,6 +50,7 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 	##sort the positions    
 	position<-position[order(start(position)),]
 	rownames(ranges(newSet))<-peptide(newSet)
+	## Change this line to a match, in case the peptides in the position are not on the array
 	newSet<-newSet[rownames(position),]#mainly for subsetting the exprs matrix
 #	browser()
 	#merge the values from position
@@ -70,5 +71,5 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
   }
   pData(newSet)<-pData(peptideSet)
   preproc(newSet)$summary<-summary
-	newSet
+  newSet
 }
