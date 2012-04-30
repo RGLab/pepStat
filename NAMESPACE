@@ -10,7 +10,7 @@ importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc,"preproc<-", sampl
 importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-",as.data.frame)
 importMethodsFrom(methods, show)
 
-# importMethodsFrom(base, split)
+#importMethodsFrom(base, split)
 importFrom(methods, "@<-", new)
 importFrom(stats, rnorm)
 importFrom(limma, read.maimages, backgroundCorrect)

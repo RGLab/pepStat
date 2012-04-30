@@ -16,6 +16,7 @@ setAs(from="peptideSet",to="ExpressionSet",function(from){
 					)
 })
 
+setGeneric("summary", function(x) standardGeneric("summary"))
 setMethod("summary", signature("peptideSet"),
     function(object) {
       cat("   Sample name(s): ",sampleNames(object@phenoData)," \n")
@@ -126,6 +127,7 @@ setMethod("clade","peptideSet",function(x){
 })
 
 
+setGeneric("split", function(x, ...) standardGeneric("split"))
 setMethod("split","peptideSet",function(x, f, byrow=TRUE){
   if(is.vector(f) | is.factor(f))
   {
