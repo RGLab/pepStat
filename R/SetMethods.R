@@ -147,35 +147,19 @@ setMethod("split","peptideSet",function(x, f, byrow=TRUE){
 })
 
 
-## Bind several tiling sets together
-#
-#setMethod("rbind", "tilingSet", function(..., deparse.level=1) {
-#  args <- list(...)
-#
-#  names<-lapply(args,function(x){sampleNames(x@phenoData)})
-#  lnames<-unlist(lapply(names,"length"))
-#  # Check that the number of names is the same for all
-#  if(length(unique(lnames))!=1)
-#  {
-#    stop("Objects to be concatenated should have the same number of columns")    
-#  }
-#
-#  featureChromosome<-unlist(lapply(args,function(x){x@featureChromosome}))
-#  featurePosition<-unlist(lapply(args,function(x){x@featurePosition}))
-#  featureCopyNumber<-unlist(lapply(args,function(x){x@featureCopyNumber}))
-#  featureSequence<-unlist(lapply(args,function(x){x@featureSequence}))
-#  
-#  ord<-order(featureChromosome,featurePosition)
-#  
-#  featureChromosome<-unlist(lapply(args,function(x){x@featureChromosome}))
-#  y<-do.call("rbind",lapply(args,function(x){exprs(x)}))
-#  
-#  ## For the sample name, I simply use the first set
-#  colnames(y)<-names[[1]]
-#  rownames(y)<-NULL
-#  newSet<-new('tilingSet', featureChromosome=featureChromosome[ord],featurePosition=featurePosition[ord],
-#  featureCopyNumber=featureCopyNumber[ord], exprs=y[ord,], genomeName=unlist(lapply(args,function(x){x@genomeName})),
-#  featureSequence=featureSequence[ord], experimentData=args[[1]]@experimentData)
-#  return(newSet)
-#})
-#
+setMethod("cbind", "peptideSet", function(..., deparse.level=1){
+ args <- list(...)
+
+ names<-unlist(sapply(args,function(x){sampleNames(x)}))
+ pd.list<-lapply(args,function(x){pData(x)})
+
+ pd<-do.call(rbind,pd.list)
+ 
+ eSet.list<-lapply(args,function(x){exprs(x)})
+ eSet<-do.call(cbind,eSet.list)
+
+ newSet<-new('peptideSet',exprs=as.matrix(eSet),featureRange=args[[1]]@featureRange,experimentData=args[[1]]@experimentData)
+pData(newSet)<-pd
+sampleNames(newSet)<-names
+newSet 
+})

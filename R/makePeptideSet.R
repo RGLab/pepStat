@@ -1,4 +1,4 @@
-makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRUE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
+makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE, empty.control.list=c("empty","blank control"), bgCorrect.method="normexp", log=TRUE, verbose=FALSE)
 {
 	# There is some ambiguity with respect to what is Name and ID
 	# ID -> peptide
@@ -6,8 +6,11 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRU
 	f <- function(x) as.numeric(x$Flags > -99)
 	# Only read the red channel
 	RG<-read.maimages(files=files,source="genepix", path=path, ext="gpr", columns=list(R="F635 Median",Rb="B635 Median"), wt.fun=f,verbose=verbose)
-
-	RG<-backgroundCorrect(RG, method=bgCorrect.method, offset=1, verbose=verbose)
+	
+	offset<-0.5
+	if(bgCorrect.method=="half") offset<-.5 else offset<-1
+	RG<-try(backgroundCorrect(RG, method=bgCorrect.method, offset=offset, verbose=verbose))
+#	RG<-backgroundCorrect(RG, method="half", offset=1, verbose=verbose)
 
 	myDesc <- new("MIAME")
 
@@ -45,7 +48,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=TRU
 	{
 		mean.empty<-rep(0,ncol(as.matrix(RG$E)))
 	}
-
+	
+	ind.keep<-rep(TRUE,nrow(RG$E))
 	if(!is.null(rm.control.list))
 	{
 		ind.keep<-lapply(rm.control.list,function(x,Name,ID){!grepl(x,Name) & !grepl(x,ID)},as.character(RG$genes$Name),as.character(RG$genes$ID))

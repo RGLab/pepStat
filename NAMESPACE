@@ -8,7 +8,7 @@ importClassesFrom(Biobase,eSet, VersionedBiobase, Versioned, AnnotatedDataFrame,
 importClassesFrom(methods, character, integer, numeric)
 
 importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc,"preproc<-", sampleNames,"sampleNames<-",rowMedians)
-importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-")
+importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-",as.data.frame)
 importMethodsFrom(methods, show)
 
  #importMethodsFrom(base, split)

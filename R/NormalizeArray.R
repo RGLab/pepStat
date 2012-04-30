@@ -1,4 +1,4 @@
-NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constant", centered=TRUE, cName=NULL, verbose=FALSE, Zpep = NULL)
+NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep", centered=TRUE, verbose=FALSE)
 { 
 
   ### Sanity checks 
@@ -14,14 +14,6 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
   data<-exprs(peptideSet)
   
   sNames<-sampleNames(peptideSet)
-  if(!is.null(cName))
-  {
-    cat("** Only the control samples are used to estimate the background **\n")
-    cat("** The options 'center' and 'standard' are set to FALSE **\n")
-    centered<-standard<-FALSE
-    data<-data[,grep(cName,sNames)]
-  }
-
 
   if(method=="constant")
   {
@@ -35,6 +27,8 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
   else if(method == "Zpep")
   {
   	methodNum = 3
+	X<-as.data.frame(ranges(peptideSet)@values[,grepl("z[1-9]sum",colnames(ranges(peptideSet)))][[1]])
+	Zpep<-as.matrix(cbind(X,X^2))
   }
   numZpep = 0
   if(!is.null(Zpep))
@@ -83,20 +77,11 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
 
   if(verbose)
   {
-    if(!is.null(cName))
-    {
-      ssNames<-sNames[grep(cName,sNames)]
-    }
-    else
-    {
-      ssNames<-sNames
-    }
-
     cat("** Finished Normalizing ",nProbes," probes on ",nArrays," arrays **\n")
     cat("** Sample: R^2, BIC **\n")
     for(i in 1:length(obj$center))
     {
-      cat("**", ssNames[i],":", round(obj$RSquare[i],2),",", as.integer(obj$BIC[i])," **\n")
+      cat("**", sNames[i],":", round(obj$RSquare[i],2),",", as.integer(obj$BIC[i])," **\n")
     }
   }
   # beta<-matrix(obj$beta[obj$beta!=0],length(alphabet)+1,ncol(y),byrow=TRUE)
@@ -110,11 +95,6 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
   }
 
   
-  if(!is.null(cName))
-  {
-    background<-data-normData+centered*rep(1,nProbes)%*%t(obj$center)
-  }
-
   if(!centered)
   {
     # Recenter the data
@@ -122,14 +102,7 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=TRUE, method="constan
   }
 
   ### Set the normalized data as exprs
-  if(!is.null(cName))
-  {
-    exprs(peptideSet)<-exprs(peptideSet)-rowMeans(background)
-  }
-  else
-  {
-    exprs(peptideSet)<-normData
-  }
+  exprs(peptideSet)<-normData
   colnames(exprs(peptideSet))<-sampleNames(peptideSet)
   ### Setting the normalization parameters
   normalization<-"Z-scale"

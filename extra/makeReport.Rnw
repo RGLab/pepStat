@@ -1,0 +1,33 @@
+\documentclass[letter]{article}
+
+%% system('cp ~/Dropbox/git/pepStat/extra/makeReport.Rnw ./')
+%% system('cp ./makeReport.Rnw ~/Dropbox/git/pepStat/extra/makeReport.Rnw')
+
+%% Set some options
+%% Set the figure width
+\SweaveOpts{fig.path=./Figures/,echo=FALSE,eval=TRUE,cache=TRUE,message=FALSE,out.width=.9\textwidth,fig.align=center}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{endfloat}
+\usepackage{comment}
+
+<<set-data-path,cache=FALSE,echo=FALSE>>=
+# Always copy the latest version of the file
+system("cp ~/Dropbox/git/pepStat/extra/options.R ./")
+source("./options.R")
+group<-quote(infect)
+system("cp ~/Dropbox/git/pepStat/extra/template.Rnw ./")
+@
+
+\title{Analysis report\\ \Sexpr{reportName}} 
+\author{Raphael Gottardo}
+\begin{document}
+
+\maketitle
+
+% opts_knit$set(progress = TRUE, verbose = FALSE)
+
+
+\SweaveInput{template.Rnw} 
+
+\end{document}
