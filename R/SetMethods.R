@@ -125,7 +125,7 @@ setMethod("clade","peptideSet",function(x){
 	
 })
 
-setGeneric("split", function(x,f, ...) standardGeneric("split"))
+setGeneric("split")
 
 setMethod("split","peptideSet",function(x, f, byrow=TRUE){
   if(is.vector(f) | is.factor(f))
