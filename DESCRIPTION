@@ -7,6 +7,6 @@ Maintainer: Mike Jiang <wjiang2@fhcrc.org>, Raphael Gottardo <raph@rglab.org>
 Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends: R(>= 2.12.0),Biobase (>= 2.5.5),IRanges
-Imports: methods, gdata,limma
+Imports: methods, gdata,limma,stats4
 biocViews: Microarray, Preprocessing, Statistics
 URL: http://www.rglab.org

@@ -126,6 +126,7 @@ setMethod("clade","peptideSet",function(x){
 	
 })
 
+setGeneric("split")
 
 setGeneric("split", function(x, ...) standardGeneric("split"))
 setMethod("split","peptideSet",function(x, f, byrow=TRUE){
