@@ -14,6 +14,8 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",
   data<-exprs(peptideSet)
   
   sNames<-sampleNames(peptideSet)
+  # Initialize Zpep
+  Zpep<-matrix(0,0,0)
 
   if(method=="constant")
   {
