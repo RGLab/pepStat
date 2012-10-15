@@ -115,15 +115,15 @@ setMethod("featureID","peptideSet",
 		})
 
 
-setGeneric("clade", function(x, ...) standardGeneric("clade"))
-
-setMethod("clade","peptideSet",function(x){
+#setGeneric("clade", function(x, ...) standardGeneric("clade"))
+#
+#setMethod("clade","peptideSet",function(x){
 #			browser()
 #	x@featureAnnotation[names(x@featureAnnotation)%in%c("M","A","B","C","D","CRF01","CRF02")]
-	df<-IRanges::as.data.frame(values(ranges(x)))
-	df[,colnames(df)%in%c("M","A","B","C","D","CRF01","CRF02")]		
-	
-})
+#	df<-IRanges::as.data.frame(values(ranges(x)))
+#	df[,colnames(df)%in%c("M","A","B","C","D","CRF01","CRF02")]		
+#	
+#})
 
 setGeneric("split")
 
@@ -163,3 +163,11 @@ pData(newSet)<-pd
 sampleNames(newSet)<-names
 newSet 
 })
+
+#clade acessor
+setMethod("clade",
+                signature=signature(object="peptideSet"),
+                definition=function(object)
+                        {
+                                clade(object@featureRange)
+                        }) 
