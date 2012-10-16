@@ -47,8 +47,9 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 	
   if(!is.null(position))
   {
-	##sort the positions    
-	position<-position[order(start(position)),]
+	##sort the positions 
+	# Here I assume that the positions are sorted
+	# position<-position[order(start(position)),]
 	rownames(ranges(newSet))<-peptide(newSet)
 	## Change this line to a match, in case the peptides in the position are not on the array
 	newSet<-newSet[rownames(position),]#mainly for subsetting the exprs matrix

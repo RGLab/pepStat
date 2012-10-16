@@ -39,8 +39,9 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=NULL
 		#parse the grouping variable 
 		groupBy<-.parseCond(group)
 		t1<-grepl("[Pp][Oo][Ss][Tt]",pData(peptideSet)$visit)
-		#Only select the Post
-		pd<-pData(peptideSet)[t1,]
+		#Only select the Post and remove empty levels
+		pd<-drop.levels(pData(peptideSet)[t1,])
+		
 		#generate the factor list based on multipe grouping vairable
 		factors<-lapply(groupBy,function(x,pd){eval(substitute(pd$v,list(v=x)))},pd)[[1]]
 		if(nlevels(factors)>1)
@@ -61,7 +62,6 @@ makeCalls<-function(peptideSet, cutoff=.1, method="local", freq=TRUE, group=NULL
 	{
 		return(rowMeans(Calls)*100)
 	}
-	Calls
 }
 
 .parseCond <-

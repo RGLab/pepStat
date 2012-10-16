@@ -1,3 +1,4 @@
+
 setMethod("show", "peptideSet",function(object){
     cat("Object of class 'peptideSet' contains","\n")
 	print(as(object,"ExpressionSet"))
@@ -49,21 +50,45 @@ setMethod("[","peptideSet",
 			
 		})
 
+		# There is an S3 methods for this, should we use it?
+setGeneric("subset")
+setMethod("subset","peptideSet",
+#subset.pSet<-
+function (x, select, subset, drop = FALSE, ...) 
+{
+    if (missing(subset)) 
+        vars <- rep(TRUE,ncol(x))
+    else {
+        e <- substitute(subset)
+        vars <- eval(e, pData(x), parent.frame())
+        if (!is.logical(vars)) 
+            stop("'subset' must evaluate to logical")
+        vars <- vars & !is.na(vars)
+    }
+    if (missing(select)) 
+		r <- rep(TRUE,nrow(x))
+    else {
+        e <- substitute(select)
+        r <- eval(e, rg@values[[1]], parent.frame())
+        if (!is.logical(r)) 
+            stop("'subset' must evaluate to logical")
+        r <- r & !is.na(r)
+    }
+    x[r, vars, drop = drop]
+	}
+)
 
 setGeneric("position", function(x, ...) standardGeneric("position"))
 setMethod("position","peptideSet",function(x){
-			#x@featurePosition
 			round((start(ranges(x))+end(ranges(x)))/2)
 		})
 
 
 setMethod("start","peptideSet",function(x){
-			#x@featurePosition
 			start(ranges(x))
 		})
 
 setMethod("end","peptideSet",function(x){
-			#x@featurePosition
 			end(ranges(x))
 		})
 
@@ -115,18 +140,12 @@ setMethod("featureID","peptideSet",
 		})
 
 
-#setGeneric("clade", function(x, ...) standardGeneric("clade"))
-#
-#setMethod("clade","peptideSet",function(x){
-#			browser()
-#	x@featureAnnotation[names(x@featureAnnotation)%in%c("M","A","B","C","D","CRF01","CRF02")]
-#	df<-IRanges::as.data.frame(values(ranges(x)))
-#	df[,colnames(df)%in%c("M","A","B","C","D","CRF01","CRF02")]		
-#	
+#setMethod("clade","peptideSet",function(object){
+	#object<-ranges(object)
+	#HIV.db:::clade(object)
 #})
 
 setGeneric("split")
-
 setMethod("split","peptideSet",function(x, f, byrow=TRUE){
   if(is.vector(f) | is.factor(f))
   {
@@ -163,6 +182,14 @@ pData(newSet)<-pd
 sampleNames(newSet)<-names
 newSet 
 })
+
+setGeneric("write.pSet", function(x, ...) standardGeneric("write.pSet"))	
+setMethod("write.pSet", "peptideSet", function(x,...){
+	y<-cbind(peptide(x),start(x),end(x),featureID(x),exprs(x))
+	colnames(y)[1:4]<-c("peptide","start","end","annotation")
+	write.table(y,...)
+	})
+	
 
 #clade acessor
 setMethod("clade",

@@ -11,7 +11,7 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",
     stop("The peptideSet measurements need to be log transformed!")
   }
 
-  data<-exprs(peptideSet)
+  data<-exprs(peptideSet)  
   
   sNames<-sampleNames(peptideSet)
   # Initialize Zpep
@@ -29,7 +29,7 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",
   else if(method == "Zpep")
   {
   	methodNum = 3
-	X<-as.data.frame(ranges(peptideSet)@values[,grepl("z[1-9]sum",colnames(ranges(peptideSet)))][[1]])
+	X<-as.data.frame(ranges(peptideSet)@values[,grepl("z[1-9]",colnames(ranges(peptideSet)))][[1]])
 	Zpep<-as.matrix(cbind(X,X^2))
   }
   numZpep = 0
@@ -53,7 +53,7 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",
 
   # Extract the alphabet from the sequences
   alphabet<-sort(unique(AllChar<-unlist(sapply(seq, function(x){strsplit(x,"")}))))
-
+  
   # Calling C code
   obj<-.C("NormalizeProbes",
   as.character(seq),
