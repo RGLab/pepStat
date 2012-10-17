@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{The petStat users guide}
+%\VignetteIndexEntry{The pepStat users guide}
 %\VignetteDepends{}
 %\VignetteKeywords{Preprocessing, Affymetrix}
 %\VignettePackage{pepStat}

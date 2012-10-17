@@ -26,4 +26,4 @@ importFrom(gdata,drop.levels)
 ## export anything w/out a dot in front. 
 exportPattern("^[^\\.]")
 exportClasses(peptideSet)
-exportMethods(show,summary,"[","position","clade","split","peptide","featureID","start","end","subset","write.pSet")
+exportMethods(show,summary,"[","position","clade","split","peptide","featureID","start","end","width","values","values<-","treatment","write.pSet")

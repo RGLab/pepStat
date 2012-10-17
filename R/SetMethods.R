@@ -51,32 +51,41 @@ setMethod("[","peptideSet",
 		})
 
 		# There is an S3 methods for this, should we use it?
-setGeneric("subset")
-setMethod("subset","peptideSet",
+#setGeneric("subset")
+#setMethod("subset","peptideSet",
 #subset.pSet<-
-function (x, select, subset, drop = FALSE, ...) 
-{
-    if (missing(subset)) 
-        vars <- rep(TRUE,ncol(x))
-    else {
-        e <- substitute(subset)
-        vars <- eval(e, pData(x), parent.frame())
-        if (!is.logical(vars)) 
-            stop("'subset' must evaluate to logical")
-        vars <- vars & !is.na(vars)
-    }
-    if (missing(select)) 
-		r <- rep(TRUE,nrow(x))
-    else {
-        e <- substitute(select)
-        r <- eval(e, rg@values[[1]], parent.frame())
-        if (!is.logical(r)) 
-            stop("'subset' must evaluate to logical")
-        r <- r & !is.na(r)
-    }
-    x[r, vars, drop = drop]
-	}
-)
+#function (x, select, subset, drop = FALSE, ...) 
+#{
+    #if (missing(subset)) 
+        #vars <- rep(TRUE,ncol(x))
+    #else {
+        #e <- substitute(subset)
+        #vars <- eval(e, pData(x), parent.frame())
+        #if (!is.logical(vars)) 
+            #stop("'subset' must evaluate to logical")
+        #vars <- vars & !is.na(vars)
+    #}
+    #if (missing(select)) 
+		#r <- rep(TRUE,nrow(x))
+    #else {
+        #e <- substitute(select)
+        #r <- eval(e, rg@values[[1]], parent.frame())
+        #if (!is.logical(r)) 
+            #stop("'subset' must evaluate to logical")
+        #r <- r & !is.na(r)
+    #}
+    #x[r, vars, drop = drop]
+	#}
+#)
+setGeneric("treatment", function(x,...) standardGeneric("treatment"))
+setMethod("treatment", "peptideSet", function(x, treatment){
+  ret<-new("peptideSet") #Create new object and set all slots separately to avoid sampleNames conflicts
+  ret@featureRange<-x@featureRange
+  pData(ret)<-pData(x)[pData(x)$treatment==treatment,]
+  exprs(ret)<-exprs(x)[,rownames(pd)]
+  return(ret)
+})
+
 
 setGeneric("position", function(x, ...) standardGeneric("position"))
 setMethod("position","peptideSet",function(x){
@@ -92,6 +101,17 @@ setMethod("end","peptideSet",function(x){
 			end(ranges(x))
 		})
 
+setMethod("width","peptideSet",function(x){
+			width(ranges(x))
+		})
+
+setMethod("values","peptideSet",function(x){
+			values(ranges(x))
+		})
+
+setMethod("values<-","peptideSet",function(x, value){
+			values(ranges(x))<-value
+		})
 
 setReplaceMethod("ranges","peptideSet",
 		function(x,value)
