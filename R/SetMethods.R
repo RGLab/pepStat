@@ -53,7 +53,7 @@ setMethod("[","peptideSet",
 		# There is an S3 methods for this, should we use it?
 #setGeneric("subset")
 #setMethod("subset","peptideSet",
-#subset.pSet<-
+##subset.pSet<-
 #function (x, select, subset, drop = FALSE, ...) 
 #{
     #if (missing(subset)) 
@@ -69,7 +69,7 @@ setMethod("[","peptideSet",
 		#r <- rep(TRUE,nrow(x))
     #else {
         #e <- substitute(select)
-        #r <- eval(e, rg@values[[1]], parent.frame())
+        #r <- eval(e, ranges(x), parent.frame())
         #if (!is.logical(r)) 
             #stop("'subset' must evaluate to logical")
         #r <- r & !is.na(r)
@@ -77,13 +77,20 @@ setMethod("[","peptideSet",
     #x[r, vars, drop = drop]
 	#}
 #)
-setGeneric("treatment", function(x,...) standardGeneric("treatment"))
-setMethod("treatment", "peptideSet", function(x, treatment){
-  ret<-new("peptideSet") #Create new object and set all slots separately to avoid sampleNames conflicts
-  ret@featureRange<-x@featureRange
-  pData(ret)<-pData(x)[pData(x)$treatment==treatment,]
-  exprs(ret)<-exprs(x)[,rownames(pd)]
-  return(ret)
+setMethod("subset","peptideSet",
+function (x, subset, drop = FALSE, ...) 
+{
+    if (missing(subset))
+	r <- rep(TRUE,nrow(x))
+    else {
+        e <- substitute(subset)#class(e) = call
+        r <- eval(e, pData(x), parent.frame())
+        if (!is.logical(r)) 
+            stop("'subset' must evaluate to logical")
+        r <- r & !is.na(r)
+	vars<-r
+    }
+    x[,vars, drop = drop]
 })
 
 
