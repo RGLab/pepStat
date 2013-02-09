@@ -89,7 +89,7 @@ void NormalizeProbes(char **seq, double *y, double *yNormalized, int *nProbes, i
 	if(*method==1) /** This is the MAT model **/
 	{
 	  nVariables= *numZpep + *lAlphabet;
-    // printf("nLetter=%d\n",nVariables);
+    // Rprintf("nLetter=%d\n",nVariables);
 	  
 	  pairNumCount1=gsl_matrix_calloc(nProbesTotal,*lAlphabet + *numZpep);
 	  createPairMatrixCountSimple(pairNumCount1, seq, alphabet, lAlphabet);
@@ -104,7 +104,7 @@ void NormalizeProbes(char **seq, double *y, double *yNormalized, int *nProbes, i
 	else if(*method==2)
 	{
     nVariables=0+3**lAlphabet;
-    // printf("nLetter=%d\n",nVariables);
+    // Rprintf("nLetter=%d\n",nVariables);
 
     pairNumCount1=gsl_matrix_calloc(nProbesTotal,*lAlphabet);
     pairNumCount2=gsl_matrix_calloc(nProbesTotal,*lAlphabet);
@@ -137,7 +137,7 @@ void NormalizeProbes(char **seq, double *y, double *yNormalized, int *nProbes, i
 	
 	if(*isVerbose)
 	{
-	  printf("** End of NormalizeProbes procedure **\n");
+	  Rprintf("** End of NormalizeProbes procedure **\n");
 	}
 }
       
@@ -146,8 +146,8 @@ int convertSeq(char* seq, char **alphabet, int *lAlphabet)
 	int i=0;
     for(i=0;i<*lAlphabet;i++)
     {
-//     	printf("a=%s\n",alphabet[i]);
-//     	printf("seq=%s\n",seq);
+//      Rprintf("a=%s\n",alphabet[i]);
+//      Rprintf("seq=%s\n",seq);
 
     	/* Compare the two strings */
 		if(strcmp(seq, alphabet[i]) == 0)
@@ -360,8 +360,8 @@ void normArray(char **seq, double *y, double *yNormalized, int *nProbes, int *nA
   {
     nVariables=0+3**lAlphabet;
     X=gsl_matrix_calloc(*nProbes,nVariables);
-    // printf("*nProbes=%d\n",*nProbes);
-    // printf("*nVariables=%d\n",nVariables);
+    // Rprintf("*nProbes=%d\n",*nProbes);
+    // Rprintf("*nVariables=%d\n",nVariables);
     createDesignMatrixPairBinned(pairNumCount1,
       pairNumCount2,
       pairNumCount3,
@@ -397,7 +397,7 @@ void normArray(char **seq, double *y, double *yNormalized, int *nProbes, int *nA
   
   if(*isVerbose)
   {
-    printf("** Start normalization of array %d **\n",j);
+    Rprintf("** Start normalization of array %d **\n",j);
   }
 
   meanY=gsl_stats_mean(y+j*nProbesTotal,1,*nProbes);
@@ -439,7 +439,7 @@ void normArray(char **seq, double *y, double *yNormalized, int *nProbes, int *nA
   {
     if(*isVerbose)
     {
-      printf("** Start robust normalization of array %d **\n",j);      
+      Rprintf("** Start robust normalization of array %d **\n",j);      
     }
     
     for(k=0;k<=iterMax;k++)
@@ -518,7 +518,7 @@ void normArray(char **seq, double *y, double *yNormalized, int *nProbes, int *nA
   {
     if(*isVerbose)
     {
-      printf("** Start scaling of array %d **\n",j);
+      Rprintf("** Start scaling of array %d **\n",j);
     }
     gsl_permutation_init(indexSorted);
     for(i=0;i<nProbesTotal;i++)

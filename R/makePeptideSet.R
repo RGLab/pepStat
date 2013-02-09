@@ -82,7 +82,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
 		index<-RG$genes$Name%in%empty.control.list | RG$genes$ID%in%empty.control.list
 		if(verbose)
 		{
-			cat("** Background corrected using ", sum(index), " empty splots **")
+			cat("** Background corrected using ", sum(index), " empty splots **\n")
 		}		
 		mean.empty<-matrix(colMeans(as.matrix(RG$E[index,])),nrow=nrow(as.matrix(RG$E)),ncol=ncol(as.matrix(RG$E)),byrow=TRUE)
 	}

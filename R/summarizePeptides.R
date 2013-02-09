@@ -5,20 +5,15 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
   df<-as.data.frame(exprs(peptideSet))
   featureSequence<-peptide(peptideSet)
 	
-#	system.time(
-			sdata<-do.call("rbind"
-							,by(df,list(as.factor(featureSequence))
-									,function(x){
-#										browser()
-										switch(summary ,
-												mean=colMeans(x),
-												median=rowMedians(t(x))
-												)			
-										
-									})
-							)
-#	)
-			colnames(sdata)<-colnames(df)
+  sdata<-do.call("rbind",
+	by(df,list(as.factor(featureSequence)),
+		function(x){
+			switch(summary,
+				mean=colMeans(x),
+				median=rowMedians(t(x)))
+			   })
+		)
+  colnames(sdata)<-colnames(df)
 
 	
 #	featureSequence<-sapply(split(peptideSet@featureSequence,as.factor(peptideSet@featureSequence)),unique)
@@ -34,7 +29,7 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 	nPep<-length(featureID)
 	newSet<-new('peptideSet'
 				,featureRange=RangedData(IRanges(rep(0,nPep),rep(0,nPep))
-										,featureID								
+										,featureID
 										,peptide=featureSequence
 										)
 				, exprs=as.matrix(sdata)
@@ -43,8 +38,6 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 		
 	sampleNames(newSet)<-sampleNames(peptideSet)
 
-#	browser()  
-	
   if(!is.null(position))
   {
 	##sort the positions 
@@ -53,7 +46,6 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 	rownames(ranges(newSet))<-peptide(newSet)
 	## Change this line to a match, in case the peptides in the position are not on the array
 	newSet<-newSet[rownames(position),]#mainly for subsetting the exprs matrix
-#	browser()
 	#merge the values from position
 	vdata<-c(values(ranges(newSet))[[1]],values(position)[[1]])
 	rownames(vdata)<-rownames(values(ranges(newSet)))[[1]]

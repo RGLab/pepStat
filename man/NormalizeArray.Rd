@@ -1,4 +1,5 @@
-\name{NormalizeProbes}
+\name{NormalizeArray}
+\alias{NormalizeArray}
 \alias{NormalizeProbes}
 
 \title{Normalize tiling array data using sequence information}
@@ -8,20 +9,17 @@
 }
 
 \usage{
-
-ScSetNorm<-NormalizeProbes(tilingSet, method="MAT",robust=FALSE, all=FALSE, standard=TRUE, verbose=FALSE)
-						
-
+ScSetNorm<-NormalizeProbes(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",centered=TRUE, verbose=FALSE)
 }
+%ScSetNorm<-NormalizeProbes(tilingSet, method="MAT",robust=FALSE, all=FALSE, standard=TRUE, verbose=FALSE)
 
 \arguments{
-  \item{tilingSet}{This object contains an ExpressionSet and has the following additional slots}	
-   \item{method}{The normalization method to be used. User can choose from "MAT", or "PairBinned". As an upgrade to MAT, the Pair option also takes into account of the interaction between adjacent pairs along the probe as covariates for linear regression. }
-   \item{robust}{A logical value. If TRUE, reweighted least-squares estimates are computed.}
-   \item{all}{A logical value. If not using all probes to compute (for faster computation and memory efficiency) the regression parameters, then use the minimum of 300,000 or number of probes, whichever is less.}
-    \item{verbose}{A logical value. If verbose is TRUE, progress information would be displayed.}
-    
-   
+  %\item{tilingSet}{This object contains an ExpressionSet and has the following additional slots}	
+  \item{peptideSet}{This object contains an ExpressionSet and has the following additional slots}	
+  \item{method}{The normalization method to be used. User can choose from "MAT", or "PairBinned". As an upgrade to MAT, the Pair option also takes into account of the interaction between adjacent pairs along the probe as covariates for linear regression. }
+  \item{robust}{A logical value. If TRUE, reweighted least-squares estimates are computed.}
+  %\item{all}{A logical value. If not using all probes to compute (for faster computation and memory efficiency) the regression parameters, then use the minimum of 300,000 or number of probes, whichever is less.}
+  \item{verbose}{A logical value. If verbose is TRUE, progress information would be displayed.}
 }
 
 \details{
@@ -40,7 +38,7 @@ Johnson et al. Model-based analysis of tiling-arrays for ChIP-chip. Proc Natl Ac
 \author{
   Charles Cheung, \email{cykc@interchange.ubc.ca} and
   Raphael Gottardo, \email{raphael.gottardo@ircm.qc.ca}
-   Arnaud Droit, \email{arnaud.droit@ircm.qc.ca}
+  Arnaud Droit, \email{arnaud.droit@ircm.qc.ca}
 }
 
 

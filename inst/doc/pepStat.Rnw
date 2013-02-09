@@ -5,29 +5,29 @@
 \documentclass[11pt]{article}
 \usepackage{hyperref}
 \usepackage{url}
-\usepackage{color, pdfcolmk}
-\usepackage[authoryear,round]{natbib}
-\bibliographystyle{plainnat}
+\SweaveOpts{keep.source=FALSE}
 
-\newcommand{\scscst}{\scriptscriptstyle}
-\newcommand{\scst}{\scriptstyle}
-
-\author{Charles Cheung\footnote{cykc@interchange.ubc.ca} and Raphael
-  Gottardo\footnote{raphael.gottardo@ircm.qc.ca} and Arnaud Droit\footnote{arnaud.droit@ircm.qc.ca}}
+\title{The pepStat user guide}
+\author{Raphael Gottardo\footnote{rgottard@fhcrc.org}, Mike Jiang\footnote{wjiang2@fhcrc.org} and Renan Sauteraud\footnote{rsautera@fhcrc.org}}
 
 \begin{document}
-\title{Model Based Analysis of Tiling Arrays\\ The rMAT package.}
 \maketitle
 
 
 
 \textnormal {\normalfont}
-A step-by-step guide in the analysis of tiling array data using the Digested package in R
+A step-by-step guide in the analysis of peptide microarray antibody binding
 
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 
+\section{Generating a peptideSet}
 
-\part{Licensing}
+%<<makePepideSet>>=
+%mapping<-system.file(
+%pSet<-makePeptideSet(
+%@
+
+
 \end{document}

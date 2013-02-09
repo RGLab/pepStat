@@ -43,7 +43,7 @@ void callEnrichedRegions(double *MATScores, int *nProbes, int *position, double 
   {
     if(*verbose)
     {
-      printf("** Merging regions **\n");  
+      Rprintf("** Merging regions **\n");  
     }        
     numRegions[0] = mergeMATScores(position, *nProbes, *dMerge, MATScores, mu0, *threshold, 1, regions, seqNum);
   }
@@ -51,12 +51,12 @@ void callEnrichedRegions(double *MATScores, int *nProbes, int *position, double 
   {
     if(*verbose)
     {
-      printf("** Calculating P-values **\n");  
+      Rprintf("** Calculating P-values **\n");  
     }    
     MATpValue(*nProbes, MATScores, sigma0, mu0, pValues);
     if(*verbose)
     {
-      printf("** Merging regions **\n");  
+      Rprintf("** Merging regions **\n");  
     }        
     numRegions[0] = mergeMATScores(position, *nProbes, *dMerge, pValues, 0, *threshold, -1, regions, seqNum);
   }
@@ -64,13 +64,13 @@ void callEnrichedRegions(double *MATScores, int *nProbes, int *position, double 
   {
     if(*verbose)
     {
-      printf("** Calculating FDR **\n");  
+      Rprintf("** Calculating FDR **\n");  
     }    
     
     cutoff=MATcutoffFDR(position, *nProbes, *dMerge, MATScores, mu0, *threshold, regions, seqNum);
     if(*verbose)
     {
-      printf("** Merging regions **\n");  
+      Rprintf("** Merging regions **\n");  
     }    
     /** Form the regions using the threshold found **/
     numRegions[0] = mergeMATScores(position, *nProbes, *dMerge, MATScores, mu0, cutoff, 1, regions, seqNum);
