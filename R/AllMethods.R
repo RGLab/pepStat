@@ -118,6 +118,7 @@ setMethod("values","peptideSet",function(x){
 
 setMethod("values<-","peptideSet",function(x, value){
 			values(ranges(x))<-value
+                        return(x)
 		})
 
 setReplaceMethod("ranges","peptideSet",
@@ -219,6 +220,27 @@ setMethod("write.pSet", "peptideSet", function(x,...){
 	
 
 #clade acessor
+setGeneric("clade",
+                def=function(object)
+                        standardGeneric("clade"))
+
+setMethod("clade",
+                signature=signature(object="RangedData"),
+                definition=function(object){
+                        cladeList<-unique(unlist(strsplit(levels(as.factor(object$clade)),","))) #List of all possible clades
+                        len<-nrow(object)
+                        retMatrix<-matrix(FALSE, nrow=len, ncol=length(cladeList))
+                        pepClades<-strsplit(object$clade, split=",") #clades for each peptide
+                        for(pepIdx in 1:len){
+                                tmpList<-cladeList %in% pepClades[[pepIdx]]
+                                retMatrix[pepIdx,]<-tmpList
+                        }   
+                        rownames(retMatrix)<-rownames(object)
+                        colnames(retMatrix)<-cladeList
+                        return(retMatrix)
+                })  
+
+
 setMethod("clade",
                 signature=signature(object="peptideSet"),
                 definition=function(object)

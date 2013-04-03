@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{The pepStat users guide}
-%\VignetteDepends{}
+%\VignetteDepends{PEP.db}
 %\VignetteKeywords{Preprocessing, Affymetrix}
 %\VignettePackage{pepStat}
 \documentclass[11pt]{article}
@@ -21,13 +21,52 @@ A step-by-step guide in the analysis of peptide microarray antibody binding
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+\section{Introduction}
+
+As with any R package, it should first be loaded in the session.
+<<loading-pakage>>=
+library(pepStat)
+@
 
 \section{Generating a peptideSet}
 
-%<<makePepideSet>>=
-%mapping<-system.file(
-%pSet<-makePeptideSet(
-%@
+The reading function takes a path as its argument and parse all the files in the given directory.
+
+<<makePepideSet>>=
+mapFile<-system.file("extdata/mapping.csv", package="pepStat")
+dirToParse<-system.file("extdata/RVV", package="pepStat")
+pSet<-makePeptideSet(files=NULL, path=dirToParse, mapping.file=mapFile, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"),log=TRUE,verbose=TRUE)
+@
+
+A new object of class \texttt{peptideSet}. It contins only the sequence of the peptides and the intensities measured. Any additional information must be passed using a known collection of peptides. In this example, we use pep\_hxb2 available in the \texttt{PEP.db} package.
+
+<<adding-positions>>=
+library(PEP.db)
+data(pep_hxb2)
+psSet<-summarizePeptides(pSet, summary="mean", position=pep_hxb2)
+@
+
+pep\_hxb2 gives information regarding the position of each peptide, their z-scores, the clades they belong to and the alignment with the reference sequence HXB2.
+
+
+\section{Normalizing the peptideSet}
+<<normalize>>=
+pnSet<-NormalizeArray(psSet, verbose=TRUE)
+@
+
+
+\section{Making calls}
+
+<<makeCalls>>=
+Vsum<-subset(psSet, treatment!="PLACEBO")
+Vnorm<-subset(pnSet, treatment!="PLACEBO")
+V_smooth<-slidingMean(Vnorm, width=9)
+
+cutoff<-1.1
+V_calls<-makeCalls(V_smooth,cutoff=cutoff,method="absolute")
+@
+
+
 
 
 \end{document}
