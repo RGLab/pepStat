@@ -8,7 +8,7 @@ This function merges the replicates and adds information from a peptide collecti
 }
 
 \usage{
-summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
+summarizePeptides(peptideSet,summary="mean",position=NULL)
 }
 
 \arguments{
@@ -19,6 +19,10 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
 
 \value{
 An object of class \code{peptideSet} with added columns and updated ranges.
+}
+
+\note{
+For the position argument, some peptide collections can be found in the \code{PEP.db} package.
 }
 
 \author{Raphael Gottardo}

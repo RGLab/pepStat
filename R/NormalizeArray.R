@@ -30,7 +30,13 @@ NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",
   {
   	methodNum = 3
 	X<-as.data.frame(ranges(peptideSet)@values[,grepl("z[1-9]",colnames(ranges(peptideSet)))][[1]])
-	Zpep<-as.matrix(cbind(X,X^2))
+	Zpep<-as.matrix(X)
+  }
+  else if(method == "ZpepQuad")
+  {
+	  methodNum = 3
+	  X<-as.data.frame(ranges(peptideSet)@values[,grepl("z[1-9]",colnames(ranges(peptideSet)))][[1]])
+	  Zpep<-as.matrix(cbind(X, X^2))
   }
   numZpep = 0
   if(!is.null(Zpep))
