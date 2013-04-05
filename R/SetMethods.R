@@ -214,7 +214,7 @@ setGeneric("write.pSet", function(x, ...) standardGeneric("write.pSet"))
 setMethod("write.pSet", "peptideSet", function(x,...){
 	y<-cbind(peptide(x),start(x),end(x),featureID(x),exprs(x))
 	colnames(y)[1:4]<-c("peptide","start","end","annotation")
-	write.table(y,...)
+	write.csv(y,...)
 	})
 	
 
