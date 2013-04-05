@@ -57,7 +57,7 @@ The makePeptideSet function can be used to create a peptideSet object from a lis
   \item{"show"}{: \code{signature(x = "peptideSet")}: Display method.}
   \item{"peptide"}{: \code{signature(x = "peptideSet")}: Returns the sequence of the peptides.}
   %\item{"position"}{: \code{signature(x = "peptideSet")}: The position of the peptides: (end - start)/2 }
-  \item{"split"}{:}
+  \item{"split"}{: \code{signature(x = "peptideSet", f = "factor")}: Split the peptideSet in a \code{list} of \code{peptideSet} based on the given factor.}
   \item{"featureID"}{: \code{signature(x = "peptideSet")}: The ID of the peptides.}
   \item{"write.pSet"}{: \code{signature(x = "peptideSet")}: Write the peptides to a file. This is a wrapper to \code{write.table} and any additional argument \code{"..."} will be passed to the base function.}
 }

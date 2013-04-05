@@ -1,6 +1,5 @@
 \name{NormalizeArray}
 \alias{NormalizeArray}
-\alias{NormalizeProbes}
 
 \title{Normalize tiling array data using sequence information}
 
@@ -9,17 +8,19 @@
 }
 
 \usage{
-ScSetNorm<-NormalizeProbes(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",centered=TRUE, verbose=FALSE)
+NormalizeArray(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",centered=TRUE, verbose=FALSE)
 }
 %ScSetNorm<-NormalizeProbes(tilingSet, method="MAT",robust=FALSE, all=FALSE, standard=TRUE, verbose=FALSE)
 
 \arguments{
   %\item{tilingSet}{This object contains an ExpressionSet and has the following additional slots}	
   \item{peptideSet}{This object contains an ExpressionSet and has the following additional slots}	
+  \item{robust}{A \code{logical} value. If TRUE, reweighted least-squares estimates are computed.}
+  \item{standard}{A \code{logical}. If TRUE, 
   \item{method}{The normalization method to be used. User can choose from "MAT", or "PairBinned". As an upgrade to MAT, the Pair option also takes into account of the interaction between adjacent pairs along the probe as covariates for linear regression. }
-  \item{robust}{A logical value. If TRUE, reweighted least-squares estimates are computed.}
+  \item{centered}{A \code{logical}. If TRUE, recenter the data.}
   %\item{all}{A logical value. If not using all probes to compute (for faster computation and memory efficiency) the regression parameters, then use the minimum of 300,000 or number of probes, whichever is less.}
-  \item{verbose}{A logical value. If verbose is TRUE, progress information would be displayed.}
+  \item{verbose}{A \code{logical} value. If verbose is TRUE, progress information would be displayed.}
 }
 
 \details{

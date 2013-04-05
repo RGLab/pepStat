@@ -8,7 +8,7 @@ This function merges the replicates and adds information from a peptide collecti
 }
 
 \usage{
-summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
+summarizePeptides(peptideSet,summary="mean",position=NULL)
 }
 
 \arguments{

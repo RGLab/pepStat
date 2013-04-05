@@ -1,4 +1,4 @@
-summarizePeptides<-function(peptideSet,summary="mean",position=NULL,...)
+summarizePeptides<-function(peptideSet,summary="mean",position=NULL)#,...)
 {
   FUN <- match.fun(summary)
   df<-as.data.frame(exprs(peptideSet))
