@@ -1,8 +1,7 @@
 #now we can only assume there is one chromosome per time
 #Furthermore, the vectors must be sorted
 
-slidingMean<-function(peptideSet, width=5, verbose=FALSE)
-{
+slidingMean<-function(peptideSet, width=5, verbose=FALSE){
   if(class(peptideSet)!="peptideSet")
   {
     stop("peptideSet must be an object of class peptideSet")
