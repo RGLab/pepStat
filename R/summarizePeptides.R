@@ -1,5 +1,6 @@
-summarizePeptides<-function(peptideSet,summary="mean",position=NULL)#,...)
+summarizePeptides<-function(peptideSet,summary="median",position=NULL,...)
 {
+
   FUN <- match.fun(summary)
   df<-as.data.frame(exprs(peptideSet))
   featureSequence<-peptide(peptideSet)
@@ -7,12 +8,13 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL)#,...)
   sdata<-do.call("rbind",
 	by(df,list(as.factor(featureSequence)),
 		function(x){
-			switch(summary, 
+			switch(summary,
 				mean=colMeans(x),
 				median=rowMedians(t(x)))
 			   })
 		)
   colnames(sdata)<-colnames(df)
+
 	
 #	featureSequence<-sapply(split(peptideSet@featureSequence,as.factor(peptideSet@featureSequence)),unique)
 #	featureID<-sapply(split(peptideSet@featureID,as.factor(peptideSet@featureSequence)),unique)
@@ -25,13 +27,15 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL)#,...)
 	rownames(exprs)<-featureSequence
 	colnames(exprs)<-sampleNames(peptideSet)
 	nPep<-length(featureID)
-	newSet<-new('peptideSet',featureRange=RangedData(IRanges(rep(0,nPep),rep(0,nPep))
-	                                                  ,featureID
-				                          ,peptide=featureSequence
-				                        )
+	newSet<-new('peptideSet'
+				,featureRange=RangedData(IRanges(rep(0,nPep),rep(0,nPep))
+										,featureID
+										,peptide=featureSequence
+										)
 				, exprs=as.matrix(sdata)
 				, experimentData=peptideSet@experimentData
-		    )
+			)
+		
 	sampleNames(newSet)<-sampleNames(peptideSet)
 
   if(!is.null(position))
@@ -41,21 +45,22 @@ summarizePeptides<-function(peptideSet,summary="mean",position=NULL)#,...)
 	# position<-position[order(start(position)),]
 	rownames(ranges(newSet))<-peptide(newSet)
 	## Change this line to a match, in case the peptides in the position are not on the array
-	newSet<-newSet[rownames(ranges(position)),]#mainly for subsetting the exprs matrix
+	newSet<-newSet[rownames(position),]#mainly for subsetting the exprs matrix
 	#merge the values from position
 	vdata<-c(values(ranges(newSet))[[1]],values(position)[[1]])
 	rownames(vdata)<-rownames(values(ranges(newSet)))[[1]]
-	values(newSet)<-vdata
+	values(ranges(newSet))<-vdata
 
 	#update the IRanges from position
-	names(ranges(newSet))<-names(ranges(position))
-	ranges(ranges(newSet))<-ranges(ranges(position))
+	names(ranges(newSet))<-names(position)
+	ranges(ranges(newSet))<-ranges(position)
 	
 	noMatch<-which(!featureSequence%in%rownames(position))
 	if(length(noMatch)>0)
 	{
 		message("Some peptides have no match in the RangedData object and are removed from the peptideSet!")
 	}
+
   }
   pData(newSet)<-pData(peptideSet)
   preproc(newSet)$summary<-summary

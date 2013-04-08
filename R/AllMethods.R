@@ -211,9 +211,14 @@ sampleNames(newSet)<-names
 newSet 
 })
 
-setGeneric("write.pSet", function(x, ...) standardGeneric("write.pSet"))	
-setMethod("write.pSet", "peptideSet", function(x,...){
-	y<-cbind(peptide(x),start(x),end(x),featureID(x),exprs(x))
+setGeneric("write.pSet", function(x, bg.correct=FALSE, ...) standardGeneric("write.pSet"))
+setMethod("write.pSet", "peptideSet", function(x, bg.correct=FALSE, ...){
+	if (bg.correct) {
+		exprs<-pepStat:::.bgCorrect.pSet(x)
+		} else {
+		exprs<-exprs(x)
+	}
+	y<-cbind(peptide(x),start(x),end(x),featureID(x),exprs)
 	colnames(y)[1:4]<-c("peptide","start","end","annotation")
 	write.csv(y,...)
 	})
