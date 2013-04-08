@@ -16,7 +16,7 @@ NormalizeArray(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",centered=T
   %\item{tilingSet}{This object contains an ExpressionSet and has the following additional slots}	
   \item{peptideSet}{This object contains an ExpressionSet and has the following additional slots}	
   \item{robust}{A \code{logical} value. If TRUE, reweighted least-squares estimates are computed.}
-  \item{standard}{A \code{logical}. If TRUE, 
+  \item{standard}{A \code{logical}.}
   \item{method}{The normalization method to be used. User can choose from "MAT", or "PairBinned". As an upgrade to MAT, the Pair option also takes into account of the interaction between adjacent pairs along the probe as covariates for linear regression. }
   \item{centered}{A \code{logical}. If TRUE, recenter the data.}
   %\item{all}{A logical value. If not using all probes to compute (for faster computation and memory efficiency) the regression parameters, then use the minimum of 300,000 or number of probes, whichever is less.}
