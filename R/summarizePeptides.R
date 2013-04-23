@@ -1,4 +1,4 @@
-summarizePeptides<-function(peptideSet,summary="median",position=NULL,...)
+summarizePeptides<-function(peptideSet,summary="median",position=NULL)
 {
 
   FUN <- match.fun(summary)
