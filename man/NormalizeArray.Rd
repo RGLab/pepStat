@@ -8,7 +8,7 @@
 }
 
 \usage{
-NormalizeArray(peptideSet, robust=TRUE, standard=FALSE, method="Zpep",centered=TRUE, verbose=FALSE)
+NormalizeArray(peptideSet, robust=TRUE, standard=FALSE, method="ZpepQuad",centered=TRUE, verbose=FALSE)
 }
 %ScSetNorm<-NormalizeProbes(tilingSet, method="MAT",robust=FALSE, all=FALSE, standard=TRUE, verbose=FALSE)
 

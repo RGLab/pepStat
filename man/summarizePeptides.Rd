@@ -8,13 +8,14 @@ This function merges the replicates and adds information from a peptide collecti
 }
 
 \usage{
-summarizePeptides(peptideSet,summary="mean",position=NULL)
+summarizePeptides(peptideSet,summary="median",position=NULL)
 }
 
 \arguments{
 \item{peptideSet}{A \code{peptideSet} object.}
 \item{summary}{A character string. The method to be used for merging replicates.}
 \item{position}{A \code{RangedData} object. A collection of peptides that can be found in the PEP.db package.}
+%\item{\dots}{Additional items.}
 }
 
 \value{
