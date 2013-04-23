@@ -1,4 +1,4 @@
-NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep", centered=TRUE, verbose=FALSE)
+NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="ZpepQuad", centered=TRUE, verbose=FALSE)
 { 
 
   ### Sanity checks 
