@@ -8,11 +8,10 @@
 \SweaveOpts{keep.source=FALSE}
 
 \title{The pepStat user guide}
-\author{Raphael Gottardo\footnote{rgottard@fhcrc.org}, Mike Jiang\footnote{wjiang2@fhcrc.org} and Renan Sauteraud\footnote{rsautera@fhcrc.org}}
+\author{Raphael Gottardo\footnote{rgottard@fhcrc.org}, Greg Imholte\footnote{gimholte@uw.edu}, Mike Jiang\footnote{wjiang2@fhcrc.org} and Renan Sauteraud\footnote{rsautera@fhcrc.org}}
 
 \begin{document}
 \maketitle
-
 
 
 \textnormal {\normalfont}
@@ -22,7 +21,18 @@ A step-by-step guide in the analysis of peptide microarray antibody binding
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \section{Introduction}
+The \texttt{pepStat} package offers a complete analytical framework for the analysis of peptide microarray data. It includes a novel normalization method to remove non-specific peptide binding activity of antibodies, a data smoothing reducing the background noise and subject-specific positivity calls. 
 
+%\subsection{Citing} %If/when it gets accepted
+%If you use this package for a publication, we would ask you to cite the following:
+%
+%\begin{quote}
+%Greg C. Imholte, Renan Sauteraud, Bette Korber, Robert T. Bailer, Ellen T. Turk3, Georgia Tomaras, Shauna Shen, John Mascola, Richard Koup, David Montefiori, and  Raphael Gottardo (2013).
+%\textbf{A computational framework for the analysis of peptide microarray antibody binding data with application to HIV vaccine profiling.}
+%\end{quote}
+
+
+\subsection{Loading the package}
 As with any R package, it should first be loaded in the session.
 <<loading-pakage>>=
 library(pepStat)
@@ -38,7 +48,7 @@ dirToParse<-system.file("extdata/RVV", package="pepStat")
 pSet<-makePeptideSet(files=NULL, path=dirToParse, mapping.file=mapFile, rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"),log=TRUE)
 @
 
-It returns a new object of class \texttt{peptideSet}. It contains only the sequence of the peptides and the intensities measured. Any additional information must be passed using a known collection of peptides. In this example, we use pep\_hxb2 available in the \texttt{PEP.db} package.
+\texttt{makePeptideSet} returns a new object of class \texttt{peptideSet}. This is the base structure used in \texttt{pepStat}. It contains only the sequence of the peptides and the intensities measured. Any additional information must be passed using a known collection of peptides. In this example, we use pep\_hxb2 available in the \texttt{PEP.db} package.
 
 <<adding-positions>>=
 library(PEP.db)
@@ -50,23 +60,36 @@ pep\_hxb2 gives information regarding the position of each peptide, their z-scor
 
 
 \section{Normalizing the peptideSet}
+The primary goal of the data normalization step is to remove non-biological source of bias and increase the comparability of true positive signal intensities across slides.
+The method developped for this package uses physiochemical properties of individual peptides to model non-specific antibody binding to arrays.
+
 <<normalize>>=
 pnSet<-NormalizeArray(psSet)
 @
 
+An object of class \texttt{peptideSet} containing the corrected peptides intensities is returned.
 
-\section{Making calls}
 
-<<makeCalls>>=
-Vsum<-subset(psSet, treatment!="PLACEBO")
+\section{Data smoothing}
+The data smoothing step takes advantage of the overlapping nature of the peptides on the array to remove background noise caused by experimental variation.
+It is expected that the binding effect of two overlapping peptides will be positively correlated. Therefore, \texttt{pepStat} use a sliding mean technique technique to borrow strength across neighboring peptides and to reduce signal variability. Even though this is a loss of resolution, this statistic increases detection of binding \textit{hotspots} that noisy signals might otherwise obscure.
+
+<<data-smoothing>>=
 Vnorm<-subset(pnSet, treatment!="PLACEBO")
 V_smooth<-slidingMean(Vnorm, width=9)
+@
 
+The returned \texttt{peptideSet} intensities distribution is centered around zero.
+
+\section{Making calls}
+The final step is to make the positivity calls.
+
+<<makeCalls>>=
 cutoff<-1.1
 V_calls<-makeCalls(V_smooth,cutoff=cutoff,method="absolute")
 @
 
-
+\texttt{makeCalls} returns a \texttt{numeric} vector with a single value for each peptide. If the score for a given peptide is superior to 0. The peptide is positive for antibody binding. 
 
 
 \end{document}
