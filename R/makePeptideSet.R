@@ -141,6 +141,9 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
 		mean.empty <- rep(0,ncol(as.matrix(RG$E)))
 	}
 	
+	# Keep the layout
+	layout<-lapply(RG$genes[,c("Block","Row","Column")],as.factor)
+	
 	ind.keep<-rep(TRUE,nrow(RG$E))
 	if(!is.null(rm.control.list))
 	{
@@ -160,7 +163,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
 	nPep <- length(which(ind.keep))
 	pSet <- new('peptideSet',
 			featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)), featureID,
-					peptide = featureSequence),
+					peptide = featureSequence,block=layout$Block[ind.keep],row=layout$Row[ind.keep],column=layout$Column[ind.keep]),
 			exprs = as.matrix(RG$E-mean.empty)[ind.keep,],
 			experimentData = myDesc)
 
