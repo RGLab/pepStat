@@ -90,20 +90,20 @@ checkArgs_sumPeps = function(peptideSet, summary, position)
 		attr(OK, "ErrorString") = ("summary must be either median or mean")
 	}
 	
-	if(class(peptideSet) != "peptideSet"){
-		OK = FALSE
-		attr(OK, "ErrorString") = ("peptideSet argument must be an object of class peptideSet")
-	}	
-	
-	if(class(position) != "RangedData" & !is.null(position)){
-		OK = FALSE
-		attr(OK, "ErrorString") = ("if non-NULL, position argument must be a RangedData object")
-	}
-	
-	if(is.null(rownames(position)) & !is.null(position)){
+	if(class(position) == "RangedData" & is.null(rownames(position)) & !is.null(position)){
 		OK = FALSE
 		attr(OK, "ErrorString") = ("rownames of position RangedData object must be peptide sequences")
 	}
-	
+  
+  if(class(position) != "RangedData" & !is.null(position)){
+    OK = FALSE
+    attr(OK, "ErrorString") = ("if non-NULL, position argument must be a RangedData object")
+  }
+  
+  if(class(peptideSet) != "peptideSet"){
+    OK = FALSE
+    attr(OK, "ErrorString") = ("peptideSet argument must be an object of class peptideSet")
+  }	
+  
 	return(OK)	
 }
