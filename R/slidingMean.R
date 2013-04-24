@@ -1,5 +1,5 @@
 slidingMean <- function(peptideSet, width=9, verbose=FALSE){
-  if (is(peptideSet,"peptideSet")){
+  if (!is(peptideSet,"peptideSet")){
     stop("peptideSet must be an object of class peptideSet")
   }
   if (preproc(peptideSet)$transformation!="log"){
