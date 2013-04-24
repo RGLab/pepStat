@@ -1,40 +1,42 @@
 #now we can only assume there is one chromosome per time
 #Furthermore, the vectors must be sorted
 
-slidingMean<-function(peptideSet, width=5, verbose=FALSE){
-  if(class(peptideSet)!="peptideSet")
-  {
+slidingMean <- function(peptideSet, width=9, verbose=FALSE){
+  if (!is(peptideSet,"peptideSet")){
     stop("peptideSet must be an object of class peptideSet")
   }
-  if(preproc(peptideSet@experimentData)$transformation!="log" & preproc(peptideSet@experimentData)$transformation!="vsn")
-  {
+  if (preproc(peptideSet)$transformation!="log"){
     stop("The probe measurements need to be log/vsn transformed!")
   }
-  if(preproc(peptideSet@experimentData)$normalization=="none")
-  {
+  if (preproc(peptideSet)$normalization=="none"){
     warning("You should probably normalize your data before using this function")
   }
   
-  #whether the Control array is available
-  y<-exprs(peptideSet)
+  # Make a copy of the original ordering
+  pep<-peptide(peptideSet)
+  order<-order(position(peptideSet))
   
-  if(length(peptideSet)==0)
-  {
-    stop("A position vector must be specified in the peptideSet")
+  # Reorder based on positions
+  peptideSet<-peptideSet[order,]
+  y <- exprs(peptideSet)
+  
+  if(all(position(peptideSet)==0)){
+    stop("Your pSet object does not contain peptide position.\n Did you use `summarizePeptides' with a `position' argument?")
   }
 
   # This could be made more efficient with multicore
-  ny<-apply(y,2,slidingMeanVector,width,position(peptideSet))
+  ny<-apply(y, 2, slidingMeanVector, width, position(peptideSet))
 
-  # y<-matrix(obj$SScore,nPep,ncol(y),byrow=TRUE)
   exprs(peptideSet)<-ny
   
   if(verbose)
   {
-    cat("** Finished processing ",nrow(y)," probes on ",ncol(y)," arrays **\n");
+    cat("** Finished processing ",nrow(y)," peptides across ",ncol(y)," slides **\n");
   }
-  peptideSet
+  # Reset the original ordering
+  peptideSet[match(pep,peptide(peptideSet)),]
 }
+
 
 slidingMeanVector<-function(y,dMax,position)
 {
