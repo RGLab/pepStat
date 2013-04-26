@@ -1,14 +1,15 @@
-NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="ZpepQuad", centered=TRUE, verbose=FALSE)
+NormalizeArray<-function(peptideSet, robust=TRUE, standard=FALSE, method="ZpepQuad",
+    centered=TRUE, verbose=FALSE)
 { 
 
   ### Sanity checks 
   if(class(peptideSet)!="peptideSet")
   {
-    stop("peptideSet must be an object of class peptideSet (e.g. returned by readPeptideSet)!")
+    stop("peptideSet must be an object of class peptideSet (e.g. returned by makePeptideSet)!")
   }
   if(preproc(peptideSet@experimentData)$transformation!="log")
   {
-    stop("The peptideSet measurements need to be log transformed!")
+    warning("The peptideSet measurements may not be log transformed!")
   }
 
   data<-exprs(peptideSet)  
