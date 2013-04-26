@@ -31,7 +31,7 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE, split.by.space=TRUE)
 					set <- set[o,]
 				
 					y <- exprs(set)
-					p <- positon(set)
+					p <- position(set)
 					ny <- apply(y, 2, slidingMeanVector, width, p)
 					exprs(set) <- ny
 					rownames(exprs(set)) <- rownames(y)
@@ -53,6 +53,8 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE, split.by.space=TRUE)
 	
   else
 	{
+    if(length(names(ranges(peptideSet))) > 1)
+      warning("smoothing over multiple spaces in peptideSet object")
 		# This could be made more efficient with multicore
 		p <- position(peptideSet)
 		o <- order(p)
