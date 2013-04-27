@@ -103,14 +103,14 @@ NormalizeArray <- function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep
   ### Setting the normalization parameters
   if(robust)
   {
-    normalization<-paste(method, "robust",sep=" ")
+    normalization <- paste(method, "robust",sep=" ")
   }
   if(standard)
   {
-    normalization<-paste(method, "standardized",sep=" ")
+    normalization <- paste(method, "standardized",sep=" ")
   }
 
-  preproc(peptideSet@experimentData)$normalization<-method
+  preproc(peptideSet@experimentData)$normalization <- normalization
   
   peptideSet
 }
