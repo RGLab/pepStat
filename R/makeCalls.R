@@ -12,26 +12,26 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
 		warning("You should probably normalize your data before using this function.")
 	}
   
-	I <- .bgCorrect.pSet(peptideSet, verbose=verbose)
+	I <- pepStat:::.bgCorrect.pSet(peptideSet, verbose=verbose)
   
 	if (method == "FDR") {
-		Calls<-.findFDR(I, cutoff, position)
+		Calls<-.findFDR(I, cutoff, position(peptideSet))
 		
 		} else if(method == "absolute") {
 		Calls <- I > cutoff
 	}
-  	  
-  
+
 	if (!is.null(group) && freq) {
 		#parse the grouping variable 
 
 		# Only select the Post and remove empty levels        
 		t1 <- grepl("post", pData(peptideSet)$visit)
-		pd <- drop.levels(pData(peptideSet)[t1, ])
-        if(!group%in%colnames(pd)) {
-            error("The grouping variable is not part of the pData object.")
+		pd <- pData(peptideSet)[t1, ]
+    
+        if (!group%in%colnames(pd)) {
+            stop("The grouping variable is not part of the pData object.")
         } else {
-            factor<-as.factor(pd[,group])
+            factor<-factor(pd[,group])
         }
             
             

@@ -1,6 +1,6 @@
 summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 {    
-	if (is(peptideSet,"peptideSet")){
+	if (!is(peptideSet,"peptideSet")){
       stop("peptideSet must be an object of class peptideSet")
     }
 	

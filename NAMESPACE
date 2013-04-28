@@ -4,29 +4,22 @@
 useDynLib(pepStat)
 importFrom(stats4,summary)
 importClassesFrom(IRanges, RangedData)
-importClassesFrom(Biobase,eSet, VersionedBiobase, Versioned, AnnotatedDataFrame,AssayData,ExpressionSet, MIAME, Versions)
+importClassesFrom(Biobase, eSet, VersionedBiobase, Versioned, AnnotatedDataFrame, AssayData, ExpressionSet, MIAME, Versions)
 importClassesFrom(methods, character, integer, numeric)
 
-importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc,"preproc<-", sampleNames,"sampleNames<-",rowMedians)
-importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-",as.data.frame, width)
+importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc, "preproc<-", sampleNames, "sampleNames<-", rowMedians)
+importMethodsFrom(IRanges, lapply, "ranges<-",ranges, values, "values<-", as.data.frame, width)
 importMethodsFrom(methods, show)
-#importMethodsFrom(PEP.db,clade)
 
-#importFrom(base,subset)
-#importFrom(methods, "@<-", new)
 importFrom(methods, new)
 importFrom(stats, rnorm)
 importFrom(limma, read.maimages, backgroundCorrect)
-importFrom(gdata,read.xls)
-importFrom(IRanges, RangedData,IRanges)
-importFrom(Biobase,ExpressionSet)
+importFrom(IRanges, RangedData, IRanges)
+importFrom(Biobase, ExpressionSet)
+#importMethodsFrom(gdata, drop.levels)
+importFrom(tools, file_ext)
 
-importFrom(gdata,drop.levels)
-
-
-## export anything w/out a dot in front. 
-#exportPattern("^[^\\.]")
 exportClasses(peptideSet)
-exportMethods(show,summary,"[","position","clade","split","peptide","featureID","start","end","width","values","values<-", "subset","write.pSet")
+exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "subset", "write.pSet")
 export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "makeCalls")
 
