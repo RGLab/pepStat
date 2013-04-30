@@ -1,7 +1,7 @@
 summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 {
 	# Check arguments for conformity
-	check = checkArgs_sumPeps(peptideSet, summary, position)
+	check = .checkArgs_sumPeps(peptideSet, summary, position)
 	if(!check)
 		stop(attr(check, "ErrorString"))
 	
@@ -82,7 +82,7 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 	newSet
 }
 
-checkArgs_sumPeps = function(peptideSet, summary, position)
+.checkArgs_sumPeps = function(peptideSet, summary, position)
 {
 	OK = TRUE
 	attr(OK, "ErrorString") = NULL
