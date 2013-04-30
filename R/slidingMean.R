@@ -51,7 +51,7 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE, split.by.space=TRUE)
   else
 	{
     if(length(names(ranges(peptideSet))) > 1)
-      warning("smoothing over multiple spaces in peptideSet object")
+      warning("smoothing multiple spaces together in peptideSet object")
 		# This could be made more efficient with multicore
 		p <- position(peptideSet)
 		o <- order(p)
