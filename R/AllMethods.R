@@ -27,71 +27,44 @@ setMethod("summary", signature("peptideSet"),
     }
 )
 
-setMethod("[","peptideSet",
-		function(x,i,j,..., drop=FALSE)
-		{
-			if(!missing(i))
-			{
-			sdata<-exprs(x)[i,j]		
-			featureRange=ranges(x)[i,]
-			}
-			else
-			{
-			    sdata<-exprs(x)[,j]				
-				featureRange<-ranges(x)
-			}
-		    newSet<-new('peptideSet'
-							,exprs=as.matrix(sdata)
-							,featureRange=featureRange
-							,experimentData=x@experimentData)
-			pData(newSet)<-pData(x)[j,]
-			sampleNames(newSet)<-sampleNames(x)[j]
-		    newSet
-			
-		})
+setMethod("[", "peptideSet",
+          function(x, i, j, ..., drop=FALSE) {
+            if (!missing(i)) {
+              sdata <- exprs(x)[i, j]
+              featureRange <- ranges(x)[i, ]
+            } else {
+              sdata <- exprs(x)[, j]
+              featureRange <- ranges(x)
+            }
+            
+            newSet<-new('peptideSet', 
+                        exprs = as.matrix(sdata), 
+                        featureRange = featureRange, 
+                        experimentData = x@experimentData)
+            
+            if (!missing(j)) {
+             pData(newSet) <- pData(x)[j,]
+             sampleNames(newSet) <- sampleNames(x)[j]
+            } else {
+              pData(newSet) <- pData(x)
+            }  
+            newSet
+          })
 
-		# There is an S3 methods for this, should we use it?
-#setGeneric("subset")
-#setMethod("subset","peptideSet",
-##subset.pSet<-
-#function (x, select, subset, drop = FALSE, ...) 
-#{
-    #if (missing(subset)) 
-        #vars <- rep(TRUE,ncol(x))
-    #else {
-        #e <- substitute(subset)
-        #vars <- eval(e, pData(x), parent.frame())
-        #if (!is.logical(vars)) 
-            #stop("'subset' must evaluate to logical")
-        #vars <- vars & !is.na(vars)
-    #}
-    #if (missing(select)) 
-		#r <- rep(TRUE,nrow(x))
-    #else {
-        #e <- substitute(select)
-        #r <- eval(e, ranges(x), parent.frame())
-        #if (!is.logical(r)) 
-            #stop("'subset' must evaluate to logical")
-        #r <- r & !is.na(r)
-    #}
-    #x[r, vars, drop = drop]
-	#}
-#)
-setMethod("subset","peptideSet",
-function (x, subset, drop = FALSE, ...) 
-{
-    if (missing(subset))
-	r <- rep(TRUE,nrow(x))
-    else {
-        e <- substitute(subset)#class(e) = call
-        r <- eval(e, pData(x), parent.frame())
-        if (!is.logical(r)) 
-            stop("'subset' must evaluate to logical")
-        r <- r & !is.na(r)
-	vars<-r
-    }
-    x[,vars, drop = drop]
-})
+setMethod("subset", "peptideSet", 
+          function (x, subset, drop = FALSE, ...) {
+            if (missing(subset)){
+              r <- rep(TRUE,nrow(x)) 
+            } else {
+              e <- substitute(subset)#class(e) = call
+              r <- eval(e, pData(x), parent.frame())
+              if (!is.logical(r)) 
+                stop("'subset' must evaluate to logical")
+              r <- r & !is.na(r)
+              vars<-r
+            }
+            x[,vars, drop = drop]
+          })
 
 
 setGeneric("position", function(x, ...) standardGeneric("position"))

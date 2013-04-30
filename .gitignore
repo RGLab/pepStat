@@ -7,3 +7,6 @@ src/Makevars
 src/NormalizeProbes.o
 src/pepStat.so
 .DS_Store
+.Rbuildignore
+.Rproj.*
+.project

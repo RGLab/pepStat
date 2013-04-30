@@ -1,7 +1,7 @@
-summarizePeptides <- function(peptideSet,summary="median",position=NULL)
+summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 {
 	# Check arguments for conformity
-	check = checkArgs_sumPeps(peptideSet, summary, position)
+	check = .checkArgs_sumPeps(peptideSet, summary, position)
 	if(!check)
 		stop(attr(check, "ErrorString"))
 	
@@ -18,22 +18,24 @@ summarizePeptides <- function(peptideSet,summary="median",position=NULL)
 	)
 	colnames(sdata)<-colnames(df)
 	
-	# Since they are the same, we only take the first one
+	
 	featureID <- sapply(split(featureID(peptideSet),as.factor(featureSequence)),function(x){x[1]})
 	featureSequence <- as.character(sapply(split(featureSequence,featureSequence),function(x){x[1]}))
 	
-	exprs<-as.matrix(sdata)
-	rownames(exprs)<-featureSequence
-	colnames(exprs)<-sampleNames(peptideSet)
-	nPep<-length(featureID)
+	exprs <- as.matrix(sdata)
+	rownames(exprs) <- featureSequence
+	colnames(exprs) <- sampleNames(peptideSet)
+	nPep <- length(featureID)
+
 	newSet<-new('peptideSet',
 			featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)),
 					featureID, peptide = featureSequence),
 			exprs = as.matrix(sdata),
 			experimentData=peptideSet@experimentData)
 	
-	sampleNames(newSet)<-sampleNames(peptideSet)
-	
+	sampleNames(newSet) <- sampleNames(peptideSet)
+
+
 	if(!is.null(position))
 	{
 		# assume that rownames of position RangedData 
@@ -80,7 +82,7 @@ summarizePeptides <- function(peptideSet,summary="median",position=NULL)
 	newSet
 }
 
-checkArgs_sumPeps = function(peptideSet, summary, position)
+.checkArgs_sumPeps = function(peptideSet, summary, position)
 {
 	OK = TRUE
 	attr(OK, "ErrorString") = NULL
