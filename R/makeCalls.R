@@ -60,7 +60,7 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
     # Compute the mean over unique positions
     D <- sapply(tmp,apply, 2, mean)
     
-    FDR <- sapply(seqY, function(x, D){median(apply(D, 1, function(D,x){min(max(sum(D < -x)/sum(D > x), 0), 1)}, x), na.rm=TRUE)}, D)
+    FDR <- sapply(seqY, function(x, D){median(apply(D, 1, function(D,x){min(sum(D < -x)/sum(D > x), 1)}, x), na.rm=TRUE)}, D)
     
     # Did not find anything below the cutoff or everything is NA
     if (all(round(FDR,2)>cutoff, na.rm=TRUE) | all(is.na(FDR))) {
