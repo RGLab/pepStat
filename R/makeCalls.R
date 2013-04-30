@@ -25,7 +25,7 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
 		#parse the grouping variable 
 
 		# Only select the Post and remove empty levels        
-		t1 <- grepl("post", pData(peptideSet)$visit)
+		t1 <- grepl("post", tolower(pData(peptideSet)$visit))
 		pd <- pData(peptideSet)[t1, ]
     
         if (!group%in%colnames(pd)) {
