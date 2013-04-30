@@ -10,3 +10,5 @@ src/pepStat.so
 .Rbuildignore
 .Rproj.*
 .project
+.Rproj.user
+pepStat.Rproj
