@@ -31,6 +31,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     RG <- RG.list[[1]]
     # Find the common target
     target.id <- Reduce(intersect,lapply(RG.list,function(x){x$genes$ID}))
+    # Remove the control that might not match across array designs
+    target.id <- target.id[!target.id %in% rm.control.list]
     if(length(target.id)==0){
       error("No common features found across slides")
     }
@@ -58,7 +60,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     # Make sure the sample names are consitent across objects
     colnames(RG$E) <- rownames(RG$targets)
     colnames(RG$Eb) <- rownames(RG$targets)
-    RG$genes <- RG.list[[1]]$genes
+    RG$genes <- RG.list[[1]]$genes[RG.list[[1]]$genes$ID %in% target.id,]
     
   }
   
