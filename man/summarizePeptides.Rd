@@ -5,11 +5,11 @@
 
 \description{
 This function merges the replicates and adds information from a peptide collection 
-to a peptideSet. This include coordinates, alignment information and zScores.
+to a peptideSet. This collection can include coordinates, alignment information, Z-scales, and other peptide information.
 }
 
 \usage{
-summarizePeptides(peptideSet,summary="median",position=NULL)
+summarizePeptides(peptideSet, summary = "median", position = NULL)
 }
 
 \arguments{
@@ -19,13 +19,10 @@ summarizePeptides(peptideSet,summary="median",position=NULL)
 }
 
 \details{
-The \code{summary} argument must be either "mean" or "median", indicating how within-array
-replicates of peptides will be summarized.
+The \code{summary} argument must be either "mean" or "median", indicating how within-array replicates of peptides will be summarized.
 
-If non-\code{NULL}, the \code{position} argument must be a \link{RangedData} object 
-that has rownames corresponding to the ID of array probes. In particular,
-array probe IDs from \code{peptide(peptideSet)} are matched against these rownames. 
-It is permissible for the \code{position} object to cover multiple spaces.
+If non-\code{NULL}, the \code{position} argument must be a \link{RangedData} object that has rownames corresponding to the ID of array probes. In particular,
+array probe IDs from \code{peptide(peptideSet)} are matched against these rownames. It is permissible for the \code{position} object to cover multiple spaces.
 }
 
 \value{
@@ -36,10 +33,10 @@ An object of class \code{peptideSet} with added columns and updated ranges.
 For the position argument, some peptide collections can be found in the \code{PEP.db} package.
 }
 
-\author{Raphael Gottardo}
+\author{Raphael Gottardo, Gregory Imholte}
 
 \seealso{
-\code{makePeptideSet}
+\link{makePeptideSet}
 }
 
 \keyword{functions}
