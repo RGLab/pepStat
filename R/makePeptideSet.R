@@ -160,12 +160,12 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
       stop("Mapping file must be a .csv file")
     
     # ensure that mapping.file has a filename entry
-    header <- tolower(scan(mapping.file, what = "character",
-                           nlines = 1, sep = ",", quiet = TRUE))
-    if( sum(c("filename","ptid","visit") %in% header)!=3 )
+    header <- scan(mapping.file, what = "character",
+                           nlines = 1, sep = ",", quiet = TRUE)
+    if( sum(c("filename","ptid","visit") %in% tolower(header)) != 3 )
       stop("mapping.file document header must include 3 mandatory columns: filename, ptid, visit")
     
-    j <- match("filename", header)
+    j <- match("filename", tolower(header))
     mapping.file <- read.csv(mapping.file, row.names=header[j])
   } else {
     if(!is.data.frame(mapping.file)){
@@ -177,16 +177,18 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     
     if (!is.na(j)) {
       row.names(mapping.file) <- mapping.file[,j]
+      # drop the filename now that we are using it as row names
+      mapping.file <- subset(mapping.file, select = -j)
     } else {
       message("filename entry not found in mapping.file, using rownames as file names")
     }
-    mapping.file <- subset(mapping.file, select=-c(filename))
-    
+    if( sum(c("ptid", "visit") %in% tolower(colnames(mapping.file))) < 2 )
+      stop("mapping.file object must include mandatory columns: ptid, visit")
   }
+  
   rownames(mapping.file) <- tolower(rownames(mapping.file))
   colnames(mapping.file) <- tolower(colnames(mapping.file))
   
-  # drop the filename now that we are using it as row names
   mapping.file$ptid <- tolower(mapping.file$ptid)
   mapping.file$visit <- tolower(mapping.file$visit)		
   

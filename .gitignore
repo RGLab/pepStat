@@ -9,5 +9,7 @@ src/pepStat.so
 .DS_Store
 .Rbuildignore
 .Rproj.*
-.Rproj.user
 .Rhistory
+.project
+.Rproj.user
+pepStat.Rproj

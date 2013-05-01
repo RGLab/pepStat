@@ -12,12 +12,12 @@
 	} else {
 		if (isTRUE(all.equal(sort(ptid[t0]), sort(ptid[t1])))) {
 			if (verbose) {
-				cat("You have paired PRE/POST samples\n")
+				message("You have paired PRE/POST samples\n")
 			}
 			I <- as.matrix(y[,t1])-as.matrix(y[,t0])
         } else {
 			if(verbose) {
-				cat("You don't have paired PRE/POST samples\n")
+				message("You don't have paired PRE/POST samples\n")
 			}	  
 			I <- as.matrix(y[,t1])-rowMeans(y[, t0, drop=FALSE], na.rm=TRUE)#the vector to be subtracted from matrix need to be the same length as nrow of the matrix  	
 		}

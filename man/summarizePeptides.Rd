@@ -1,20 +1,31 @@
 \name{summarizePeptides}
 \alias{summarizePeptides}
 
-\title{Add informations to a peptideSet}
+\title{Add informations to a peptideSet and summarizes peptides}
 
 \description{
-This function merges the replicates and adds information from a peptide collection to a peptideSet. This include coordinates, alignment information and zScores.
+This function merges the replicates and adds information from a peptide collection 
+to a peptideSet. This include coordinates, alignment information and zScores.
 }
 
 \usage{
-summarizePeptides(peptideSet,summary="mean",position=NULL)
+summarizePeptides(peptideSet,summary="median",position=NULL)
 }
 
 \arguments{
-\item{peptideSet}{A \code{peptideSet} object.}
+\item{peptideSet}{A \code{peptideSet} object, preferably created by \link{makePeptideSet}.}
 \item{summary}{A character string. The method to be used for merging replicates.}
-\item{position}{A \code{RangedData} object. A collection of peptides that can be found in the PEP.db package.}
+\item{position}{A \code{RangedData} object. See Details}
+}
+
+\details{
+The \code{summary} argument must be either "mean" or "median", indicating how within-array
+replicates of peptides will be summarized.
+
+If non-\code{NULL}, the \code{position} argument must be a \link{RangedData} object 
+that has rownames corresponding to the ID of array probes. In particular,
+array probe IDs from \code{peptide(peptideSet)} are matched against these rownames. 
+It is permissible for the \code{position} object to cover multiple spaces.
 }
 
 \value{

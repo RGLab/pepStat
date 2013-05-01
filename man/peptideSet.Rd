@@ -11,6 +11,7 @@
 \alias{values,peptideSet-method}
 \alias{values<-,peptideSet-method}
 \alias{show,peptideSet-method}
+\alias{summary,peptideSet-method}
 \alias{peptide}
 \alias{peptide,peptideSet-method}
 \alias{position}
@@ -55,6 +56,7 @@ The makePeptideSet function can be used to create a peptideSet object from a lis
   %\item{"values"}{:}
   %\item{"values<-"}{:}
   \item{"show"}{: \code{signature(x = "peptideSet")}: Display method.}
+  \item{"show"}{: \code{signature(x = "peptideSet")}: Display a quick summary of the Samples and the preprocessing information.}
   \item{"peptide"}{: \code{signature(x = "peptideSet")}: Returns the sequence of the peptides.}
   %\item{"position"}{: \code{signature(x = "peptideSet")}: The position of the peptides: (end - start)/2 }
   \item{"split"}{: \code{signature(x = "peptideSet", f = "factor")}: Split the peptideSet in a \code{list} of \code{peptideSet} based on the given factor.}
