@@ -8,10 +8,10 @@ This function reads GenePix results (.gpr) files and creates a peptideSet object
 }
 
 \usage{
-makePeptideSet(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
-	rm.control.list=c("empty","none","JPT-","Ig","Cy","landmark"), norm.empty=TRUE,
-	empty.control.list=c("empty","blank control"), bgCorrect.method="normexp",
-	log=TRUE, check.row.order=FALSE, verbose=FALSE)
+makePeptideSet(files = NULL, path = NULL, mapping.file = NULL, 
+  use.flags=FALSE, rm.control.list = NULL, norm.empty = TRUE,
+	empty.control.list = NULL, bgCorrect.method = "normexp",
+	log = TRUE, check.row.order = FALSE, verbose = FALSE)
 }
 
 \arguments{
@@ -29,41 +29,24 @@ makePeptideSet(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
 }
 
 \details{
-	GenePix results files (\code{.gpr}) are read when found in either the \code{files} or \code{path}
-	arguments. By default, the foreground and background median intensities of the "red" channels,
-	"F635 Median" and "B635 Median", are read. The background correction specified in
-	\code{bgCorrect.method} is passed to the \link{backgroundCorrect} method in the \code{limma}
-	package.
+	GenePix results files (\code{.gpr}) are read when found in either the \code{files} or \code{path} arguments. By default, the foreground and background median intensities of the "red" channels, "F635 Median" and "B635 Median", are read. The background correction specified in \code{bgCorrect.method} is passed to the \link{backgroundCorrect} method in the \code{limma} package.
 
-	The argument \code{mapping.file} may either be a character string file path or data frame. If a file path,
-	it must point to a \code{.csv} file which is read and used as experiment information. Each row of the
-	provided data frame must correspond to a single slide. Entries in the data frame are matched
-	to arrays by file name. To this end, one column in the \code{mapping.file} data frame MUST be labeled
-	"Filename" (not case sensitive) if provided. Entries in this column must match filenames read from
-	the \code{path} or \code{files} arguments after dropping the \code{.gpr} extention. For example,
-	"PID_101_vst1.gpr" must be matched by "PID_101_vst1" in the "filename" column provided by 
-	\code{mapping.file}.
+	The argument \code{mapping.file} may either be a character string file path or data frame. If a file path, it must point to a \code{.csv} file which is read and used as experiment information. Each row of the \code{mapping.file} data frame is taken to correspond with information about a single slide. Entries in the data frame are matched to arrays by file name. One column in the \code{mapping.file} data frame MUST be labeled "Filename" (not case sensitive) if provided. Entries in this column must match file names read from the \code{path} or \code{files} arguments after dropping the \code{.gpr} extension. For example, "PID_101_vst1.gpr" would be matched to "PID_101_vst1" in a "filename" column provided by \code{mapping.file}.
 	
-	The argument \code{rm.control.list} specifies (possibly partial) names of array probes to be removed 
-	from the data set. Elements of this vector are matched against the Name and ID columns of the
-	\code{.gpr} files.
+	The argument \code{rm.control.list} specifies (possibly partial) names of array probes to be removed from the data set. Elements of this vector are matched against the Name and ID columns of the \code{.gpr} files.
 	
-	After background correction, if \code{norm.empty = TRUE}, intensities of probes matching 
-	strings (possibly partially) in \code{empty.control.list} are averaged within each array, 
-	and the average is subtracted from all intensities within the each array.
+	After background correction, if \code{norm.empty = TRUE}, intensities of probes matching strings (possibly partially) in \code{empty.control.list} are averaged within each array, and the average is subtracted from all intensities within the each array.
 	
-	If \code{check.row.order = TRUE}, the final set of probes is taken to be those with IDs found
-	in all arrays that were read.
+	If \code{check.row.order = TRUE}, the final set of probes is taken to be those with IDs found in all arrays that were read.
 	
-	Row, Column, and Block spatial array positions for each probe are stored in the \code{featureRanges}
-	slot of the returned object.
+	Row, Column, and Block spatial array positions for each probe are stored in the \code{featureRanges} slot of the returned object.
 }
 
 \value{
 	A \link{peptideSet} object.
 }
 
-\author{Raphael Gottardo}
+\author{Raphael Gottardo, Gregory Imholte}
 
 \seealso{
 \link{peptideSet}
