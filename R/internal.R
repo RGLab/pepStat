@@ -37,3 +37,17 @@
 #     sy
 # }
 # 
+
+.reduce2hotspots<-function(pSet,freq,cutoff) {
+    hotspots<-reduce(ranges(pSet)[freq>cutoff,])
+    data.hotspots<-sapply(1:nrow(hotspots), .max.freq, start(hotspots), end(hotspots), pepStat:::position(pSet), freq)
+    hotspots<-data.frame(start=start(hotspots), end=end(hotspots), center=as.integer(data.hotspots[1,]), frequency=data.hotspots[2,])
+    hotspots
+}
+
+.max.freq <- function(i, start, end, position, freq) {
+    index <- position > start[i] & (position < end[i])
+    pos <- position[index]
+    freq <- freq[index]
+    c(pos[which.max(freq)], freq[which.max(freq)])
+}
