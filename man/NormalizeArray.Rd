@@ -8,8 +8,8 @@
 }
 
 \usage{
-NormalizeArray(peptideSet, robust = TRUE, standard = FALSE, method = "ZpepQuad",
-  centered = TRUE, verbose = FALSE)
+NormalizeArray(peptideSet, robust = TRUE, standard = FALSE, 
+method = "ZpepQuad", centered = TRUE, verbose = FALSE)
 }
 
 \arguments{
@@ -36,7 +36,7 @@ If \code{robust = TRUE} the linear model is fit with \eqn{t_4} distributed error
 
 
 \references{
-Sandberg, M., Eriksson, L., Jonsson, J., Sjostrom, M., and Wold, S. (1998). New chemical descriptors relevant for the design of biologically active peptides. A multivariate characterization of 87 amino acids. Journal of Medicinal Chemistry 41, 2481–2491.
+Sandberg, M., Eriksson, L., Jonsson, J., Sjostrom, M., and Wold, S. (1998). New chemical descriptors relevant for the design of biologically active peptides. A multivariate characterization of 87 amino acids. Journal of Medicinal Chemistry 41, 2481-2491.
 }
 
 \value{
