@@ -32,7 +32,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     # Find the common target
     target.id <- Reduce(intersect,lapply(RG.list,function(x){x$genes$ID}))
     if(length(target.id)==0){
-      error("No common features found across slides")
+      stop("No common features found across slides")
     }
     
     # subset all
