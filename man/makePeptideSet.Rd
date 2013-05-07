@@ -9,9 +9,10 @@ This function reads GenePix results (.gpr) files and creates a peptideSet object
 
 \usage{
 makePeptideSet(files = NULL, path = NULL, mapping.file = NULL, 
-  use.flags=FALSE, rm.control.list = NULL, norm.empty = TRUE,
-	empty.control.list = NULL, bgCorrect.method = "normexp",
-	log = TRUE, check.row.order = FALSE, verbose = FALSE)
+  use.flags = FALSE, rm.control.list = NULL, norm.empty = FALSE,
+	empty.control.list = c("empty","blank control"),
+  bgCorrect.method = "normexp", log = TRUE, check.row.order = FALSE,
+  verbose = FALSE)
 }
 
 \arguments{

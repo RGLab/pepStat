@@ -3,7 +3,7 @@
 \alias{peptideSet}
 \alias{peptideSet-class}
 \alias{clade,peptideSet-method}
-\alias{[,peptideSet-method}
+\alias{[,peptideSet,ANY,ANY,logical-method}
 \alias{subset,peptideSet-method}
 \alias{start,peptideSet-method}
 \alias{end,peptideSet-method}

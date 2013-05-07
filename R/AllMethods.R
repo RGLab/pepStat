@@ -23,8 +23,8 @@ setMethod("summary", signature("peptideSet"),
     }
 )
 
-setMethod("[", "peptideSet",
-          function(x, i, j, ..., drop=FALSE) {
+setMethod("[", signature("peptideSet", i = "ANY", j = "ANY", drop = "logical"),
+          function(x, i, j, ..., drop = FALSE) {
             if (!missing(i)) {
               sdata <- exprs(x)[i, j]
               featureRange <- ranges(x)[i, ]
@@ -48,7 +48,7 @@ setMethod("[", "peptideSet",
             newSet
           })
 
-setMethod("subset", "peptideSet", 
+setMethod("subset", signature(x = "peptideSet"), 
           function (x, subset, drop = FALSE, ...) {
             if (missing(subset)){
               r <- rep(TRUE,nrow(x)) 
