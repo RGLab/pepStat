@@ -8,6 +8,6 @@ Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends: R(>= 2.15.0),Biobase (>= 2.5.5), IRanges
 Suggests: PEP.db
-Imports: methods, limma, stats4
+Imports: methods, limma, stats4, fields, ggplot2, plyr
 biocViews: Microarray, Preprocessing, Statistics
 URL: https://github.com/RGLab/pepStat

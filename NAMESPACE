@@ -11,6 +11,7 @@ importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc,"preproc<-", sampl
 importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-",as.data.frame, width, cbind, rbind)
 importMethodsFrom(methods, show)
 
+import(ggplot2)
 importFrom(methods, new)
 importFrom(stats, rnorm)
 importFrom(limma, read.maimages, backgroundCorrect)
@@ -18,8 +19,10 @@ importFrom(IRanges, RangedData, IRanges)
 importFrom(Biobase, ExpressionSet)
 #importMethodsFrom(gdata, drop.levels)
 importFrom(tools, file_ext)
+importFrom(fields, smooth.2d)
+importFrom(plyr, ddply)
 
 exportClasses(peptideSet)
 exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "subset", "write.pSet")
-export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "makeCalls")
+export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "makeCalls", "plotArrayImage", "plotArrayResiduals")
 
