@@ -23,14 +23,14 @@ setMethod("summary", signature("peptideSet"),
     }
 )
 
-setMethod("[", signature("peptideSet", i = "ANY", j = "ANY", drop = "logical"),
+setMethod("[", signature("peptideSet", i = "ANY", j = "ANY"),
           function(x, i, j, ..., drop = FALSE) {
             if (!missing(i)) {
-              sdata <- exprs(x)[i, j]
+              sdata <- exprs(x)[i, j, drop = drop]
               featureRange <- ranges(x)[i, ]
             } 
             else {
-              sdata <- exprs(x)[, j]
+              sdata <- exprs(x)[, j, drop = drop]
               featureRange <- ranges(x)
             }
             

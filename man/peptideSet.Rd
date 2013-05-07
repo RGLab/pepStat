@@ -3,7 +3,7 @@
 \alias{peptideSet}
 \alias{peptideSet-class}
 \alias{clade,peptideSet-method}
-\alias{[,peptideSet,ANY,ANY,logical-method}
+\alias{[,peptideSet,ANY,ANY,ANY-method}
 \alias{subset,peptideSet-method}
 \alias{start,peptideSet-method}
 \alias{end,peptideSet-method}
@@ -47,8 +47,8 @@ The \link{makePeptideSet} function can be used to create a peptideSet object fro
 
 \section{Methods}{
 \describe{
-  \item{"["}{: \code{signature(x = "peptideSet")}: subset method for \code{peptideSet} object.}
-  \item{"subset"}{: \code{signature(x = "peptideSet")}: subset method for \code{peptideSet} object.}
+  \item{"x[i,j]"}{: \code{signature(x = "peptideSet")}: subset method for \code{peptideSet} object. Row index \code{i} subsets probes, while column index \code{j} subsets by samples (slides).}
+  \item{"subset"}{: \code{signature(x = "peptideSet")}: subset method for \code{peptideSet} object}
   \item{"clade"}{: \code{signature(object = "peptideSet")}: Returns a \code{matrix} of the clades each peptide belongs to.}
   \item{"show"}{: \code{signature(x = "peptideSet")}: Display a quick summary of the Samples and the preprocessing information.}
   \item{"peptide"}{: \code{signature(x = "peptideSet")}: Returns the sequence of the peptides.}
