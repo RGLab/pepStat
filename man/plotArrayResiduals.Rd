@@ -11,7 +11,7 @@ slides.
 }
 \usage{plotArrayResiduals(peptideSet, array.index = NULL, smooth = FALSE,
   low = "blue", high = "red",
-  ask = dev.interactive() & 1 < length(array.index))
+  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
 }
 \arguments{
   \item{peptideSet}{

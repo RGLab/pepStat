@@ -1,6 +1,6 @@
 plotArrayImage <- function(peptideSet, array.index = NULL,
   low = "white", high = "steelblue",
-  ask = dev.interactive() & 1 < length(array.index))
+  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
 {
   if (is.null(array.index))
     stop("Must specify indicies of arrays to be plotted")
@@ -26,6 +26,7 @@ plotArrayImage <- function(peptideSet, array.index = NULL,
     oask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(oask))
   }
+  
   for(i in 1:n.plots) {
     dev.hold()
     d.tmp <- data.frame(Intensity = y[,i], plot.coord)
@@ -46,7 +47,7 @@ plotArrayImage <- function(peptideSet, array.index = NULL,
 
 plotArrayResiduals <- function(peptideSet, array.index = NULL, smooth = FALSE,
   low = "blue", high = "red",
-  ask = dev.interactive() & 1 < length(array.index))
+  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
 {
   if (is.null(array.index))
     stop("Must specify indicies of arrays to be plotted")

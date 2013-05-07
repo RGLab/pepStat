@@ -10,7 +10,7 @@ slide. Such plots are helpful for diagnosing spatial abnormalities on slides.
 }
 \usage{plotArrayImage(peptideSet, array.index = NULL,
   low = "white", high = "steelblue",
-  ask = dev.interactive() & 1 < length(array.index))
+  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
 }
 \arguments{
   \item{peptideSet}{
