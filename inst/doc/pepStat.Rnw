@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{fullpage}
+\usepackage{graphicx}
 \SweaveOpts{keep.source=FALSE}
 
 \title{The pepStat user guide}
@@ -84,11 +85,14 @@ pSet <- makePeptideSet(files=NULL, path=dirToParse, mapping.file=mapFile,
 \subsection{Visualize slides}
 We include two plotting functions to detect possible spatial slide artifacts.
 
-<<plot-slide, include=TRUE, fig.width=7.48, fig.height=3>>=
+\setkeys{Gin}{width=\textwidth}
+<<plot-slide, fig=TRUE, include=TRUE, width=7.48, height=3>>=
 plotArrayImage(pSet, array.index = 1)
-plotArrayResiduals(pSet, array.index = 1, smooth = TRUE)
 @
 
+<<plot-residuals, fig=TRUE, include=TRUE, width=7.48, height=3>>=
+plotArrayResiduals(pSet, array.index = 1, smooth = TRUE)
+@
 
 \subsection{Accessing \texttt{peptideSet} elements}
 \texttt{makePeptideSet} returns an object of class \texttt{peptideSet}, 
@@ -177,7 +181,8 @@ V_calls <- makeCalls(psmSet, freq = TRUE, group = "treatment",
                      cutoff = .1, method = "FDR", verbose = TRUE)
 @
 
-
-
+<<session>>=
+sessionInfo()
+@
 
 \end{document}
