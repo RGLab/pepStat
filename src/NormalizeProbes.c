@@ -575,3 +575,17 @@ void normArray(char **seq, double *y, double *yNormalized, int *nProbes, int *nA
   gsl_permutation_free(indexSorted);
   gsl_vector_free(XR);
 }
+
+
+static const R_CMethodDef cMethods[] = {
+  	{"NormalizeProbes", (DL_FUNC) &NormalizeProbes, 19},
+		{NULL, NULL, 0}
+};
+
+void R_init_pepStat(DllInfo *info)
+{
+	R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+}
+
+
+

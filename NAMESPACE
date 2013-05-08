@@ -1,7 +1,7 @@
 ##
 ## NAMESPACE file for pepStat library.
 ##
-useDynLib(pepStat)
+useDynLib(pepStat, .registration = TRUE, .fixes = "C_")
 importFrom(stats4,summary)
 importClassesFrom(IRanges, RangedData)
 importClassesFrom(Biobase, eSet, VersionedBiobase, Versioned, AnnotatedDataFrame, AssayData, ExpressionSet, MIAME, Versions)
@@ -17,7 +17,6 @@ importFrom(stats, rnorm)
 importFrom(limma, read.maimages, backgroundCorrect)
 importFrom(IRanges, RangedData, IRanges)
 importFrom(Biobase, ExpressionSet)
-#importMethodsFrom(gdata, drop.levels)
 importFrom(tools, file_ext)
 importFrom(fields, smooth.2d)
 importFrom(plyr, ddply)

@@ -56,7 +56,7 @@ NormalizeArray <- function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep
   alphabet<-sort(unique(AllChar<-unlist(sapply(seq, function(x){strsplit(x,"")}))))
   
   # Calling C code
-  obj<-.C("NormalizeProbes",
+  obj<-.C(C_NormalizeProbes,
   as.character(seq),
   as.double(y),
   yNormalized=as.double(rep(0,nArrays*nProbes)),
@@ -75,8 +75,7 @@ NormalizeArray <- function(peptideSet, robust=TRUE, standard=FALSE, method="Zpep
   as.integer(standard),
   as.integer(verbose),
   as.integer(numZpep),
-  as.double(Zpep),
-  package="pepStat")
+  as.double(Zpep))
 
   if(verbose)
   {
