@@ -1,7 +1,7 @@
 ##
 ## NAMESPACE file for pepStat library.
 ##
-useDynLib(pepStat, .registration = TRUE, .fixes = "C_")
+
 importFrom(stats4,summary)
 importClassesFrom(IRanges, RangedData)
 importClassesFrom(Biobase, eSet, VersionedBiobase, Versioned, AnnotatedDataFrame, AssayData, ExpressionSet, MIAME, Versions)
