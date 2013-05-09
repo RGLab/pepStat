@@ -11,3 +11,4 @@ src/pepStat.so
 .Rproj.*
 .project
 .Rproj.user
+.Rhistory
