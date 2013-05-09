@@ -42,7 +42,7 @@ If \code{freq = FALSE}, a \code{logical} matrix with TRUE values indicating a po
 
 
 \seealso{
-\link{NormalizeArray}
+\link{normalizeArray}
 \link{slidingMean}
 }
 

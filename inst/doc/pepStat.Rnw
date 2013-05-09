@@ -142,7 +142,7 @@ package uses physiochemical properties of individual peptides to model
 non-specific antibody binding to arrays.
 
 <<normalize>>=
-pnSet <- NormalizeArray(psSet)
+pnSet <- normalizeArray(psSet)
 @
 
 An object of class \texttt{peptideSet} containing the corrected peptides intensities is returned.

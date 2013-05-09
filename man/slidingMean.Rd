@@ -31,7 +31,7 @@ The function returns the peptideSet object with smoothed intensities.
 
 
 \seealso{
-\link{NormalizeArray}, \link{summarizePeptides}
+\link{normalizeArray}, \link{summarizePeptides}
 }
 
 \keyword{functions}
