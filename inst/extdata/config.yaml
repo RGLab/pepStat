@@ -1,0 +1,16 @@
+--- 
+# project options
+projdir: "~/workspace/others/peptide_microarray/template_project/proj1/"
+
+# pepStat options
+mapping: mapping.csv
+collection: pep_hxb2
+method: absolute
+call.cutoff: 0.1
+
+# HIV.db options
+genome: hxb2
+features:
+  - V1
+  - V2
+  - V3

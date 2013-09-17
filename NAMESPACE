@@ -24,4 +24,6 @@ importFrom(plyr, ddply)
 exportClasses(peptideSet)
 exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "subset", "write.pSet")
 export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "normalizeArray", "makeCalls", "plotArrayImage", "plotArrayResiduals")
+#Templates
+export("mk_project", "rm_project")
 
