@@ -1,6 +1,5 @@
 --- 
 # project options
-projdir: "~/workspace/others/peptide_microarray/template_project/proj1/"
 
 # pepStat options
 mapping: mapping.csv
@@ -14,3 +13,6 @@ features:
   - V1
   - V2
   - V3
+  - ID
+  - MPER
+  - TM

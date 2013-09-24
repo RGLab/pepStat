@@ -1,8 +1,6 @@
 ```{r knitr-opts, echo=FALSE}
 library(knitr)
-opts_chunk$set(message=TRUE,
-               cache.path=paste0(projdir, "/reports/cache_", report_name,"/"),
-               fig.path=paste0(projdir, "/data/output/figures_", report_name,"/"))
+opts_chunk$set(message=TRUE)
 ```
 
 ```{r libraries, echo=FALSE, message=FALSE}
@@ -13,10 +11,16 @@ library(Pviz)
 library(yaml)
 ```
 
+```{r path}
+projdir
+dI <- paste(projdir, "data/input/", sep="/")
+dI <- paste(projdir, "data/output/", sep="/")
+
+```
 
 ## Reading the option file
 ```{r read-config}
-yaml_opts <- yaml.load_file(paste0(projdir, "/settings/", report_name, ".yaml"))
+yaml_opts <- yaml.load_file(paste0("../settings/", report_name, ".yaml"))
 #pepStat opts
 mappingfilename <- yaml_opts$mapping
 collection <- get(eval(substitute(data(x), list(x=yaml_opts$collection))))
@@ -65,16 +69,9 @@ features <- getFeature(anno_db, name=features)
 ## Tracks creation
 ```{r Pviz-tracks}
 pat <- ProteinAxisTrack(addNC=TRUE, littleTicks=TRUE)
-anno <- ATrack(start=start(features), end=end(features), name="landmarks", id=getName(features), showFeatureId=TRUE)
-pro_anno <- ATrack(start=start(proteins),end=end(proteins), id=proteins$name, name="Proteins",size=1.5, showFeatureId=TRUE, stacking="dense")
-dt <- DTrack(start=position(pnSet[names(freq),]), width=0, data=freq, name="Frequency", type="l")
-```
+anno <- ATrack(start=start(features), end=end(features), name=getName(features))
 
-## Plotting
-```{r plotTracks}
-plotTracks(c(pat, anno, pro_anno, dt))
 ```
-
 <!--
 ```{r evalF, eval=FALSE, echo=FALSE}
 hotspot <- pepStat::.reduce2hotspots <- function(pSet, freq, hotspot.cutoff=.2)
