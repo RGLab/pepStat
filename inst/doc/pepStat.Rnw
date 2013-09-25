@@ -1,5 +1,6 @@
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{The pepStat users guide}
-%\VignetteDepends{PEP.db}
+%\VignetteDepends{PEP.db, knitr}
 %\VignetteKeywords{Preprocessing, Affymetrix}
 %\VignettePackage{pepStat}
 \documentclass[11pt]{article}
@@ -7,12 +8,16 @@
 \usepackage{url}
 \usepackage{fullpage}
 \usepackage{graphicx}
-\SweaveOpts{keep.source=FALSE}
 
+<<include=FALSE>>=
+opts_chunk$set(tidy=TRUE)
+@
+
+
+\begin{document}
 \title{The pepStat user guide}
 \author{Raphael Gottardo\footnote{rgottard@fhcrc.org}, Greg Imholte\footnote{gimholte@uw.edu}, Mike Jiang\footnote{wjiang2@fhcrc.org} and Renan Sauteraud\footnote{rsautera@fhcrc.org}}
 
-\begin{document}
 \maketitle
 
 
@@ -20,7 +25,7 @@
 A step-by-step guide in the analysis of peptide microarray antibody binding
 
 \tableofcontents
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newpage
 \section{Introduction}
 The \texttt{pepStat} package offers a complete analytical framework for 
@@ -86,11 +91,11 @@ pSet <- makePeptideSet(files=NULL, path=dirToParse, mapping.file=mapFile,
 We include two plotting functions to detect possible spatial slide artifacts.
 
 \setkeys{Gin}{width=\textwidth}
-<<plot-slide, fig=TRUE, include=TRUE, width=7.48, height=3>>=
+<<plot-slide, include=TRUE, fig.width=7.48, fig.height=3>>=
 plotArrayImage(pSet, array.index = 1)
 @
 
-<<plot-residuals, fig=TRUE, include=TRUE, width=7.48, height=3>>=
+<<plot-residuals, include=TRUE, fig.width=7.48, fig.height=3>>=
 plotArrayResiduals(pSet, array.index = 1, smooth = TRUE)
 @
 

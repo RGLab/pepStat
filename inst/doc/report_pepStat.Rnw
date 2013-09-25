@@ -55,7 +55,7 @@ The report itself is the document that contains the R code used for the analysis
 
 
 The chunk of code below	executes the report `report1' if it exists in the project.
-<<run-report>>=
+<<run-report, eval=FALSE>>=
 run_report(path="./", project_name="project", report_name="report1")
 @
 \texttt{run\_report} is essentially a wrapper around \texttt{knitr}'s \texttt{knit2pdf} function. A single project can have multiple reports and each report can have a different set of options. However, all the reports will use the same data file.
