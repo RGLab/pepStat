@@ -11,7 +11,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   # before reading in files, check whether mapping.file is accessible,
   # to save user time in case they made a mistake.
   if (!is.null(mapping.file)){
-    mapping.file<-.sanitize.mapping.file(mapping.file)
+    #mapping.file<-.sanitize.mapping.file(mapping.file)
+    mapping.file<-.sanitize_mapping_file2(mapping.file)
   }
   
   if (!check.row.order) { # Assume that the design is the same and don't check rows, order, etc.
@@ -191,4 +192,14 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   mapping.file$visit <- tolower(mapping.file$visit)		
   
   mapping.file
+}
+
+.sanitize_mapping_file2 <- function(mapping.file){
+  map <- read.csv(mapping.file, header=TRUE)
+  colnames(map) <- tolower(colnames(map))
+  if(!all(c("filename", "ptid", "visit") %in% colnames(map))){
+    stop("The mapping file should include at least the 3 mandatory columns: 'filename', 'ptid' and 'visit'")
+  }
+  row.names(map) <- file_path_sans_ext(tolower(map$filename))
+  return(map)
 }

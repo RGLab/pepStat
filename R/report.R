@@ -32,3 +32,8 @@ rm_project <- function(path="./", project_name="project"){
     stop("The given path and project_name do not look like a valid project.")
   }
 }
+
+clear_all_caches <- function(path="./", project_name="project"){
+  to_remove <- list.files(paste0(path, "/", project_name, "/reports/"), pattern="^cache_", full.names=TRUE)
+  unlink(x=to_remove, recursive=TRUE)
+}

@@ -25,6 +25,9 @@ call.cutoff <- yaml_opts$call.cutoff
 #HIV.db opts
 genome <- yaml_opts$genome
 features <- yaml_opts$features
+#Pviz opts
+from <- yaml_opts$from
+to <- yaml_opts$to
 ```
 
 ## Generating a peptideSet
@@ -60,19 +63,20 @@ freq <- makeCalls(pnmSet, cutoff=call.cutoff, group=NULL, method=method)
 ```{r annotations}
 anno_db<-loadFeatures(genome=genome)
 features <- getFeature(anno_db, name=features)
+proteins <- getFeature(anno_db, category="protein")
 ```
 
 ## Tracks creation
 ```{r Pviz-tracks}
 pat <- ProteinAxisTrack(addNC=TRUE, littleTicks=TRUE)
-anno <- ATrack(start=start(features), end=end(features), name="landmarks", id=getName(features), showFeatureId=TRUE)
-pro_anno <- ATrack(start=start(proteins),end=end(proteins), id=proteins$name, name="Proteins",size=1.5, showFeatureId=TRUE, stacking="dense")
+anno <- ATrack(start=start(features), end=end(features), name="landmarks", id=getName(features), showFeatureId=TRUE, fill=1:nrow(features))
+pro_anno <- ATrack(start=start(proteins),end=end(proteins), id=proteins$name, name="Proteins",size=1.5, showFeatureId=TRUE, stacking="dense", fill=1:nrow(proteins))
 dt <- DTrack(start=position(pnSet[names(freq),]), width=0, data=freq, name="Frequency", type="l")
 ```
 
 ## Plotting
-```{r plotTracks}
-plotTracks(c(pat, anno, pro_anno, dt))
+```{r plotTracks, fig.align='center', fig.height=8, fig.width=12}
+plotTracks(c(pat, anno, pro_anno, dt), from=from, to=to)
 ```
 
 <!--
