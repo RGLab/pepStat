@@ -39,7 +39,7 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
 			#split the ptid into groups
 			ptidGroups <- split(pd$ptid,factor)
 			#apply the rowMeans to each group
-			res <- lapply(ptidGroups, function(curPtid,Calls,ptid){rowMeans(Calls[,ptid%in%curPtid])}, Calls, pd$ptid)
+			res <- lapply(ptidGroups, function(curPtid,Calls,ptid){rowMeans(Calls[,ptid%in%curPtid, drop=FALSE])}, Calls, pd$ptid)
 			res <- do.call(cbind, res)
 		} else {
 			return(rowMeans(Calls)*100)
