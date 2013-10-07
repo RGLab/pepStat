@@ -177,7 +177,7 @@ setGeneric("write.pSet",
            function(x, bg.correct=FALSE, ...) standardGeneric("write.pSet"))
 setMethod("write.pSet", "peptideSet", function(x, bg.correct=FALSE, ...){
   if (bg.correct) {
-    exprs<-pepStat:::.bgCorrect.pSet(x)
+    exprs<-.bgCorrect.pSet(x)
   } else {
     exprs<-exprs(x)
   }

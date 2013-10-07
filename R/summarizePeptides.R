@@ -82,7 +82,7 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 	newSet
 }
 
-.checkArgs_sumPeps = function(peptideSet, summary, position)
+.checkArgs_sumPeps <- function(peptideSet, summary, position)
 {
 	OK = TRUE
 	attr(OK, "ErrorString") = NULL
@@ -106,6 +106,5 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL)
     OK = FALSE
     attr(OK, "ErrorString") = ("peptideSet argument must be an object of class peptideSet")
   }	
-  
-	return(OK)	
+  return(OK)	
 }

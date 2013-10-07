@@ -26,7 +26,7 @@
     rownames(I) <- peptide(pSet)
 	I
 }
-.bgCorrect2.pSet <- function(pSet, verbose=FALSE){{
+.bgCorrect2.pSet <- function(pSet, verbose=FALSE){
   y <- exprs(pSet)
   ptid <- pData(pSet)$ptid
   t0 <- grep("pre", tolower(pData(pSet)$visit))

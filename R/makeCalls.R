@@ -12,12 +12,11 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
 		warning("You should probably normalize your data before using this function.")
 	}
   
-	I <- pepStat:::.bgCorrect.pSet(peptideSet, verbose=verbose)
+	I <- .bgCorrect.pSet(peptideSet, verbose=verbose)
   
 	if (method == "FDR") {
 		Calls<-.findFDR(I, cutoff, position(peptideSet))
-		
-		} else if(method == "absolute") {
+	} else if(method == "absolute") {
 		Calls <- I > cutoff
 	}
 
