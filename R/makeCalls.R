@@ -1,4 +1,4 @@
-makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group=NULL, verbose=FALSE)
+makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, group=NULL, verbose=FALSE)
 {
 	if (class(peptideSet)!="peptideSet") {
 		stop("peptideSet must be an object of class peptideSet")
@@ -15,7 +15,7 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
 	I <- .bgCorrect.pSet(peptideSet, verbose=verbose)
   
 	if (method == "FDR") {
-		Calls<-.findFDR(I, cutoff, position(peptideSet))
+		Calls<-.findFDR(I, cutoff, position(peptideSet), verbose=verbose)
 	} else if(method == "absolute") {
 		Calls <- I > cutoff
 	}
@@ -51,21 +51,26 @@ makeCalls <- function(peptideSet, cutoff=.1, method="absolute", freq=TRUE, group
     }
 }
 
-.findFDR <- function(I, cutoff, position)
-{
+.findFDR <- function(I, cutoff, position, verbose=FALSE){
     seqY <- seq(min(abs(I)), max(abs(I)),.05)
     # Split the data by unique positions
     tmp <- split(as.data.frame(I), position)
     # Compute the mean over unique positions
     D <- sapply(tmp,apply, 2, mean)
     
-    FDR <- sapply(seqY, function(x, D){median(apply(D, 1, function(D,x){min(sum(D < -x)/sum(D > x), 1)}, x), na.rm=TRUE)}, D)
+    #Calculate F(T)
+    FDR <- sapply(seqY, function(x, D){median(
+                  #Fs(T)
+                  apply(D, 1, function(D,x){min(sum(D < -x)/sum(D > x), 1)}, x), na.rm=TRUE)}, D)
     
     # Did not find anything below the cutoff or everything is NA
     if (all(round(FDR,2)>cutoff, na.rm=TRUE) | all(is.na(FDR))) {
         return(I > max(I)) # Return all FALSE
     } else {
         Dmin <- seqY[which.min(abs(FDR-cutoff))]
+        if(verbose){
+          cat("The selected threshold T is ", Dmin, "\n")
+        }
         return(I > Dmin)
     }
 }

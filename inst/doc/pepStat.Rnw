@@ -10,6 +10,7 @@
 \usepackage{graphicx}
 
 <<include=FALSE>>=
+library(knitr)
 opts_chunk$set(tidy=TRUE)
 @
 

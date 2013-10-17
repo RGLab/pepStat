@@ -8,7 +8,7 @@ After normalization and data smoothing, this last step makes the calls for each 
 }
 
 \usage{
-makeCalls(peptideSet, cutoff = .1, method = "absolute", freq = TRUE, group = NULL, verbose = FALSE)
+makeCalls(peptideSet, cutoff = 1.2, method = "absolute", freq = TRUE, group = NULL, verbose = FALSE)
 }
 
 \arguments{
