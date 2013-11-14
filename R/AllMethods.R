@@ -121,6 +121,17 @@ setMethod("peptide", "peptideSet",
 				warning("'",type, "' is not valid types(",validTypes,")!")
 			}
 		})
+setGeneric("peptide<-", function(object, value, ...) standardGeneric("peptide<-"))
+setReplaceMethod("peptide", signature("peptideSet", "character"), function(object, value, type="peptide"){
+  validTypes<-c("peptide", "aligned", "trimmed")
+  if(type %in% validTypes){
+    ranges(object)[[type]] <- value
+  } else{
+    warning("'",type, "' is not valid types(",validTypes,")!")
+  }
+  return(object)
+})
+    
 
 setGeneric("featureID", function(x, ...) standardGeneric("featureID"))
 setMethod("featureID", "peptideSet",
