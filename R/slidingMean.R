@@ -29,6 +29,7 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE,
       y <- exprs(set)
       p <- position(set)
       ny <- applySlidingMean(y, width, p)
+      rownames(ny) <- rownames(y)[ro]
       exprs(set) <- ny
       rownames(exprs(set)) <- rownames(y)
       

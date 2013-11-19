@@ -23,7 +23,7 @@ importFrom(plyr, ddply)
 importFrom(knitr, knit2html)
 
 exportClasses(peptideSet)
-exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "peptide<-", "subset", "write.pSet")
+exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "peptide<-", "subset", "write.pSet", "pepZscore", "pepZscore<-", "colnames")
 export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "normalizeArray", "makeCalls", "plotArrayImage", "plotArrayResiduals", "computeZscores")
 #reports
 export("mk_project", "rm_project", "run_report")

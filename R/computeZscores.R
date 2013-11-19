@@ -10,6 +10,7 @@ computeZpep = function(AAstring, ztable){
 }
 
 makeZpepMatrix = function(Sequence){
+  Sequence <- as.character(Sequence)
   z = c(0.24, 0.84, 3.98, 3.11, -4.22,
         2.05, 2.47, -3.89, 2.29, -4.28,
         -2.85, 3.05, -1.66, 1.75, 3.52,
@@ -48,20 +49,3 @@ computeZscores <- function(peptideSet){
   return(peptideSet)
 }
 
-setGeneric("pepZscore", function(object) standardGeneric("pepZscore"))
-setMethod("pepZscore", signature("peptideSet"), function(object){
-  as.data.frame(values(object)[[1]][,c("z1", "z2", "z3", "z4", "z5")])
-})
-
-setGeneric("pepZscore<-", function(object, values) standardGeneric("pepZscore<-"))
-setMethod("pepZscore<-", signature("peptideSet", "data.frame"), function(object, values){
-  zs <- c("z1", "z2", "z3", "z4", "z5")
-  if(!all(zs %in% colnames(values))){
-    stop("The given data.frame does not contain the required colum names: 'z1', 'z2', 'z3', 'z4', 'z5'")
-  }
-  for(z in zs){
-    ranges(object)[[z]] <- values[,z]
-  }
-  return(object)
-})
-  

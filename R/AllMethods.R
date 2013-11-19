@@ -224,3 +224,36 @@ setMethod("clade",
                 signature = signature(object="peptideSet"),
                 definition = function(object){ clade(object@featureRange)
                 }) 
+
+setGeneric("pepZscore", function(object) standardGeneric("pepZscore"))
+setMethod("pepZscore", signature("RangedData"), function(object){
+  vals <- as.data.frame(values(object))
+  zs <- c("z1", "z2", "z3", "z4", "z5")
+  zIns <- zs[zs %in% colnames(vals)]
+  return(vals[,zIns])
+})
+
+setMethod("pepZscore", signature("peptideSet"), function(object){
+  pepZscore(ranges(object))
+})
+
+setGeneric("pepZscore<-", function(object, values) standardGeneric("pepZscore<-"))
+setReplaceMethod("pepZscore", signature("RangedData", "data.frame"), function(object, values){
+  zs <- c("z1", "z2", "z3", "z4", "z5")
+  if(!all(zs %in% colnames(values))){
+    stop("The given data.frame does not contain the required colum names: 'z1', 'z2', 'z3', 'z4', 'z5'")
+  }
+  for(z in zs){
+    object[[z]] <- values[[z]]
+  }
+  return(object)
+})
+
+
+setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(object, values){
+  pepZscore(ranges(object)) <- values
+  return(object)
+})
+
+setMethod("colnames", "peptideSet", function(x){ colnames(ranges(x)) })
+
