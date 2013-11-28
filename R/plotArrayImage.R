@@ -1,3 +1,34 @@
+#' Plot microarray images
+#' 
+#' Plot a color image of the intensities on a slide. These plots are helpful to
+#' diagnose spatial abnormalities. 
+#' 
+#' 
+#' @param peptideSet A \code{peptideSet} object
+#' @param array.index A vector subsetting \code{exprs(peptideSet)}, indicating 
+#' which slides to plot
+#' @param smooth A \code{logical}, a 2D spatial smoother is applied to residuals,
+#' the fitted residuals are plotted.
+#' @param low A \code{character} string. The color of the lowest slide intensity.
+#' passed to \code{scale_fill_gradient}.
+#' the fitted residuals are plotted.
+#' @param high A \code{character} string. The color of the highest slide intensity.
+#' passed to \code{scale_fill_gradient}.
+#' @param ask A \code{logical}. If TRUE, the user is asked before each plot. See
+#' \code{par(ask=.)}.
+#' 
+#' @author Gregory Imholte
+#' 
+#' @aliases plotArrayImage
+#' @aliases plotArrayResiduals
+#' 
+#' @importFrom ggplot2 ggplot ggtitle theme geom_tile scale_fill_gradient aes 
+#' element_blank geom_segment
+#' @importFrom fields smooth.2d
+#' @importFrom plyr ddply
+#' @export
+#' @rdname plotArray
+#' 
 plotArrayImage <- function(peptideSet, array.index = NULL,
   low = "white", high = "steelblue",
   ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
@@ -45,6 +76,8 @@ plotArrayImage <- function(peptideSet, array.index = NULL,
   }
 }
 
+#' @rdname plotArray
+#' @export
 plotArrayResiduals <- function(peptideSet, array.index = NULL, smooth = FALSE,
   low = "blue", high = "red",
   ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))

@@ -1,8 +1,100 @@
+#' peptideSet methods
+#' 
+#' Methods for handling peptideSet objects
+#' @name peptideSet-methods
+#' @rdname peptideSet-methods
+#' 
+#' @section Accessors:
+#' \describe{
+#'  \item{\code{nrow(x)}:}{The number of peptides in x.}
+#'  \item{\code{ncol(x)}:}{The number of samples in x.}
+#'  \item{\code{start(x)}:}{Get the starts of the peptides.}
+#'  \item{\code{end(x)}:}{Get the ends of the peptides.}
+#'  \item{\code{width(x)}:}{Get the widths of the peptides.}
+#'  \item{\code{position(x)}:}{Get the coordinates of the central amino-acid of 
+#'  each peptide, given by: \code{round((start(x) + end(x))/2)}.}
+#'  \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains 
+#'  the annotations for the peptides.}
+#'  \item{\code{ranges(x)<- value}}{}
+#'  \item{\code{values(x)}:}{Returns a \code{SplitDataFrameList}. Accessor for the
+#'  values of the featureRange slot.}
+#'  \item{\code{clade(x)}:}{If available, returns the clade information for each
+#'  peptide as a \code{matrix}.}
+#'  \item{\code{peptide(x)}:}{Get the sequence of the peptides.}
+#'  \item{\code{peptide(x)<- value}}{}
+#'  \item{\code{featureID(x)}:}{Get the ID of the peptides.}
+#'  \item{\code{pepZscore(x)}:}{If available, returns a \code{matrix} of the zScores
+#'  for each peptide.}
+#'  \item{\code{pepZscore(x)<- value}}{}
+#' }
+#' 
+#' @aliases start,peptideSet-method
+#' @aliases end,peptideSet-method
+#' @aliases width,peptideSet-method
+#' @aliases position
+#' @aliases position-method
+#' @aliases position,peptideSet-method
+#' @aliases ranges,peptideSet-method
+#' @aliases ranges<-,peptideSet-method
+#' @aliases values,peptideSet-method
+#' @aliases clade
+#' @aliases clade-methods
+#' @aliases clade,RangedData-method
+#' @aliases clade,peptideSet-method
+#' @aliases peptide
+#' @aliases peptide<-
+#' @aliases peptide-method
+#' @aliases peptide,peptideSet-method
+#' @aliases peptide<-,peptideSet,character-method
+#' @aliases featureID
+#' @aliases featureID-method
+#' @aliases featureID,peptideSet-method
+#' @aliases pepZscore
+#' @aliases pepZscore<-
+#' @aliases pepZscore-method
+#' @aliases pepZscore,peptideSet-method
+#' @aliases pepZscore<-,peptideSet,data.frame-method
+#' @aliases pepZscore,RangedData-method
+#' @aliases pepZscore<-,RangedData,data.frame-method 
+#'  
+#' @exportMethod "start", "end", "width", "position"
+#' @exportMethod "ranges", "values", "ranges<-"
+#' @exportMethod "clade", "peptide", "pepZscore", "featureID", 
+#' "peptide<-", "pepZscore<-"
+#' 
+#' @section Display:
+#' \describe{
+#'  \item{\code{show(object)}:}{Display a peptideSet object.}
+#'  \item{\code{summary(object)}:}{Summarize a peptideSet object.}
+#' }
+#' 
+#' @aliases show,peptideSet-method
+#' @aliases summary,peptideSet-method
+#' 
+#' @exportMethod "show", "summary"
+#' 
+#' @section Subset:
+#' \describe{
+#'  \item{\code{x[i, j]}:}{Subset x by peptides (i), or samples (j).}
+#'  \item{\code{subset(x, subset, drop=FALSE)}:}{Subset x given an expression 'subset'.}
+#' }
+#' 
+#' @aliases [,peptideSet,ANY,ANY,ANY-method
+#' @aliases subset,peptideSet-method
+#' 
+#' @exportMethod "[", "subset"
+#' 
+#' @importMethodsFrom IRanges lapply ranges ranges<- values values<- width cbind
+#' rbind
+NULL
+
+
 setMethod("show", "peptideSet",function(object){
   cat("Object of class 'peptideSet' contains","\n")
   print(as(object,"ExpressionSet"))
   print(ranges(object))
 })
+
 
 setAs(from="peptideSet",to="ExpressionSet",function(from){
 			ExpressionSet(assayData(from)
@@ -22,6 +114,7 @@ setMethod("summary", signature("peptideSet"),
       cat("     - Normalization:",preproc(object@experimentData)$normalization, "\n")      
     }
 )
+
 
 setMethod("[", signature("peptideSet", i = "ANY", j = "ANY"),
           function(x, i, j, ..., drop = FALSE) {
@@ -121,14 +214,9 @@ setMethod("peptide", "peptideSet",
 				warning("'",type, "' is not valid types(",validTypes,")!")
 			}
 		})
-setGeneric("peptide<-", function(object, value, ...) standardGeneric("peptide<-"))
-setReplaceMethod("peptide", signature("peptideSet", "character"), function(object, value, type="peptide"){
-  validTypes<-c("peptide", "aligned", "trimmed")
-  if(type %in% validTypes){
-    ranges(object)[[type]] <- value
-  } else{
-    warning("'",type, "' is not valid types(",validTypes,")!")
-  }
+setGeneric("peptide<-", function(object, value) standardGeneric("peptide<-"))
+setReplaceMethod("peptide", signature("peptideSet", "character"), function(object, value){
+  ranges(object)[["peptide"]] <- value
   return(object)
 })
     
@@ -237,21 +325,21 @@ setMethod("pepZscore", signature("peptideSet"), function(object){
   pepZscore(ranges(object))
 })
 
-setGeneric("pepZscore<-", function(object, values) standardGeneric("pepZscore<-"))
-setReplaceMethod("pepZscore", signature("RangedData", "data.frame"), function(object, values){
+setGeneric("pepZscore<-", function(object, value) standardGeneric("pepZscore<-"))
+setReplaceMethod("pepZscore", signature("RangedData", "data.frame"), function(object, value){
   zs <- c("z1", "z2", "z3", "z4", "z5")
-  if(!all(zs %in% colnames(values))){
+  if(!all(zs %in% colnames(value))){
     stop("The given data.frame does not contain the required colum names: 'z1', 'z2', 'z3', 'z4', 'z5'")
   }
   for(z in zs){
-    object[[z]] <- values[[z]]
+    object[[z]] <- value[[z]]
   }
   return(object)
 })
 
 
-setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(object, values){
-  pepZscore(ranges(object)) <- values
+setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(object, value){
+  pepZscore(ranges(object)) <- value
   return(object)
 })
 

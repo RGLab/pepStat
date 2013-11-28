@@ -1,0 +1,30 @@
+##
+## NAMESPACE file for pepStat library.
+##
+
+importFrom(stats4,summary)
+importClassesFrom(IRanges, RangedData)
+importClassesFrom(Biobase, eSet, VersionedBiobase, Versioned, AnnotatedDataFrame, AssayData, ExpressionSet, MIAME, Versions)
+importClassesFrom(methods, character, integer, numeric)
+
+importMethodsFrom(Biobase, combine, exprs, "exprs<-", preproc,"preproc<-", sampleNames,"sampleNames<-",rowMedians)
+importMethodsFrom(IRanges, lapply,"ranges<-",ranges,values,"values<-",as.data.frame, width, cbind, rbind)
+importMethodsFrom(methods, show)
+
+import(ggplot2)
+importFrom(methods, new)
+importFrom(stats, rnorm)
+importFrom(limma, read.maimages, backgroundCorrect)
+importFrom(IRanges, RangedData, IRanges)
+importFrom(Biobase, ExpressionSet)
+importFrom(tools, file_ext, file_path_as_absolute, file_path_sans_ext)
+importFrom(fields, smooth.2d)
+importFrom(plyr, ddply)
+importFrom(knitr, knit2html)
+
+exportClasses(peptideSet)
+exportMethods(show, summary, "[", "position", "clade", "split", "peptide", "featureID", "start", "end", "width", "values", "values<-", "peptide<-", "subset", "write.pSet", "pepZscore", "pepZscore<-", "colnames")
+export("makePeptideSet", "summarizePeptides", "slidingMean", "NormalizeArray", "normalizeArray", "makeCalls", "plotArrayImage", "plotArrayResiduals", "computeZscores", "makeZpepMatrix")
+#reports
+export("mk_project", "rm_project", "run_report")
+

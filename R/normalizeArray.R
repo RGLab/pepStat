@@ -1,12 +1,48 @@
-NormalizeArray = function(peptideSet, robust = TRUE, standard = FALSE,
-                          method = "ZpepQuad", centered = TRUE){
-  .Deprecated("normalizeArray")
-  normalizeArray(peptideSet, robust, standard, method, centered)
-}
-
-normalizeArray <- function(peptideSet, robust = TRUE, standard = FALSE,
-                           method = "ZpepQuad", centered = TRUE)
-{
+#' Normalize tiling array data using sequence information
+#' 
+#' This function is used to normalize the peptide microarray data using sequence
+#' information. 
+#'
+#' @param peptideSet A \code{peptideSet}. The expression data for the peptides as 
+#' well as annotations and ranges.
+#' @param method A \code{character}. The normalization method to be used. Can be
+#' "Zpep" or "ZpepQuad".
+#' @param robust A \code{logical}. If TRUE, reweigthed least-squares estimates are
+#'  computed.
+#' @param centered A \code{logical}. If TRUE, recenter the data.
+#' 
+#' @details
+#' The available methods are "Zpep" and "ZpepQuad". These methods fit a linear model
+#' using either linear or linear and quadratic terms (respectively), regressing 
+#' intensity on the peptides' five Z-scale scores. A peptide Z-scale score is 
+#' obtained by summing over the Z-scale values in Sandburg et al (1998) of the amino
+#' acids the peptide comprises.
+#' 
+#' Peptide Z-scale scores may be provided in the featureRange slot of peptideSet. 
+#' This slot is a \code{RangedData} object x, and the function will seek five columns 
+#' labelled z1 through z5 in values(x). If these are not found, the function attempts 
+#' to calculate Z-scales from sequence information found in peptide(peptideSet)
+#' 
+#' If robust = TRUE the linear model is fit with t_4 distributed errors. The method 
+#' returns the residuals of each peptide intensity in the fitted linear model. If 
+#' centered = TRUE the fitted intercept term is added back to the residuals of the fit.
+#' 
+#' @return A \code{peptideSet} object with updated normalized intensity values.
+#' 
+#' @seealso \code{\link{summarizePeptides}}, \code{\link{makeCalls}}
+#' 
+#' @author Raphael Gottardo, Gregory Imholte
+#' @references Sandberg, M., Eriksson, L., Jonsson, J., Sjostrom, M., and Wold, 
+#' S. (1998). New chemical descriptors relevant for the design of biologically 
+#' active peptides. A multivariate characterization of 87 amino acids. Journal of
+#'  Medicinal Chemistry 41, 2481-2491.
+#'
+#' @name normalizeArray
+#' @rdname normalizeArray
+#' @aliases NormalizeArray
+#' @export
+#' 
+normalizeArray <- function(peptideSet, method = "ZpepQuad", robust = TRUE, centered = TRUE){
   ### Sanity checks 
   if (class(peptideSet)!="peptideSet") {
     stop("peptideSet must be an object of class peptideSet (e.g. returned by makePeptideSet)!")
@@ -22,7 +58,7 @@ normalizeArray <- function(peptideSet, robust = TRUE, standard = FALSE,
   
   # Call fitting function
   ynew <- getWeightedEstimator(ymat = exprs(peptideSet), x = Zpep,
-                               robust, centered, standard)
+                               robust, centered)
   
   ### Set the normalized data as exprs
   exprs(peptideSet) <- ynew
@@ -31,9 +67,6 @@ normalizeArray <- function(peptideSet, robust = TRUE, standard = FALSE,
   ### Setting the normalization parameters
   if (robust){
     normalization <- paste(method, "robust", sep = " ")
-  }
-  if (standard){
-    normalization <- paste(method, "standardized", sep = " ")
   }
   preproc(peptideSet@experimentData)$normalization <- normalization
   peptideSet

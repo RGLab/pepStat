@@ -1,56 +1,109 @@
 \name{makePeptideSet}
 \alias{makePeptideSet}
-
 \title{peptideSet constructor}
-
-\description{
-This function reads GenePix results (.gpr) files and creates a peptideSet object gathering experiment information.
-}
-
 \usage{
-makePeptideSet(files = NULL, path = NULL, mapping.file = NULL, 
-  use.flags = FALSE, rm.control.list = NULL, norm.empty = FALSE,
-	empty.control.list = c("empty","blank control"),
-  bgCorrect.method = "normexp", log = TRUE, check.row.order = FALSE,
-  verbose = FALSE)
+  makePeptideSet(files = NULL, path = NULL, mapping.file =
+    NULL, use.flags = FALSE, rm.control.list = NULL,
+    empty.control.list = c("empty","blank control"),
+    bgCorrect.method = "normexp", log = TRUE,
+    check.row.order = FALSE, verbose = FALSE)
 }
-
 \arguments{
-\item{files}{A character vector containing the names of the files to read. If omitted, all the files with the extension .gpr in specified path will be read.}
-\item{path}{A character string giving the directory containing files.}
-\item{mapping.file}{A character string or a data frame giving a mapping file for the data. See Details.}
-\item{use.flags}{A \code{logical}. Should spots with spot flag values -99 or lower be excluded?}
-\item{rm.control.list}{A vector of character strings. The name of the controls to be excluded from the peptideSet.}
-\item{norm.empty}{A \code{logical}. Subtract mean intensity of empty spots from remaining intensities within slide?}
-\item{empty.control.list}{A vector of character strings. The name of the empty controls. These are used or background correction if \code{norm.empty = TRUE}.}
-\item{bgCorrect.method}{A character string. The name of the method used for background correction. See Details.}
-\item{log}{A \code{logical}. Should intensities be \code{log2} transformed after BG correction?}
-\item{check.row.order}{A \code{logical}. Should slides be reduced to a common set of peptides?}
-\item{verbose}{A \code{logical}.}
+  \item{files}{A \code{character} vector. If NULL, all
+  files with a .gpr extension in the specified path will be
+  read.}
+
+  \item{path}{A \code{character} string. The directory
+  where the .gpr files to read are located.}
+
+  \item{mapping.file}{A \code{character} string or
+  \code{data.frame}. A mapping file that gives information
+  for each sample. See details section below for a list of
+  required fields.}
+
+  \item{use.flags}{A \code{logical}. Should spots with flag
+  value -99 or lower be excluded?}
+
+  \item{rm.control.list}{A \code{character} vector. The
+  name of the controls to be excluded from the peptideSet.}
+
+  \item{empty.control.list}{A \code{character} vector. The
+  name of the empty controls. If non NULL, the intensity of
+  these empty spots will be substracted from remaining
+  intensities.}
+
+  \item{bgCorrect.method}{A \code{character} string. The
+  name of the method used for background correction. This
+  is passed to limma's backgroundCorrect method. See
+  details section below and ?backgroundCorrect for more
+  information.}
+
+  \item{log}{A \code{logical}. If TRUE, intensities will be
+  log2 transformed after BG correction.}
+
+  \item{check.row.order}{A \code{logical}. Should slides be
+  reduced to a common set of peptides?}
+
+  \item{verbose}{A \code{logical}. Displays progress and
+  additional information.}
 }
-
-\details{
-	GenePix results files (\code{.gpr}) are read when found in either the \code{files} or \code{path} arguments. By default, the foreground and background median intensities of the "red" channels, "F635 Median" and "B635 Median", are read. The background correction specified in \code{bgCorrect.method} is passed to the \link{backgroundCorrect} method in the \code{limma} package.
-
-	The argument \code{mapping.file} may either be a character string file path or data frame. If a file path, it must point to a \code{.csv} file which is read and used as experiment information. Each row of the \code{mapping.file} data frame is taken to correspond with information about a single slide. Entries in the data frame are matched to arrays by file name. One column in the \code{mapping.file} data frame MUST be labeled "Filename" (not case sensitive) if provided. Entries in this column must match file names read from the \code{path} or \code{files} arguments after dropping the \code{.gpr} extension. For example, "PID_101_vst1.gpr" would be matched to "PID_101_vst1" in a "filename" column provided by \code{mapping.file}.
-	
-	The argument \code{rm.control.list} specifies (possibly partial) names of array probes to be removed from the data set. Elements of this vector are matched against the Name and ID columns of the \code{.gpr} files.
-	
-	After background correction, if \code{norm.empty = TRUE}, intensities of probes matching strings (possibly partially) in \code{empty.control.list} are averaged within each array, and the average is subtracted from all intensities within the each array.
-	
-	If \code{check.row.order = TRUE}, the final set of probes is taken to be those with IDs found in all arrays that were read.
-	
-	Row, Column, and Block spatial array positions for each probe are stored in the \code{featureRanges} slot of the returned object.
-}
-
 \value{
-	A \link{peptideSet} object.
+  A \code{peptideSet} object that contain the intensities,
+  peptide sequences and annotations available in the
+  mapping file.
 }
+\description{
+  This function reads GenePix results (.gpr) files and
+  creates a peptideSet object gathering experiment
+  information.
+}
+\details{
+  GenePix results files (.gpr) are read when found in
+  either the files or path arguments. By default, the
+  foreground and background median intensities of the "red"
+  channels, "F635 Median" and "B635 Median", are read. The
+  background correction specified in bgCorrect.method is
+  passed to the backgroundCorrect method in the limma
+  package.
 
-\author{Raphael Gottardo, Gregory Imholte}
+  The mapping.file can be either a filename or a
+  data.frame. In any case, it should contain at least three
+  columns labeled "filename", "ptid" and "visit". The
+  filenames given here should match those read from the
+  path or files argument, or be a subset of it. For each
+  ptid (patient ID), the visit column should have at least
+  one "pre" and one "post" sample. Any additional column
+  will be kept into the resulting \code{peptideSet} and can
+  be used later on for groupping.
 
+  If check.row.order = TRUE, the final set of probes is
+  taken to be those with IDs found in all arrays that were
+  read.
+
+  Row, Column and Block spatial array position for each
+  probe are stored in the \code{featureRanges} slot of the
+  returned object.
+}
+\examples{
+# Read gpr files
+library(PEP.db)
+mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+pSet <- makePeptideSet(files = NULL, path = dirToParse,
+                       mapping.file = mapFile, log=TRUE)
+
+# Specify controls to be removed and empty controls
+# to be used for background correction.
+pSet <- makePeptideSet(files = NULL, path = dirToParse,
+                       mapping.file = mapFile, log = TRUE,
+                       rm.control.list = c("JPT-control", "Ig", "Cy3"),
+                       empty.control.list= c("empty", "blank control"))
+}
+\author{
+  Raphael Gottardo, Gregory Imholte
+}
 \seealso{
-\link{peptideSet}
+  \code{\link{peptideSet}}, \code{\link{read.maimages}},
+  \code{\link{backgroundCorrect}}
 }
 
-\keyword{functions}

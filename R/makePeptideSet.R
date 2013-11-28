@@ -1,7 +1,91 @@
+#' peptideSet constructor
+#' 
+#' This function reads GenePix results (.gpr) files and creates a peptideSet object
+#' gathering experiment information.
+#' 
+#' @usage makePeptideSet(files = NULL, path = NULL, mapping.file = NULL, 
+#'                       use.flags = FALSE, rm.control.list = NULL,
+#'                       empty.control.list = c("empty","blank control"),
+#'                       bgCorrect.method = "normexp", log = TRUE, 
+#'                       check.row.order = FALSE, verbose = FALSE)
+#' 
+#' @param files A \code{character} vector. If NULL, all files with a .gpr extension
+#' in the specified path will be read.
+#' @param path A \code{character} string. The directory where the .gpr files to
+#' read are located.
+#' @param mapping.file A \code{character} string or \code{data.frame}. A mapping file
+#' that gives information for each sample. See details section below for a list of
+#' required fields.
+#' @param use.flags A \code{logical}. Should spots with flag value -99 or lower 
+#' be excluded?
+#' @param rm.control.list A \code{character} vector. The name of the controls to
+#' be excluded from the peptideSet.
+#' @param empty.control.list A \code{character} vector. The name of the empty 
+#' controls. If non NULL, the intensity of these empty spots will be substracted
+#' from remaining intensities.
+#' @param bgCorrect.method A \code{character} string. The name of the method used
+#' for background correction. This is passed to limma's backgroundCorrect method.
+#' See details section below and ?backgroundCorrect for more information.
+#' @param log A \code{logical}. If TRUE, intensities will be log2 transformed after
+#' BG correction.
+#' @param check.row.order A \code{logical}. Should slides be reduced to a common
+#' set of peptides?
+#' @param verbose A \code{logical}. Displays progress and additional information.
+#'  
+#' @details
+#' GenePix results files (.gpr) are read when found in either the files or path 
+#' arguments. By default, the foreground and background median intensities of the 
+#' "red" channels, "F635 Median" and "B635 Median", are read. The background 
+#' correction specified in bgCorrect.method is passed to the backgroundCorrect 
+#' method in the limma package.
+#'
+#' The mapping.file can be either a filename or a data.frame. In any case, it should
+#' contain at least three columns labeled "filename", "ptid" and "visit". The 
+#' filenames given here should match those read from the path or files argument, 
+#' or be a subset of it. For each ptid (patient ID), the visit column should have at
+#' least one "pre" and  one "post" sample. Any additional column will be kept into
+#' the resulting \code{peptideSet} and can be used later on for groupping.
+#' 
+#' If check.row.order = TRUE, the final set of probes is taken to be those with
+#' IDs found in all arrays that were read.
+#' 
+#' Row, Column and Block spatial array position for each probe are stored in the 
+#' \code{featureRanges} slot of the returned object.
+#' 
+#'
+#' @return A \code{peptideSet} object that contain the intensities, peptide
+#' sequences and annotations available in the mapping file.
+#' 
+#' @examples
+#' # Read gpr files
+#' library(PEP.db)
+#' mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+#' dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+#' pSet <- makePeptideSet(files = NULL, path = dirToParse,
+#'                        mapping.file = mapFile, log=TRUE)
+#' 
+#' # Specify controls to be removed and empty controls
+#' # to be used for background correction.
+#' pSet <- makePeptideSet(files = NULL, path = dirToParse,
+#'                        mapping.file = mapFile, log = TRUE,
+#'                        rm.control.list = c("JPT-control", "Ig", "Cy3"),
+#'                        empty.control.list= c("empty", "blank control"))
+#' 
+#' @seealso \code{\link{peptideSet}}, \code{\link{read.maimages}}, 
+#' \code{\link{backgroundCorrect}}
+#' 
+#' @author Raphael Gottardo, Gregory Imholte
+#' 
+#' @rdname makePeptideSet
+#' @export
+#' @importFrom tools file_path_sans_ext file_ext
+#' @importFrom limma read.maimages backgroundCorrect
+#' 
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL,
-                         norm.empty=FALSE, empty.control.list=c("empty","blank control"),
-                         bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE, verbose=FALSE)
+                         empty.control.list=c("empty","blank control"),
+                         bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE, 
+                         verbose=FALSE)
 {
   # There is some ambiguity with respect to what is Name and ID
   # ID -> peptide
@@ -87,7 +171,11 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     preproc(myDesc) <- c(preproc(myDesc),list(transformation="none", normalization="none"))
   }
   
+  if(!is.null(empty.control.list)){
+    norm.empty <- TRUE
+  }
   preproc(myDesc)$bgCorrect.method <- bgCorrect.method
+  preproc(myDesc)$baselineCorrect <- FALSE
   preproc(myDesc)$norm.empty <- norm.empty
   
   if (norm.empty) {
@@ -146,9 +234,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   return(pSet)
 }
 
-.sanitize.mapping.file <- function(mapping.file)
-{
-  
+.sanitize.mapping.file <- function(mapping.file){  
   if (is.character(mapping.file)) {
     if (file.access(mapping.file, mode = 0) < 0)
       stop("mapping.file is not an accessible file path. Typo?")
@@ -195,7 +281,13 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
 }
 
 .sanitize_mapping_file2 <- function(mapping.file){
-  map <- read.csv(mapping.file, header=TRUE)
+  if(is.character(mapping.file)){
+    map <- read.csv(mapping.file, header=TRUE)
+  } else if(is.data.frame(mapping.file)){
+    map <- mapping.file
+  } else {
+    stop("The mapping file should be a character vector or a data.frame")
+  }
   colnames(map) <- tolower(colnames(map))
   if(!all(c("filename", "ptid", "visit") %in% colnames(map))){
     stop("The mapping file should include at least the 3 mandatory columns: 'filename', 'ptid' and 'visit'")

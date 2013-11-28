@@ -1,5 +1,30 @@
-summarizePeptides <- function(peptideSet, summary="median", position=NULL)
-{
+#' Add information to a peptideSet and summarize peptides
+#' 
+#' This function merges the replicates and adds information from a peptide collection
+#' to a peptideSet. This collection can include coordinates, alignment information, 
+#' Z-scales, and other peptide information.
+#'  
+#' @usage summarizePeptides(peptideSet, summary = "median", position = NULL)
+#' 
+#' @param peptideSet A \code{peptideSet}, as created by \code{makePeptideSet}
+#' @param summary A \code{character} string. The method used for merging replicates.
+#' Available are: "mean" and "median".
+#' @param position A \code{RangedData}. A peptide collection such as the ones
+#' available in \code{PEP.db}. See details below and vignettes for more information.
+#' 
+#' @return An object of class \code{peptideSet} with added columns and updated ranges.
+#' 
+#' @note For the position argument, some peptide collections can be found in the 
+#' \code{PEP.db} package.
+#' 
+#' @seealso \code{\link{makePeptideSet}}, \code{\link{create_db}}
+#' 
+#' @author Raphael Gottardo, Greory Imholte
+#' 
+#' @rdname summarizePeptides
+#' @export
+#' 
+summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 	# Check arguments for conformity
 	check = .checkArgs_sumPeps(peptideSet, summary, position)
 	if(!check)
@@ -36,8 +61,7 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 	sampleNames(newSet) <- sampleNames(peptideSet)
 
 
-	if(!is.null(position))
-	{
+	if(!is.null(position)){
 		# assume that rownames of position RangedData 
 		# object are peptide sequences in peptideSet,
 		# non-null rownames checked in checkArgs above 
@@ -82,8 +106,7 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL)
 	newSet
 }
 
-.checkArgs_sumPeps <- function(peptideSet, summary, position)
-{
+.checkArgs_sumPeps <- function(peptideSet, summary, position){
 	OK = TRUE
 	attr(OK, "ErrorString") = NULL
 	

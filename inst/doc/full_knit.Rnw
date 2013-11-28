@@ -1,0 +1,111 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Full peptide microarray analysis}
+%\VignetteDepends{PEP.db, knitr}
+%\VignetteKeywords{Preprocessing, Affymetrix}
+%\VignettePackage{pepStat}
+\documentclass[11pt]{article}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{fullpage}
+\usepackage{graphicx}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(tidy=FALSE)
+@
+
+
+\begin{document}
+\title{A complete analysis of peptide microarray binding data using the pepStat framework}
+\author{Greg Imholte\footnote{gimholte@uw.edu}, Renan Sauteraud\footnote{rsautera@fhcrc.org},  Mike Jiang\footnote{wjiang2@fhcrc.org} and Raphael Gottardo\footnote{rgottard@fhcrc.org}}
+
+\maketitle
+
+This document present a full analysis, from reading the data to displaying the results that makes use of all the packages we developped for peptide microarray.
+
+\tableofcontents
+
+\newpage
+\section{Generating a peptideSet}
+Samples and examples are available in the data package PEP.db.
+<<loading-libraries>>=
+library(PEP.db)
+library(pepStat)
+@
+
+We first read in the .gpr files and the mapping file. For this, we use pepStat's \texttt{makePeptideSet} function:
+<<read-data>>=
+mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+pSet <- makePeptideSet(files = NULL, path = dirToParse,
+                       mapping.file = mapFile, log=TRUE)
+@
+
+
+\subsection{Additional arguments}
+The empty spots should be listed in order to background correct the intensities. It is also useful to remove the controls when reading the data. Here we have the JPT controls, human Ig (A, E and M) and dye controls.
+<<read-data-ctrl>>=
+pSet <- makePeptideSet(files = NULL, path = dirToParse,
+                       mapping.file = mapFile, log = TRUE,
+                       rm.control.list = c("JPT-control", "Ig", "Cy3"),
+                       empty.control.list= c("empty", "blank control"))
+@
+
+The mapping file must contain a 'visit' column with at least one 'Pre' and one 'Post' per ptid. 
+For our example, we use a toy dataset of 8 samples from 4 patients and we are interested in comparing the antibody binding in placebo versus vaccinated subjects.
+<<data-content>>=
+read.csv(mapFile)
+@
+
+\section{Adding peptide informations}
+At this point, the peptideSet contain only the peptide sequences and the associated background corrected intensities. To continue with the analysis, we need to add the position information, as well as physicochemical properties of the peptides summarized by their z-scales.
+
+The slides used in this example are the enveloppe of HIV-1 and peptide collections are available for this in our PEP.db package (please refere to the vignette and ?pep\_hxb2 for more information).
+However, we will pretend that this is not the case to show an example of how to build a custom peptide collection.
+
+\subsection{Creating a custom peptide collection}
+Here, we load a data.frame that contains the peptides used on the array as well as their start and end coordinates.
+<<create-pep-load-data>>=
+peps <- read.csv(system.file("extdata/pep_info.csv", package = "PEP.db"))
+@
+We first create a RangedData object with the available information. The region of interest is the enveloppe of the virus so we add the space information to the object.
+
+<<create-pep-RD>>=
+rd <- RangedData(ranges=IRanges(start = peps$start, end=peps$end),
+                 peptide=peps$peptide, space="gp160")
+@
+The z-scores are added afterward, using the create\_db fuction.
+<<create-db>>=
+pep_custom <- create_db(rd=rd)
+@
+
+\subsection{Summarize the information}
+With the newly constructed peptide collection, the information can be passed on to the existing peptideSet.
+<<summarizePeptideSet>>=
+psSet <- summarizePeptides(pSet, summary = "mean", position = pep_custom)
+@
+
+Now that all the required information is available, we can proceed with the analysis.
+
+\section{Normalization}
+
+<<normalizeArray>>=
+pnSet <- normalizeArray(psSet)
+@
+
+\section{Data smoothing}
+
+<<slidingMean>>=
+psmSet <- slidingMean(pnSet, width = 9)
+@
+
+\section{Making calls}
+<<makeCalls>>=
+V_calls <- makeCalls(psmSet, freq = TRUE, group = "treatment", 
+                     cutoff = .1, method = "FDR", verbose = TRUE)
+@
+The new FDR method automatically selected an appropriate threshold.
+
+
+
+\end{document}

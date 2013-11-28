@@ -11,7 +11,7 @@
 
 <<include=FALSE>>=
 library(knitr)
-opts_chunk$set(tidy=TRUE)
+#opts_chunk$set(tidy=TRUE)
 @
 
 
@@ -79,10 +79,10 @@ in the \texttt{limma} package corrects probe intensities for background
 fluorescence. Other methods may be selected, see documentation.
 
 <<makePepideSet>>=
-mapFile <- system.file("extdata/mapping.csv", package = "pepStat")
+mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
 map <- read.csv(mapFile)
 map
-dirToParse <- system.file("extdata/RVV", package = "pepStat")
+dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
 list.files(dirToParse)
 pSet <- makePeptideSet(files=NULL, path=dirToParse, mapping.file=mapFile,
                        log=TRUE)
