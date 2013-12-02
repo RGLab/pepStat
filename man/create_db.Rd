@@ -16,6 +16,21 @@
   rd can have additional columns. These columns will be
   kept in the peptide collection.
 }
+\examples{
+#construct RangedData object
+   library(IRanges)
+   AA <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
+   "Q","R", "S", "T", "V", "W", "Y")
+   starts <- seq(1, 30, 3)
+   ends <- starts + 14
+   peptides <- sapply(1:10, function(x) {
+     paste0(AA[floor(runif(15, 1, 20))], collapse = "")
+   })
+   data <- data.frame(start = starts, end = ends, peptide = peptides)
+   newRD <- RangedData(data)
+#create_db
+   new_pep <- create_db(newRD)
+}
 \seealso{
   \code{\link{RangedData}}
 }
