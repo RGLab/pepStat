@@ -4,7 +4,8 @@
 #' diagnose spatial abnormalities. 
 #' 
 #' 
-#' @param peptideSet A \code{peptideSet} object
+#' @param peptideSet A \code{peptideSet} object. The object must contain all the
+#' original probes. See details below.
 #' @param array.index A vector subsetting \code{exprs(peptideSet)}, indicating 
 #' which slides to plot
 #' @param smooth A \code{logical}, a 2D spatial smoother is applied to residuals,
@@ -16,6 +17,12 @@
 #' passed to \code{scale_fill_gradient}.
 #' @param ask A \code{logical}. If TRUE, the user is asked before each plot. See
 #' \code{par(ask=.)}.
+#' 
+#' @details
+#' This function will fail if the \code{peptideSet} is a subset of the original 
+#' layout. This means that in order to use this function, the slides have to be 
+#' read with \code{makePeptideSet} with empty.control.list = NULL and rm.control.list 
+#' = NULL
 #' 
 #' @author Gregory Imholte
 #' 

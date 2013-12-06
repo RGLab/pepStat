@@ -12,3 +12,4 @@ src/pepStat.so
 .project
 .Rproj.user
 .Rhistory
+.*/cache/*

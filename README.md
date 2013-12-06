@@ -3,9 +3,6 @@ pepStat
 
 TODO:
 -----
+- make it possible to use both PAIRED and single samples in the same analysis
+- Add option to makeCalls to output the threshold
 
-Check vignette text
-
-Finish man/makeCalls.Rd: arguments group, freq and method
-
-Maybe examples from pepStat to PEP.db (9.2Mb folder)

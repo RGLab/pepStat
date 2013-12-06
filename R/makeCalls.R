@@ -3,8 +3,6 @@
 #' After normalization and data smoothing, this last step makes the call for each
 #' peptide of the peptideSet after baseline correcting the peptide intenstities.
 #' 
-#' @usage makeCalls(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, group=NULL, verbose=FALSE)
-#' 
 #' @param peptideSet A \code{peptideSet} object. The peptides, after normalization 
 #' and possibly data smoothing.
 #' @param cutoff A \code{numeric}. If FDR, the FDR threshold. Otherwise, a cutoff 
@@ -59,12 +57,7 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
 		warning("You should probably normalize your data before using this function.")
 	}
   
-	I <- .bgCorrect2.pSet(peptideSet, verbose=verbose)
-        #if(!isTRUE(preproc(peptideSet)$baselineCorrect)){ #!isTRUE 
-	#  I <- .bgCorrect2.pSet(peptideSet, verbose=verbose)
-        #} else{
-        #  I <- exprs(peptideSet)
-        #}
+	I <- baselineCorrect.pSet(peptideSet, verbose=verbose)
   
 	if (method == "FDR") {
 		Calls<-.findFDR(I, cutoff, position(peptideSet), verbose=verbose)
@@ -126,3 +119,47 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
         return(I > Dmin)
     }
 }
+
+
+#' Substract baseline intensities
+#' 
+#' Correct intensities by substracting PRE visit sample intensities.
+#' 
+#' @param pSet A \code{peptideSet} with sample PRE and POST visits.
+#' 
+#' @return A \code{matrix} of the baseline corrected intensities, with as many 
+#' columns as there are samples POST visit
+#' 
+#' @details
+#' If samples are not PAIRED (One PRE and POST for each ptid), then the average 
+#' expression of all PRE visit samples is substracted from each sample.
+#' 
+#' @export
+#' @author Raphael Gottardo, Gregory Imholte
+#' 
+baselineCorrect.pSet <- function(pSet, verbose=FALSE){
+  y <- exprs(pSet)
+  ptid <- pData(pSet)$ptid
+  t0 <- grep("pre", tolower(pData(pSet)$visit))
+  t1 <- grep("post", tolower(pData(pSet)$visit))
+  ### Paired?
+  if (length(ptid[t0])==0||length(ptid[t1])==0) {
+    I<-as.matrix(y[,t1])
+  } else {
+    if (isTRUE(all.equal(sort(ptid[t0]), sort(ptid[t1])))) {
+      if (verbose) {
+        message("You have paired PRE/POST samples\n")
+      }
+      I <- as.matrix(y[,t1])-as.matrix(y[,t0])
+    } else {
+      if(verbose) {
+        message("You don't have paired PRE/POST samples\n")
+      }    
+      I <- as.matrix(y[,t1])-rowMeans(y[, t0, drop=FALSE], na.rm=TRUE)#the vector to be subtracted from matrix need to be the same length as nrow of the matrix  	
+    }
+  }
+  colnames(I) <- ptid[t1]
+  rownames(I) <- peptide(pSet)
+  I
+}
+

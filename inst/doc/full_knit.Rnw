@@ -1,6 +1,6 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Full peptide microarray analysis}
-%\VignetteDepends{PEP.db, knitr}
+%\VignetteDepends{PEP.db, knitr, Pviz}
 %\VignetteKeywords{Preprocessing, Affymetrix}
 %\VignettePackage{pepStat}
 \documentclass[11pt]{article}
@@ -21,19 +21,43 @@ opts_chunk$set(tidy=FALSE)
 
 \maketitle
 
-This document present a full analysis, from reading the data to displaying the results that makes use of all the packages we developped for peptide microarray.
+This document present a full analysis, from reading the data to displaying the 
+results that makes use of all the packages we developped for peptide microarray.
 
 \tableofcontents
 
 \newpage
+\section{Introduction}
+The \texttt{pepStat} package offers a complete analytical framework for the 
+analysis of peptide microarray data. It includes a novel normalization method to
+remove non-specific peptide binding activity of antibodies, a data smoothing 
+reducing step to reduce background noise, and subject-specific positivity calls. 
+
+\subsection{Requirements}
+The \texttt{pepStat} package requires GSL, an open source scientific computing 
+library. This library is freely available at \url{http://www.gnu.org/software/gsl/}.
+
+In this vignette, we make use of the samples and examples available in the data 
+package \texttt{PEP.db}.
+
 \section{Generating a peptideSet}
-Samples and examples are available in the data package PEP.db.
-<<loading-libraries>>=
+
+<<loading-libraries, message=FALSE>>=
 library(PEP.db)
 library(pepStat)
 @
 
-We first read in the .gpr files and the mapping file. For this, we use pepStat's \texttt{makePeptideSet} function:
+\subsection{Reading in \texttt{.gpr} files}
+The reading function, \texttt{makePeptideSet}, takes a path as its argument and 
+parses all the \textit{.gpr} files in the given directory. Alternatively, one may 
+specify a character vector of paths to individual 
+\textit{.gpr} files.
+
+
+By default channels F635 Median and B635 Median are collected, and
+the \texttt{'normexp'} method of the \texttt{backgroundCorrect} function 
+in the \texttt{limma} package corrects probe intensities for background 
+fluorescence. Other methods may be selected, see documentation.
 <<read-data>>=
 mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
 dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
@@ -41,32 +65,61 @@ pSet <- makePeptideSet(files = NULL, path = dirToParse,
                        mapping.file = mapFile, log=TRUE)
 @
 
+While optional, it is strongly recommended to provide a \texttt{mapping.file} giving
+annotations data for each slide, such as treatment status or patient information.
+If provided, the mapping.file should be a \texttt{.csv} file. It must include columns labeled \texttt{filename}, \texttt{ptid}, and \texttt{visit}. Elements in column \texttt{filename} must correspond to the filenames of slides to be read in, without 
+the \texttt{.gpr} extension. Column \texttt{ptid} is a subject or slide identifier. Column \texttt{visit} indicates a case or control condition, such as pre/post 
+vaccination, pre/post infection, or healthy/infected status. Control conditions 
+must be labelled \textit{pre}, while case conditions must be labelled \textit{post}. Alternatively, one may input a \texttt{data.frame} satisfying the same requirements.
+
+This minimal information is required by \texttt{pepStat}'s functions further in 
+the analysis. Any additional information (column) will be retained and can be used
+as a grouping variable.
+
+If no mapping file is included, the information will have to be added later on 
+to the \texttt{peptideSet} object.
+
+For our example, we use a toy dataset of 8 samples from 4 patients and we are 
+interested in comparing the antibody binding in placebo versus vaccinated subjects.
+<<data-content>>=
+read.csv(mapFile)
+@
 
 \subsection{Additional arguments}
 The empty spots should be listed in order to background correct the intensities. It is also useful to remove the controls when reading the data. Here we have the JPT controls, human Ig (A, E and M) and dye controls.
 <<read-data-ctrl>>=
-pSet <- makePeptideSet(files = NULL, path = dirToParse,
+pSetNoCtrl <- makePeptideSet(files = NULL, path = dirToParse,
                        mapping.file = mapFile, log = TRUE,
                        rm.control.list = c("JPT-control", "Ig", "Cy3"),
                        empty.control.list= c("empty", "blank control"))
 @
 
-The mapping file must contain a 'visit' column with at least one 'Pre' and one 'Post' per ptid. 
-For our example, we use a toy dataset of 8 samples from 4 patients and we are interested in comparing the antibody binding in placebo versus vaccinated subjects.
-<<data-content>>=
-read.csv(mapFile)
+
+\subsection{Visualize slides}
+We include two plotting functions to detect possible spatial slide artifacts. Since
+the full plate is needed for this visualization, the functions will only work with 
+rm.contol.list and empty.control.list set to NULL in makePeptideSet.
+
+<<plot-slide, include=TRUE, fig.width=7.48, fig.height=3>>=
+plotArrayImage(pSet, array.index = 1)
+@
+
+
+<<plot-residuals, include=TRUE, fig.width=7.48, fig.height=3>>=
+plotArrayResiduals(pSet, array.index = 1, smooth = TRUE)
 @
 
 \section{Adding peptide informations}
 At this point, the peptideSet contain only the peptide sequences and the associated background corrected intensities. To continue with the analysis, we need to add the position information, as well as physicochemical properties of the peptides summarized by their z-scales.
 
-The slides used in this example are the enveloppe of HIV-1 and peptide collections are available for this in our PEP.db package (please refere to the vignette and ?pep\_hxb2 for more information).
+The slides used in this example are the enveloppe of HIV-1 and peptide collections are available for this in our PEP.db package (please refere to the vignette and \texttt{?pep\_hxb2} for more information).
 However, we will pretend that this is not the case to show an example of how to build a custom peptide collection.
 
 \subsection{Creating a custom peptide collection}
 Here, we load a data.frame that contains the peptides used on the array as well as their start and end coordinates.
 <<create-pep-load-data>>=
 peps <- read.csv(system.file("extdata/pep_info.csv", package = "PEP.db"))
+head(peps)
 @
 We first create a RangedData object with the available information. The region of interest is the enveloppe of the virus so we add the space information to the object.
 
@@ -80,7 +133,10 @@ pep_custom <- create_db(rd=rd)
 @
 
 \subsection{Summarize the information}
-With the newly constructed peptide collection, the information can be passed on to the existing peptideSet.
+The function \texttt{summarizePeptides} summarizes within-slide replicates by 
+either their mean or median. Additionaly, with the newly constructed peptide 
+collection, peptides positions and annotations can be passed on to the existing
+peptideSet.
 <<summarizePeptideSet>>=
 psSet <- summarizePeptides(pSet, summary = "mean", position = pep_custom)
 @
@@ -88,24 +144,75 @@ psSet <- summarizePeptides(pSet, summary = "mean", position = pep_custom)
 Now that all the required information is available, we can proceed with the analysis.
 
 \section{Normalization}
-
+The primary goal of the data normalization step is to remove non-biological source
+of bias and increase the comparability of true positive signal intensities across
+slides. The method developped for this package uses physiochemical properties of
+individual peptides to model non-specific antibody binding to arrays.
 <<normalizeArray>>=
 pnSet <- normalizeArray(psSet)
 @
 
+An object of class \texttt{peptideSet} containing the corrected peptides 
+intensities is returned.
+
 \section{Data smoothing}
+The optional data smoothing step takes advantage of the overlapping nature of the
+peptides on the array to remove background noise caused byexperimental variation. 
+It is likely that two overlapping peptides will share common binding signal, when
+present. \texttt{pepStat} use a sliding mean technique technique to borrow strength
+across neighboring peptides and to reduce signal variability. This statistic 
+increases detection of binding \textit{hotspots} that noisy signals might otherwise
+obscure. Peptides are smoothed according to their sequence alignment position, 
+taken from \texttt{position(psSet)}.
 
 <<slidingMean>>=
 psmSet <- slidingMean(pnSet, width = 9)
 @
 
 \section{Making calls}
+The final step is to make the positivity calls. The function \texttt{makeCalls}
+automatically uses information provided in the mapping file, accessed via 
+\texttt{pData(pSet)}. It detects whether samples are paired or not. If samples 
+are paired, POST intensities are subtracted from PRE intensities, then thresholded.
+Otherwise, PRE samples are averaged, and then subtracted from POST intensities. 
+These corrected POST intensities are thresholded.
+
+The \texttt{freq} argument controls whether we return the percentage of responders
+against each peptide, or a matrix of subject specific call. When \texttt{freq} is
+\texttt{TRUE}, we may supply a \texttt{group} variable from \texttt{pData(psmSet)}
+on which we split the frequency calculation.
+
 <<makeCalls>>=
 V_calls <- makeCalls(psmSet, freq = TRUE, group = "treatment", 
                      cutoff = .1, method = "FDR", verbose = TRUE)
 @
-The new FDR method automatically selected an appropriate threshold.
+The function automatically selected an appropriate FDR threshold.
 
+\newpage
+\section{Summary}
+Here we showcase a quick analysis of peptide microarray data for HIV-1 gp160. 
+This displays the minimal ampount of code required to go from raw data file to 
+antibody binding positivity call.
+<<quick-analysis, cache=TRUE, results='hide'>>=
+mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+ps <- makePeptideSet(files = NULL, path = dirToParse,
+                       mapping.file = mapFile, log = TRUE,
+                       rm.control.list = c("JPT-control", "Ig", "Cy3"),
+                       empty.control.list= c("empty", "blank control"))
+data(pep_hxb2)
+ps <- summarizePeptides(ps, summary = "mean", position = pep_hxb2)
+ps <- normalizeArray(ps)
+ps <- slidingMean(ps, width = 9)
+V_calls <- makeCalls(ps, freq = TRUE, group = "treatment", 
+                     cutoff = .1, method = "FDR", verbose = TRUE)
+@
+
+\newpage
+\section{sessionInfo}
+<<sessionInfo>>=
+sessionInfo()
+@
 
 
 \end{document}

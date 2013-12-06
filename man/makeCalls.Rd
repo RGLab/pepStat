@@ -2,8 +2,8 @@
 \alias{makeCalls}
 \title{Make antibody binding positivity calls}
 \usage{
-  makeCalls(peptideSet, cutoff=1.2, method="absolute",
-    freq=TRUE, group=NULL, verbose=FALSE)
+  makeCalls(peptideSet, cutoff = 1.2, method = "absolute",
+    freq = TRUE, group = NULL, verbose = FALSE)
 }
 \arguments{
   \item{peptideSet}{A \code{peptideSet} object. The

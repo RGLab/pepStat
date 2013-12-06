@@ -12,7 +12,8 @@
     ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
 }
 \arguments{
-  \item{peptideSet}{A \code{peptideSet} object}
+  \item{peptideSet}{A \code{peptideSet} object. The object
+  must contain all the original probes. See details below.}
 
   \item{array.index}{A vector subsetting
   \code{exprs(peptideSet)}, indicating which slides to
@@ -36,6 +37,13 @@
 \description{
   Plot a color image of the intensities on a slide. These
   plots are helpful to diagnose spatial abnormalities.
+}
+\details{
+  This function will fail if the \code{peptideSet} is a
+  subset of the original layout. This means that in order
+  to use this function, the slides have to be read with
+  \code{makePeptideSet} with empty.control.list = NULL and
+  rm.control.list = NULL
 }
 \author{
   Gregory Imholte

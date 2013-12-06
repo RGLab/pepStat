@@ -3,12 +3,6 @@
 #' This function reads GenePix results (.gpr) files and creates a peptideSet object
 #' gathering experiment information.
 #' 
-#' @usage makePeptideSet(files = NULL, path = NULL, mapping.file = NULL, 
-#'                       use.flags = FALSE, rm.control.list = NULL,
-#'                       empty.control.list = c("empty","blank control"),
-#'                       bgCorrect.method = "normexp", log = TRUE, 
-#'                       check.row.order = FALSE, verbose = FALSE)
-#' 
 #' @param files A \code{character} vector. If NULL, all files with a .gpr extension
 #' in the specified path will be read.
 #' @param path A \code{character} string. The directory where the .gpr files to
