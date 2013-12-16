@@ -126,6 +126,8 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
 #' Correct intensities by substracting PRE visit sample intensities.
 #' 
 #' @param pSet A \code{peptideSet} with sample PRE and POST visits.
+#' @param verbose A \code{logical}. If TRUE, information regarding the 
+#' pairedness of the data will be displayed.
 #' 
 #' @return A \code{matrix} of the baseline corrected intensities, with as many 
 #' columns as there are samples POST visit
@@ -163,3 +165,55 @@ baselineCorrect.pSet <- function(pSet, verbose=FALSE){
   I
 }
 
+#' Substract baseline intensities
+#' 
+#' Correct intensities by substracting PRE visit sample intensities.
+#' 
+#' @param pSet A \code{peptideSet} with sample PRE and POST visits.
+#' @param verbose A \code{logical}. If TRUE, information regarding the 
+#' pairedness of the data will be displayed.
+#' 
+#' @return A \code{matrix} of the baseline corrected intensities, with as many 
+#' columns as there are samples POST visit
+#' 
+#' @details
+#' The function will try to pair as many sample as possible. The remaining subjects
+#' with a POST and no PRE will use the average expression of all baseline samples.
+#' Subjects with baseline only will not be represented in the resulting matrix.
+#' 
+#' @export
+#' @author Renan Sauteraud
+#' 
+baseline_correct <- function(pSet, group=NULL, verbose=FALSE){
+  exprs <- exprs(pSet)
+  pd <- pData(pSet)
+  t0 <- grep("pre", tolower(pd$visit))
+  t1 <- grep("post", tolower(pd$visit))
+  ## All paired
+  if (isTRUE(all.equal(sort(pd$ptid[t0]), sort(pd$ptid[t1])))){
+    if (verbose) {
+      message("You have paired PRE/POST samples\n")
+    }
+    I <- as.matrix(y[,t1])-as.matrix(y[,t0])
+  } else {
+    ## Deal with paired samples first
+    paired <- pd$ptid[t1][pd$ptid[t1] %in% pd$ptid[t0]]
+    pre_paired <- rownames(pd[ pd$ptid %in% paired & tolower(pd$visit)=="pre",])
+    post_paired <- rownames(pd[ pd$ptid %in% paired & tolower(pd$visit)=="post",])
+    I <- exprs[, post_paired] - exprs[, pre_paired]
+    colnames(I) <- paired
+    ## Cbind the rest
+    if (verbose) {
+      cat(length(non_paired), "subjects don't have a baseline sample.\n")
+    }
+    non_paired <- unique(pd$ptid[!( pd$ptid %in% paired) & tolower(pd$visit)=="post"])
+    if(length(non_paired) > 0){
+      post_only <- rownames(pd[ pd$ptid %in% non_paired, ])
+      I_no_pairs <- exprs[, post_only] - rowMeans(exprs[, t0, drop=FALSE], na.rm=TRUE)
+      colnames(I_no_pairs) <- non_paired
+      I <- cbind(I, I_no_pairs) 
+    }
+  }
+  rownames(I) <- peptide(pSet)
+  return(I)
+}

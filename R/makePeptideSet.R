@@ -76,11 +76,9 @@
 #' @importFrom limma read.maimages backgroundCorrect
 #' 
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
-                         rm.control.list=NULL,
-                         empty.control.list=c("empty","blank control"),
+                         rm.control.list=NULL, empty.control.list=NULL,
                          bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE, 
-                         verbose=FALSE)
-{
+                         verbose=FALSE){
   # There is some ambiguity with respect to what is Name and ID
   # ID -> peptide
   # Name -> annotation
@@ -89,8 +87,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   # before reading in files, check whether mapping.file is accessible,
   # to save user time in case they made a mistake.
   if (!is.null(mapping.file)){
-    #mapping.file<-.sanitize.mapping.file(mapping.file)
     mapping.file<-.sanitize_mapping_file2(mapping.file)
+    files <- file_path_sans_ext(mapping.file$filename)
   }
   
   if (!check.row.order) { # Assume that the design is the same and don't check rows, order, etc.
@@ -167,21 +165,27 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   
   if(!is.null(empty.control.list)){
     norm.empty <- TRUE
+  } else{
+    norm.empty <- FALSE
   }
   preproc(myDesc)$bgCorrect.method <- bgCorrect.method
-  preproc(myDesc)$baselineCorrect <- FALSE
   preproc(myDesc)$norm.empty <- norm.empty
   
   if (norm.empty) {
     #Check both name and ID for the control list
     index <- RG$genes$Name%in%empty.control.list | RG$genes$ID%in%empty.control.list
-    if (verbose) {
-      cat("** Background corrected using ", sum(index), " empty splots **\n")
+    if(sum(index)==0){
+      warning("No empty controls matching the given list were found.")
+      mean.empty <- rep(0, ncol(as.matrix(RG$E)))
+    } else{
+      if (verbose) {
+        cat("** Background corrected using ", sum(index), " empty splots **\n")
+      }
+      mean.empty <- matrix(colMeans(as.matrix(RG$E[index,])), 
+                           nrow=nrow(as.matrix(RG$E)), 
+                           ncol=ncol(as.matrix(RG$E)), 
+                           byrow=TRUE)
     }
-    mean.empty <- matrix(colMeans(as.matrix(RG$E[index,])), 
-                         nrow=nrow(as.matrix(RG$E)), 
-                         ncol=ncol(as.matrix(RG$E)), 
-                         byrow=TRUE)
   } else {
     mean.empty <- rep(0, ncol(as.matrix(RG$E)))
   }
