@@ -214,7 +214,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   # Positions are set to zero before the information is provided in summarize pSet
   pSet <- new('peptideSet',
               featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)), featureID,
-                                        peptide = featureSequence, block = layout$Block[ind.keep], row = layout$Row[ind.keep], column = layout$Column[ind.keep]), 
+              peptide = featureSequence, block = layout$Block[ind.keep], 
+              row = layout$Row[ind.keep], column = layout$Column[ind.keep]), 
               exprs = as.matrix(RG$E-mean.empty)[ind.keep, ],
               experimentData = myDesc)
   
@@ -222,11 +223,6 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   sampleNames(pSet)<-tolower(sampleNames(pSet))
   
   if(!is.null(mapping.file)){
-    snamesIn <- sampleNames(pSet) %in% rownames(mapping.file)
-    if(!all(snamesIn)){
-      warning(paste(c("The following array samples were not found in mapping.file:",
-                      sampleNames(pSet)[!snamesIn]), collapse = "\n"))
-    }			
     pData(pSet) <- mapping.file[match(sampleNames(pSet), rownames(mapping.file)), ]
   }
   return(pSet)

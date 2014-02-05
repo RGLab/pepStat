@@ -4,8 +4,7 @@
 \usage{
   makePeptideSet(files = NULL, path = NULL,
     mapping.file = NULL, use.flags = FALSE,
-    rm.control.list = NULL,
-    empty.control.list = c("empty", "blank control"),
+    rm.control.list = NULL, empty.control.list = NULL,
     bgCorrect.method = "normexp", log = TRUE,
     check.row.order = FALSE, verbose = FALSE)
 }

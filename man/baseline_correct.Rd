@@ -1,8 +1,8 @@
-\name{baselineCorrect.pSet}
-\alias{baselineCorrect.pSet}
+\name{baseline_correct}
+\alias{baseline_correct}
 \title{Substract baseline intensities}
 \usage{
-  baselineCorrect.pSet(pSet, verbose = FALSE)
+  baseline_correct(pSet, verbose = FALSE)
 }
 \arguments{
   \item{pSet}{A \code{peptideSet} with sample PRE and POST
@@ -20,11 +20,13 @@
   intensities.
 }
 \details{
-  If samples are not PAIRED (One PRE and POST for each
-  ptid), then the average expression of all PRE visit
-  samples is substracted from each sample.
+  The function will try to pair as many sample as possible.
+  The remaining subjects with a POST and no PRE will use
+  the average expression of all baseline samples. Subjects
+  with baseline only will not be represented in the
+  resulting matrix.
 }
 \author{
-  Raphael Gottardo, Gregory Imholte
+  Renan Sauteraud
 }
 

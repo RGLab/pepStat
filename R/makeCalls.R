@@ -136,7 +136,6 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
 #' If samples are not PAIRED (One PRE and POST for each ptid), then the average 
 #' expression of all PRE visit samples is substracted from each sample.
 #' 
-#' @export
 #' @author Raphael Gottardo, Gregory Imholte
 #' 
 baselineCorrect.pSet <- function(pSet, verbose=FALSE){
@@ -184,7 +183,7 @@ baselineCorrect.pSet <- function(pSet, verbose=FALSE){
 #' @export
 #' @author Renan Sauteraud
 #' 
-baseline_correct <- function(pSet, group=NULL, verbose=FALSE){
+baseline_correct <- function(pSet, verbose=FALSE){
   exprs <- exprs(pSet)
   pd <- pData(pSet)
   t0 <- grep("pre", tolower(pd$visit))

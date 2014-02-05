@@ -1,4 +1,4 @@
-export(baselineCorrect.pSet)
+export(baseline_correct)
 export(create_db)
 export(makeCalls)
 export(makePeptideSet)
