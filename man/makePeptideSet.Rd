@@ -2,11 +2,10 @@
 \alias{makePeptideSet}
 \title{peptideSet constructor}
 \usage{
-  makePeptideSet(files = NULL, path = NULL,
-    mapping.file = NULL, use.flags = FALSE,
-    rm.control.list = NULL, empty.control.list = NULL,
-    bgCorrect.method = "normexp", log = TRUE,
-    check.row.order = FALSE, verbose = FALSE)
+makePeptideSet(files = NULL, path = NULL, mapping.file = NULL,
+  use.flags = FALSE, rm.control.list = NULL, empty.control.list = NULL,
+  bgCorrect.method = "normexp", log = TRUE, check.row.order = FALSE,
+  verbose = FALSE)
 }
 \arguments{
   \item{files}{A \code{character} vector. If NULL, all
@@ -48,41 +47,39 @@
   additional information.}
 }
 \value{
-  A \code{peptideSet} object that contain the intensities,
-  peptide sequences and annotations available in the
-  mapping file.
+A \code{peptideSet} object that contain the intensities,
+peptide sequences and annotations available in the mapping
+file.
 }
 \description{
-  This function reads GenePix results (.gpr) files and
-  creates a peptideSet object gathering experiment
-  information.
+This function reads GenePix results (.gpr) files and
+creates a peptideSet object gathering experiment
+information.
 }
 \details{
-  GenePix results files (.gpr) are read when found in
-  either the files or path arguments. By default, the
-  foreground and background median intensities of the "red"
-  channels, "F635 Median" and "B635 Median", are read. The
-  background correction specified in bgCorrect.method is
-  passed to the backgroundCorrect method in the limma
-  package.
+GenePix results files (.gpr) are read when found in either
+the files or path arguments. By default, the foreground and
+background median intensities of the "red" channels, "F635
+Median" and "B635 Median", are read. The background
+correction specified in bgCorrect.method is passed to the
+backgroundCorrect method in the limma package.
 
-  The mapping.file can be either a filename or a
-  data.frame. In any case, it should contain at least three
-  columns labeled "filename", "ptid" and "visit". The
-  filenames given here should match those read from the
-  path or files argument, or be a subset of it. For each
-  ptid (patient ID), the visit column should have at least
-  one "pre" and one "post" sample. Any additional column
-  will be kept into the resulting \code{peptideSet} and can
-  be used later on for groupping.
+The mapping.file can be either a filename or a data.frame.
+In any case, it should contain at least three columns
+labeled "filename", "ptid" and "visit". The filenames given
+here should match those read from the path or files
+argument, or be a subset of it. For each ptid (patient ID),
+the visit column should have at least one "pre" and one
+"post" sample. Any additional column will be kept into the
+resulting \code{peptideSet} and can be used later on for
+groupping.
 
-  If check.row.order = TRUE, the final set of probes is
-  taken to be those with IDs found in all arrays that were
-  read.
+If check.row.order = TRUE, the final set of probes is taken
+to be those with IDs found in all arrays that were read.
 
-  Row, Column and Block spatial array position for each
-  probe are stored in the \code{featureRanges} slot of the
-  returned object.
+Row, Column and Block spatial array position for each probe
+are stored in the \code{featureRanges} slot of the returned
+object.
 }
 \examples{
 # Read gpr files
@@ -100,10 +97,10 @@ pSet <- makePeptideSet(files = NULL, path = dirToParse,
                        empty.control.list= c("empty", "blank control"))
 }
 \author{
-  Raphael Gottardo, Gregory Imholte
+Raphael Gottardo, Gregory Imholte
 }
 \seealso{
-  \code{\link{peptideSet}}, \code{\link{read.maimages}},
-  \code{\link{backgroundCorrect}}
+\code{\link{peptideSet}}, \code{\link{read.maimages}},
+\code{\link{backgroundCorrect}}
 }
 

@@ -2,7 +2,7 @@
 \alias{baselineCorrect.pSet}
 \title{Substract baseline intensities}
 \usage{
-  baselineCorrect.pSet(pSet, verbose = FALSE)
+baselineCorrect.pSet(pSet, verbose = FALSE)
 }
 \arguments{
   \item{pSet}{A \code{peptideSet} with sample PRE and POST
@@ -12,19 +12,19 @@
   regarding the pairedness of the data will be displayed.}
 }
 \value{
-  A \code{matrix} of the baseline corrected intensities,
-  with as many columns as there are samples POST visit
+A \code{matrix} of the baseline corrected intensities, with
+as many columns as there are samples POST visit
 }
 \description{
-  Correct intensities by substracting PRE visit sample
-  intensities.
+Correct intensities by substracting PRE visit sample
+intensities.
 }
 \details{
-  If samples are not PAIRED (One PRE and POST for each
-  ptid), then the average expression of all PRE visit
-  samples is substracted from each sample.
+If samples are not PAIRED (One PRE and POST for each ptid),
+then the average expression of all PRE visit samples is
+substracted from each sample.
 }
 \author{
-  Raphael Gottardo, Gregory Imholte
+Raphael Gottardo, Gregory Imholte
 }
 

@@ -29,8 +29,8 @@
 #' @aliases plotArrayImage
 #' @aliases plotArrayResiduals
 #' 
-#' @importFrom ggplot2 ggplot ggtitle theme geom_tile scale_fill_gradient aes 
-#' element_blank geom_segment
+#' @importFrom ggplot2 ggplot ggtitle theme geom_tile scale_fill_gradient 
+#' aes_string element_blank geom_segment scale_fill_gradient2
 #' @importFrom fields smooth.2d
 #' @importFrom plyr ddply
 #' @export
@@ -38,8 +38,7 @@
 #' 
 plotArrayImage <- function(peptideSet, array.index = NULL,
   low = "white", high = "steelblue",
-  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
-{
+  ask = dev.interactive(orNone = TRUE) & 1 < length(array.index)){
   if (is.null(array.index))
     stop("Must specify indicies of arrays to be plotted")
   
@@ -69,14 +68,14 @@ plotArrayImage <- function(peptideSet, array.index = NULL,
     dev.hold()
     d.tmp <- data.frame(Intensity = y[,i], plot.coord)
     p <- ggplot() +
-      geom_tile(data = d.tmp, aes(x = x, y = y, fill = Intensity), 
+      geom_tile(data = d.tmp, aes_string(x = "x", y = "y", fill = "Intensity"), 
                 colour = "white") +
       scale_fill_gradient(low = low, high = high) + 
       theme(panel.grid = element_blank(), panel.background = element_blank(),
             axis.title = element_blank(), axis.text = element_blank(),
             axis.ticks = element_blank()) +
       geom_segment(data = plot.grid, 
-                   aes(y = y, x = x, xend = xend, yend = yend)) +
+                   aes_string(y = "y", x = "x", xend = "xend", yend = "yend")) +
       ggtitle(paste("Sample Name:", sampleNames(peptideSet)[array.index[i]]))
     print(p)
     dev.flush()
@@ -129,14 +128,14 @@ plotArrayResiduals <- function(peptideSet, array.index = NULL, smooth = FALSE,
     dev.hold()
     d.tmp <- data.frame(Intensity = res.mat[,i], plot.coord)
     p <- ggplot() +
-      geom_tile(data = d.tmp, aes(x = x, y = y, fill = Intensity), 
+      geom_tile(data = d.tmp, aes_string(x = "x", y = "y", fill = "Intensity"), 
                 colour = "white") +
       scale_fill_gradient(low = low, high = high) + 
       theme(panel.grid = element_blank(), panel.background = element_blank(),
             axis.title = element_blank(), axis.text = element_blank(),
             axis.ticks = element_blank()) +
       geom_segment(data = plot.grid, 
-                   aes(y = y, x = x, xend = xend, yend = yend)) +
+                   aes_string(y = "y", x = "x", xend = "xend", yend = "yend")) +
       ggtitle(paste(prefix, "for Sample Name", 
                     sampleNames(peptideSet)[array.index[i]]))
     print(p)

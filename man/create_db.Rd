@@ -2,19 +2,19 @@
 \alias{create_db}
 \title{Create a peptide collection}
 \usage{
-  create_db(rd)
+create_db(rd)
 }
 \arguments{
   \item{rd}{A \code{RangedData} object. The object should
   have a peptide column.}
 }
 \description{
-  Constructor to create peptide collection such as the
-  datasets available in PEP.db.
+Constructor to create peptide collection such as the
+datasets available in PEP.db.
 }
 \details{
-  rd can have additional columns. These columns will be
-  kept in the peptide collection.
+rd can have additional columns. These columns will be kept
+in the peptide collection.
 }
 \examples{
 #construct RangedData object
@@ -32,6 +32,6 @@
    new_pep <- create_db(newRD)
 }
 \seealso{
-  \code{\link{RangedData}}
+\code{\link{RangedData}}
 }
 

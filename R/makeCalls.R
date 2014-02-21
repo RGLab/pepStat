@@ -193,7 +193,7 @@ baseline_correct <- function(pSet, verbose=FALSE){
     if (verbose) {
       message("You have paired PRE/POST samples\n")
     }
-    I <- as.matrix(y[,t1])-as.matrix(y[,t0])
+    I <- as.matrix(exprs[,t1])-as.matrix(exprs[,t0])
   } else {
     ## Deal with paired samples first
     paired <- pd$ptid[t1][pd$ptid[t1] %in% pd$ptid[t0]]

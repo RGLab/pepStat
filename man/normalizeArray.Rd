@@ -1,10 +1,10 @@
 \name{normalizeArray}
-\alias{normalizeArray}
 \alias{NormalizeArray}
+\alias{normalizeArray}
 \title{Normalize tiling array data using sequence information}
 \usage{
-  normalizeArray(peptideSet, method = "ZpepQuad",
-    robust = TRUE, centered = TRUE)
+normalizeArray(peptideSet, method = "ZpepQuad", robust = TRUE,
+  centered = TRUE)
 }
 \arguments{
   \item{peptideSet}{A \code{peptideSet}. The expression
@@ -20,47 +20,45 @@
   data.}
 }
 \value{
-  A \code{peptideSet} object with updated normalized
-  intensity values.
+A \code{peptideSet} object with updated normalized
+intensity values.
 }
 \description{
-  This function is used to normalize the peptide microarray
-  data using sequence information.
+This function is used to normalize the peptide microarray
+data using sequence information.
 }
 \details{
-  The available methods are "Zpep" and "ZpepQuad". These
-  methods fit a linear model using either linear or linear
-  and quadratic terms (respectively), regressing intensity
-  on the peptides' five Z-scale scores. A peptide Z-scale
-  score is obtained by summing over the Z-scale values in
-  Sandburg et al (1998) of the amino acids the peptide
-  comprises.
+The available methods are "Zpep" and "ZpepQuad". These
+methods fit a linear model using either linear or linear
+and quadratic terms (respectively), regressing intensity on
+the peptides' five Z-scale scores. A peptide Z-scale score
+is obtained by summing over the Z-scale values in Sandburg
+et al (1998) of the amino acids the peptide comprises.
 
-  Peptide Z-scale scores may be provided in the
-  featureRange slot of peptideSet. This slot is a
-  \code{RangedData} object x, and the function will seek
-  five columns labelled z1 through z5 in values(x). If
-  these are not found, the function attempts to calculate
-  Z-scales from sequence information found in
-  peptide(peptideSet)
+Peptide Z-scale scores may be provided in the featureRange
+slot of peptideSet. This slot is a \code{RangedData} object
+x, and the function will seek five columns labelled z1
+through z5 in values(x). If these are not found, the
+function attempts to calculate Z-scales from sequence
+information found in peptide(peptideSet)
 
-  If robust = TRUE the linear model is fit with t_4
-  distributed errors. The method returns the residuals of
-  each peptide intensity in the fitted linear model. If
-  centered = TRUE the fitted intercept term is added back
-  to the residuals of the fit.
+If robust = TRUE the linear model is fit with t_4
+distributed errors. The method returns the residuals of
+each peptide intensity in the fitted linear model. If
+centered = TRUE the fitted intercept term is added back to
+the residuals of the fit.
 }
 \author{
-  Raphael Gottardo, Gregory Imholte
+Raphael Gottardo, Gregory Imholte
 }
 \references{
-  Sandberg, M., Eriksson, L., Jonsson, J., Sjostrom, M.,
-  and Wold, S. (1998). New chemical descriptors relevant
-  for the design of biologically active peptides. A
-  multivariate characterization of 87 amino acids. Journal
-  of Medicinal Chemistry 41, 2481-2491.
+Sandberg, M., Eriksson, L., Jonsson, J., Sjostrom, M., and
+Wold, S. (1998). New chemical descriptors relevant for the
+design of biologically active peptides. A multivariate
+characterization of 87 amino acids. Journal of Medicinal
+Chemistry 41, 2481-2491.
 }
 \seealso{
-  \code{\link{summarizePeptides}}, \code{\link{makeCalls}}
+\code{\link{summarizePeptides}}, \code{\link{makeCalls}}
 }
 

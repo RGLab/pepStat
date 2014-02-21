@@ -3,13 +3,13 @@
 \alias{plotArrayResiduals}
 \title{Plot microarray images}
 \usage{
-  plotArrayImage(peptideSet, array.index = NULL,
-    low = "white", high = "steelblue",
-    ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
+plotArrayImage(peptideSet, array.index = NULL, low = "white",
+  high = "steelblue", ask = dev.interactive(orNone = TRUE) & 1 <
+  length(array.index))
 
-  plotArrayResiduals(peptideSet, array.index = NULL,
-    smooth = FALSE, low = "blue", high = "red",
-    ask = dev.interactive(orNone = TRUE) & 1 < length(array.index))
+plotArrayResiduals(peptideSet, array.index = NULL, smooth = FALSE,
+  low = "blue", high = "red", ask = dev.interactive(orNone = TRUE) & 1 <
+  length(array.index))
 }
 \arguments{
   \item{peptideSet}{A \code{peptideSet} object. The object
@@ -35,17 +35,17 @@
   before each plot. See \code{par(ask=.)}.}
 }
 \description{
-  Plot a color image of the intensities on a slide. These
-  plots are helpful to diagnose spatial abnormalities.
+Plot a color image of the intensities on a slide. These
+plots are helpful to diagnose spatial abnormalities.
 }
 \details{
-  This function will fail if the \code{peptideSet} is a
-  subset of the original layout. This means that in order
-  to use this function, the slides have to be read with
-  \code{makePeptideSet} with empty.control.list = NULL and
-  rm.control.list = NULL
+This function will fail if the \code{peptideSet} is a
+subset of the original layout. This means that in order to
+use this function, the slides have to be read with
+\code{makePeptideSet} with empty.control.list = NULL and
+rm.control.list = NULL
 }
 \author{
-  Gregory Imholte
+Gregory Imholte
 }
 
