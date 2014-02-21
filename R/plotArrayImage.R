@@ -11,10 +11,10 @@
 #' @param smooth A \code{logical}, a 2D spatial smoother is applied to residuals,
 #' the fitted residuals are plotted.
 #' @param low A \code{character} string. The color of the lowest slide intensity.
-#' passed to \code{scale_fill_gradient}.
+#' passed to \code{scale_fill_gradient2}.
 #' the fitted residuals are plotted.
 #' @param high A \code{character} string. The color of the highest slide intensity.
-#' passed to \code{scale_fill_gradient}.
+#' passed to \code{scale_fill_gradient2}.
 #' @param ask A \code{logical}. If TRUE, the user is asked before each plot. See
 #' \code{par(ask=.)}.
 #' 
@@ -28,8 +28,8 @@
 #' @aliases plotArrayImage
 #' @aliases plotArrayResiduals
 #' 
-#' @importFrom ggplot2 ggplot ggtitle theme geom_tile scale_fill_gradient 
-#' aes_string element_blank geom_segment scale_fill_gradient2
+#' @importFrom ggplot2 ggplot ggtitle theme geom_tile aes_string element_blank 
+#' geom_segment scale_fill_gradient2
 #' @importFrom fields smooth.2d
 #' @importFrom plyr ddply
 #' @export
@@ -69,7 +69,7 @@ plotArrayImage <- function(peptideSet, array.index = NULL,
     p <- ggplot() +
       geom_tile(data = d.tmp, aes_string(x = "x", y = "y", fill = "Intensity"), 
                 colour = "white") +
-      scale_fill_gradient(low = low, high = high) + 
+      scale_fill_gradient2(low = low, high = high) + 
       theme(panel.grid = element_blank(), panel.background = element_blank(),
             axis.title = element_blank(), axis.text = element_blank(),
             axis.ticks = element_blank()) +
@@ -186,9 +186,9 @@ getPlotCoords <- function(peptideSet)
   sr <- layout$nspot.r
   sc <- layout$nspot.c
   
-  block <- as.numeric(pSet@featureRange@values[[1]]@listData$block)
-  column <- as.numeric(pSet@featureRange@values[[1]]@listData$column)
-  row <- as.numeric(pSet@featureRange@values[[1]]@listData$row)
+  block <- as.numeric(peptideSet@featureRange@values[[1]]@listData$block)
+  column <- as.numeric(peptideSet@featureRange@values[[1]]@listData$column)
+  row <- as.numeric(peptideSet@featureRange@values[[1]]@listData$row)
 
   y <- column + ((block - 1) %% gc) * sc
   x <- row + floor((block - 1) / gc) * sr

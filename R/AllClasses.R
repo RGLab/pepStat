@@ -4,12 +4,18 @@
 #' 
 #' @section Slots:
 #' \describe{
-#'  \item{featureRange}{ A \code{RangedData object}. The ranges and sequences of 
+#'  \item{featureRange}{A \code{RangedData object}. The ranges and sequences of 
 #' the peptides and their associated annotation.}
-#'  \item{phenoData}{ An \code{AnnotatedDataFrame}. Annotation for the samples.}
-#'  \item{assayData, featureData, annotation, protocoldata}{ Slots inherited 
-#'  from \code{ExpressionSet}.}
+#'  \item{phenoData}{An \code{AnnotatedDataFrame}. Annotation for the samples.}
+#'  \item{assayData}{}
+#'  \item{featureData}{}
+#'  \item{annotation}{}
+#'  \item{protocolData}{Slots inherited from \code{ExpressionSet}.}
 #' }
+#'
+#' @details
+#' See \code{?`peptideSet-methods`} for a list of accessors and method associated
+#' with the class.
 #'
 #' @seealso \code{\link{ExpressionSet}}, \code{\link{peptideSet-methods}}
 #'

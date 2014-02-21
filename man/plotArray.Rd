@@ -24,12 +24,12 @@ plotArrayResiduals(peptideSet, array.index = NULL, smooth = FALSE,
 
   \item{low}{A \code{character} string. The color of the
   lowest slide intensity. passed to
-  \code{scale_fill_gradient}. the fitted residuals are
+  \code{scale_fill_gradient2}. the fitted residuals are
   plotted.}
 
   \item{high}{A \code{character} string. The color of the
   highest slide intensity. passed to
-  \code{scale_fill_gradient}.}
+  \code{scale_fill_gradient2}.}
 
   \item{ask}{A \code{logical}. If TRUE, the user is asked
   before each plot. See \code{par(ask=.)}.}
@@ -39,11 +39,9 @@ Plot a color image of the intensities on a slide. These
 plots are helpful to diagnose spatial abnormalities.
 }
 \details{
-This function will fail if the \code{peptideSet} is a
-subset of the original layout. This means that in order to
-use this function, the slides have to be read with
-\code{makePeptideSet} with empty.control.list = NULL and
-rm.control.list = NULL
+The most coherent results are achieved when the
+\code{peptideSet} object is read with \code{makePeptideSet}
+with empty.control.list = NULL and rm.control.list = NULL
 }
 \author{
 Gregory Imholte
