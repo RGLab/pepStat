@@ -19,8 +19,7 @@
 #' \code{par(ask=.)}.
 #' 
 #' @details
-#' This function will fail if the \code{peptideSet} is a subset of the original 
-#' layout. This means that in order to use this function, the slides have to be 
+#' The most coherent results are achieved when the \code{peptideSet} object is  
 #' read with \code{makePeptideSet} with empty.control.list = NULL and rm.control.list 
 #' = NULL
 #' 
@@ -130,7 +129,7 @@ plotArrayResiduals <- function(peptideSet, array.index = NULL, smooth = FALSE,
     p <- ggplot() +
       geom_tile(data = d.tmp, aes_string(x = "x", y = "y", fill = "Intensity"), 
                 colour = "white") +
-      scale_fill_gradient(low = low, high = high) + 
+      scale_fill_gradient2(low = low, high = high) + 
       theme(panel.grid = element_blank(), panel.background = element_blank(),
             axis.title = element_blank(), axis.text = element_blank(),
             axis.ticks = element_blank()) +
@@ -187,9 +186,9 @@ getPlotCoords <- function(peptideSet)
   sr <- layout$nspot.r
   sc <- layout$nspot.c
   
-  block <- rep(1:(gr * gc), each = sr * sc)
-  column <- rep(1:sc, sr * gc * gr)
-  row <- rep(rep(1:sr, each = sc), gc * gr)  
+  block <- as.numeric(pSet@featureRange@values[[1]]@listData$block)
+  column <- as.numeric(pSet@featureRange@values[[1]]@listData$column)
+  row <- as.numeric(pSet@featureRange@values[[1]]@listData$row)
 
   y <- column + ((block - 1) %% gc) * sc
   x <- row + floor((block - 1) / gc) * sr
