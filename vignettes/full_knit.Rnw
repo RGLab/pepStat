@@ -97,7 +97,7 @@ pSetNoCtrl <- makePeptideSet(files = NULL, path = dirToParse,
 
 \subsection{Visualize slides}
 We include two plotting functions to detect possible spatial slide artifacts. Since
-the full plate is needed for this visualization, the functions will only work with 
+the full plate is needed for this visualization, the functions will work best with 
 rm.contol.list and empty.control.list set to NULL in makePeptideSet.
 
 <<plot-slide, include=TRUE, fig.width=7.48, fig.height=3>>=
