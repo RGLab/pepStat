@@ -187,9 +187,9 @@ getPlotCoords <- function(peptideSet)
   sr <- layout$nspot.r
   sc <- layout$nspot.c
   
-  block <- as.numeric(pSet@featureRange@values[[1]]@listData$block)
-  column <- as.numeric(pSet@featureRange@values[[1]]@listData$column)
-  row <- as.numeric(pSet@featureRange@values[[1]]@listData$row)
+  block <- as.numeric(peptideSet@featureRange@values[[1]]@listData$block)
+  column <- as.numeric(peptideSet@featureRange@values[[1]]@listData$column)
+  row <- as.numeric(peptideSet@featureRange@values[[1]]@listData$row)
 
   y <- column + ((block - 1) %% gc) * sc
   x <- row + floor((block - 1) / gc) * sr
