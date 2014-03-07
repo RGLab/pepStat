@@ -1,31 +1,31 @@
 \name{peptideSet-methods}
+\alias{[,peptideSet,ANY,ANY,ANY-method}
 \alias{clade}
-\alias{clade-methods}
-\alias{clade,peptideSet-method}
 \alias{clade,RangedData-method}
+\alias{clade,peptideSet-method}
+\alias{clade-methods}
 \alias{end,peptideSet-method}
 \alias{featureID}
-\alias{featureID-method}
 \alias{featureID,peptideSet-method}
-\alias{peptide}
-\alias{peptide<-}
-\alias{peptide-method}
-\alias{peptide<-,peptideSet,character-method}
-\alias{peptide,peptideSet-method}
-\alias{[,peptideSet,ANY,ANY,ANY-method}
-\alias{peptideSet-methods}
+\alias{featureID-method}
 \alias{pepZscore}
-\alias{pepZscore<-}
-\alias{pepZscore-method}
-\alias{pepZscore<-,peptideSet,data.frame-method}
-\alias{pepZscore,peptideSet-method}
-\alias{pepZscore<-,RangedData,data.frame-method}
 \alias{pepZscore,RangedData-method}
+\alias{pepZscore,peptideSet-method}
+\alias{pepZscore-method}
+\alias{pepZscore<-}
+\alias{pepZscore<-,RangedData,data.frame-method}
+\alias{pepZscore<-,peptideSet,data.frame-method}
+\alias{peptide}
+\alias{peptide,peptideSet-method}
+\alias{peptide-method}
+\alias{peptide<-}
+\alias{peptide<-,peptideSet,character-method}
+\alias{peptideSet-methods}
 \alias{position}
-\alias{position-method}
 \alias{position,peptideSet-method}
-\alias{ranges<-,peptideSet-method}
+\alias{position-method}
 \alias{ranges,peptideSet-method}
+\alias{ranges<-,peptideSet-method}
 \alias{show,peptideSet-method}
 \alias{start,peptideSet-method}
 \alias{subset,peptideSet-method}
@@ -34,7 +34,7 @@
 \alias{width,peptideSet-method}
 \title{peptideSet methods}
 \description{
-  Methods for handling peptideSet objects
+Methods for handling peptideSet objects
 }
 \section{Accessors}{
   \describe{ \item{\code{nrow(x)}:}{The number of peptides
@@ -47,17 +47,19 @@
   \code{round((start(x) + end(x))/2)}.}
   \item{\code{ranges(x)}:}{Returns a \code{RangedData}
   object that contains the annotations for the peptides.}
-  \item{\code{ranges(x)<- value}}{}
-  \item{\code{values(x)}:}{Returns a
+  \item{\code{ranges(x)<- value}}{Set annotations for the
+  peptides.} \item{\code{values(x)}:}{Returns a
   \code{SplitDataFrameList}. Accessor for the values of the
   featureRange slot.} \item{\code{clade(x)}:}{If available,
   returns the clade information for each peptide as a
   \code{matrix}.} \item{\code{peptide(x)}:}{Get the
-  sequence of the peptides.} \item{\code{peptide(x)<-
-  value}}{} \item{\code{featureID(x)}:}{Get the ID of the
-  peptides.} \item{\code{pepZscore(x)}:}{If available,
-  returns a \code{matrix} of the zScores for each peptide.}
-  \item{\code{pepZscore(x)<- value}}{} }
+  sequence of the peptides.} \item{\code{peptide(x) <-
+  value}}{Set the sequence of the peptides.}
+  \item{\code{featureID(x)}:}{Get the ID of the peptides.}
+  \item{\code{pepZscore(x)}:}{If available, returns a
+  \code{matrix} of the zScores for each peptide.}
+  \item{\code{pepZscore(x) <- value}}{Set the zScores for
+  each peptide} }
 }
 
 \section{Display}{

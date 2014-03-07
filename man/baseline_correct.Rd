@@ -2,7 +2,7 @@
 \alias{baseline_correct}
 \title{Substract baseline intensities}
 \usage{
-  baseline_correct(pSet, verbose = FALSE)
+baseline_correct(pSet, verbose = FALSE)
 }
 \arguments{
   \item{pSet}{A \code{peptideSet} with sample PRE and POST
@@ -12,21 +12,21 @@
   regarding the pairedness of the data will be displayed.}
 }
 \value{
-  A \code{matrix} of the baseline corrected intensities,
-  with as many columns as there are samples POST visit
+A \code{matrix} of the baseline corrected intensities, with
+as many columns as there are samples POST visit
 }
 \description{
-  Correct intensities by substracting PRE visit sample
-  intensities.
+Correct intensities by substracting PRE visit sample
+intensities.
 }
 \details{
-  The function will try to pair as many sample as possible.
-  The remaining subjects with a POST and no PRE will use
-  the average expression of all baseline samples. Subjects
-  with baseline only will not be represented in the
-  resulting matrix.
+The function will try to pair as many sample as possible.
+The remaining subjects with a POST and no PRE will use the
+average expression of all baseline samples. Subjects with
+baseline only will not be represented in the resulting
+matrix.
 }
 \author{
-  Renan Sauteraud
+Renan Sauteraud
 }
 

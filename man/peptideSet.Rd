@@ -1,22 +1,30 @@
+\docType{class}
 \name{peptideSet}
 \alias{peptideSet}
 \alias{peptideSet-class}
 \title{peptideSet class}
 \description{
-  This class gathers all information from gpr files,
-  annotation data and sequence data
+This class gathers all information from gpr files,
+annotation data and sequence data
+}
+\details{
+See \code{?`peptideSet-methods`} for a list of accessors
+and method associated with the class.
 }
 \section{Slots}{
-  \describe{ \item{featureRange:}{ A \code{RangedData
+  \describe{ \item{featureRange}{A \code{RangedData
   object}. The ranges and sequences of the peptides and
-  their associated annotation.} \item{phenoData:}{ An
-  \code{AnnotatedDataFrame}. Annotation for the samples.} }
+  their associated annotation.} \item{phenoData}{An
+  \code{AnnotatedDataFrame}. Annotation for the samples.}
+  \item{assayData}{} \item{featureData}{}
+  \item{annotation}{} \item{protocolData}{Slots inherited
+  from \code{ExpressionSet}.} }
 }
 \author{
-  Greg Imholte
+Greg Imholte
 }
 \seealso{
-  \code{\link{ExpressionSet}},
-  \code{\link{peptideSet-methods}}
+\code{\link{ExpressionSet}},
+\code{\link{peptideSet-methods}}
 }
 

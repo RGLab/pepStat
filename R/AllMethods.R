@@ -15,52 +15,66 @@
 #'  each peptide, given by: \code{round((start(x) + end(x))/2)}.}
 #'  \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains 
 #'  the annotations for the peptides.}
-#'  \item{\code{ranges(x)<- value}}{}
+#'  \item{\code{ranges(x)<- value}}{Set annotations for the peptides.}
 #'  \item{\code{values(x)}:}{Returns a \code{SplitDataFrameList}. Accessor for the
 #'  values of the featureRange slot.}
 #'  \item{\code{clade(x)}:}{If available, returns the clade information for each
 #'  peptide as a \code{matrix}.}
 #'  \item{\code{peptide(x)}:}{Get the sequence of the peptides.}
-#'  \item{\code{peptide(x)<- value}}{}
+#'  \item{\code{peptide(x) <- value}}{Set the sequence of the peptides.}
 #'  \item{\code{featureID(x)}:}{Get the ID of the peptides.}
 #'  \item{\code{pepZscore(x)}:}{If available, returns a \code{matrix} of the zScores
 #'  for each peptide.}
-#'  \item{\code{pepZscore(x)<- value}}{}
+#'  \item{\code{pepZscore(x) <- value}}{Set the zScores for each peptide}
 #' }
 #' 
-#' @aliases start,peptideSet-method
-#' @aliases end,peptideSet-method
-#' @aliases width,peptideSet-method
-#' @aliases position
-#' @aliases position-method
-#' @aliases position,peptideSet-method
-#' @aliases ranges,peptideSet-method
-#' @aliases ranges<-,peptideSet-method
-#' @aliases values,peptideSet-method
-#' @aliases clade
-#' @aliases clade-methods
-#' @aliases clade,RangedData-method
-#' @aliases clade,peptideSet-method
-#' @aliases peptide
-#' @aliases peptide<-
-#' @aliases peptide-method
-#' @aliases peptide,peptideSet-method
-#' @aliases peptide<-,peptideSet,character-method
-#' @aliases featureID
-#' @aliases featureID-method
-#' @aliases featureID,peptideSet-method
-#' @aliases pepZscore
-#' @aliases pepZscore<-
-#' @aliases pepZscore-method
-#' @aliases pepZscore,peptideSet-method
-#' @aliases pepZscore<-,peptideSet,data.frame-method
-#' @aliases pepZscore,RangedData-method
-#' @aliases pepZscore<-,RangedData,data.frame-method 
-#'  
-#' @exportMethod "start", "end", "width", "position"
-#' @exportMethod "ranges", "values", "ranges<-"
-#' @exportMethod "clade", "peptide", "pepZscore", "featureID", 
-#' "peptide<-", "pepZscore<-"
+#' @aliases
+#' start,peptideSet-method
+#' end,peptideSet-method
+#' width,peptideSet-method
+#' position
+#' position-method
+#' position,peptideSet-method
+#' ranges,peptideSet-method
+#' ranges<-,peptideSet-method
+#' values,peptideSet-method
+#' clade
+#' clade-methods
+#' clade,RangedData-method
+#' clade,peptideSet-method
+#' peptide
+#' peptide<-
+#' peptide-method
+#' peptide,peptideSet-method
+#' peptide<-,peptideSet,character-method
+#' featureID
+#' featureID-method
+#' featureID,peptideSet-method
+#' pepZscore
+#' pepZscore<-
+#' pepZscore-method
+#' pepZscore,peptideSet-method
+#' pepZscore<-,peptideSet,data.frame-method
+#' pepZscore,RangedData-method
+#' pepZscore<-,RangedData,data.frame-method 
+#' [,peptideSet,ANY,ANY,ANY-method
+#' subset,peptideSet-method
+#' show,peptideSet-method
+#' summary,peptideSet-method
+#'
+#' @exportMethod "start"
+#' @exportMethod "end"
+#' @exportMethod "width"
+#' @exportMethod "position"
+#' @exportMethod "ranges"
+#' @exportMethod "values"
+#' @exportMethod "ranges<-"
+#' @exportMethod "clade"
+#' @exportMethod "peptide"
+#' @exportMethod "pepZscore"
+#' @exportMethod "featureID"
+#' @exportMethod "peptide<-"
+#' @exportMethod "pepZscore<-"
 #' 
 #' @section Display:
 #' \describe{
@@ -68,10 +82,8 @@
 #'  \item{\code{summary(object)}:}{Summarize a peptideSet object.}
 #' }
 #' 
-#' @aliases show,peptideSet-method
-#' @aliases summary,peptideSet-method
-#' 
-#' @exportMethod "show", "summary"
+#' @exportMethod "show"
+#' @exportMethod "summary"
 #' 
 #' @section Subset:
 #' \describe{
@@ -79,10 +91,8 @@
 #'  \item{\code{subset(x, subset, drop=FALSE)}:}{Subset x given an expression 'subset'.}
 #' }
 #' 
-#' @aliases [,peptideSet,ANY,ANY,ANY-method
-#' @aliases subset,peptideSet-method
-#' 
-#' @exportMethod "[", "subset"
+#' @exportMethod "["
+#' @exportMethod "subset"
 #' 
 #' @importMethodsFrom IRanges lapply ranges ranges<- values values<- width cbind
 #' rbind

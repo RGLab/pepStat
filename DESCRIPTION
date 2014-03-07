@@ -7,7 +7,7 @@ Maintainer: Gregory C Imholte <gimholte@uw.edu>
 Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends:
-    R(>= 2.15.0),Biobase (>= 2.5.5),
+    R(>= 2.16.0),Biobase (>= 2.5.5),
     IRanges
 Suggests:
     PEP.db,
@@ -24,16 +24,3 @@ Imports:
 biocViews: Microarray, Preprocessing, Statistics
 URL: https://github.com/RGLab/pepStat
 VignetteBuilder: knitr
-Collate:
-    'AllClasses.R'
-    'AllMethods.R'
-    'computeZscores.R'
-    'internal.R'
-    'makeCalls.R'
-    'makePeptideSet.R'
-    'normalizeArray.R'
-    'plotArrayImage.R'
-    'report.R'
-    'slidingMean.R'
-    'summarizePeptides.R'
-    'create_db.R'
