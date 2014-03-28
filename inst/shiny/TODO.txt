@@ -1,0 +1,15 @@
+Read Data
+Summary
+Normalization
+Positivity Calls
+Visualization
+
+Download data
+download bg corrected data
+download bg corrected, normalized data
+
+add annotation information to calls DataTable output
+
+remove bg correction method, exclude controls, empty controls 'controls'
+
+help popups for documentation / information
