@@ -7,8 +7,11 @@ Maintainer: Gregory C Imholte <gimholte@uw.edu>
 Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends:
-    R(>= 2.16.0),Biobase (>= 2.5.5),
-    IRanges
+    R(>= 3.0.0),Biobase (>= 2.5.5),
+    IRanges,
+    data.table,
+    Gviz,
+    Pviz
 Suggests:
     PEP.db,
     HIV.db,

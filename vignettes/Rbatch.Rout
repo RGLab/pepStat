@@ -1,0 +1,202 @@
+
+R Under development (unstable) (2013-10-02 r64018) -- "Unsuffered Consequences"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> args  <- commandArgs(TRUE)
+> if(length(args) != 1){
++   print("There should be only one argument. The name of the vignette to knit")
++ } else{
++   eval(parse(text=args[[1]]))
++ }
+> 
+> library(knitr)
+> knit2pdf(PARAM)
+
+
+processing file: full_knit.Rnw
+  |                                                                         |                                                                 |   0%  |                                                                         |..                                                               |   3%
+  ordinary text without R code
+
+  |                                                                         |....                                                             |   5%
+label: unnamed-chunk-1 (with options) 
+List of 1
+ $ include: logi FALSE
+
+  |                                                                         |.....                                                            |   8%
+  ordinary text without R code
+
+  |                                                                         |.......                                                          |  11%
+label: loading-libraries (with options) 
+List of 1
+ $ message: logi FALSE
+
+Loading required package: Biobase
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: 'BiocGenerics'
+
+The following objects are masked from 'package:parallel':
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following object is masked from 'package:stats':
+
+    xtabs
+
+The following objects are masked from 'package:base':
+
+    anyDuplicated, append, as.data.frame, as.vector, cbind,
+    colnames, duplicated, eval, evalq, Filter, Find, get,
+    intersect, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rep.int, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unlist
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: IRanges
+Loading required package: data.table
+Loading required package: Gviz
+Loading required package: grid
+Loading required package: Pviz
+
+Attaching package: 'pepStat'
+
+The following object is masked from 'package:Gviz':
+
+    position
+
+  |                                                                         |.........                                                        |  14%
+  ordinary text without R code
+
+  |                                                                         |...........                                                      |  16%
+label: read-data
+  |                                                                         |............                                                     |  19%
+  ordinary text without R code
+
+  |                                                                         |..............                                                   |  22%
+label: data-content
+  |                                                                         |................                                                 |  24%
+  ordinary text without R code
+
+  |                                                                         |..................                                               |  27%
+label: read-data-ctrl
+  |                                                                         |...................                                              |  30%
+  ordinary text without R code
+
+  |                                                                         |.....................                                            |  32%
+label: plot-slide (with options) 
+List of 3
+ $ include   : logi TRUE
+ $ fig.width : num 7.48
+ $ fig.height: num 3
+
+  |                                                                         |.......................                                          |  35%
+  ordinary text without R code
+
+  |                                                                         |.........................                                        |  38%
+label: plot-residuals (with options) 
+List of 3
+ $ include   : logi TRUE
+ $ fig.width : num 7.48
+ $ fig.height: num 3
+
+  |                                                                         |..........................                                       |  41%
+  ordinary text without R code
+
+  |                                                                         |............................                                     |  43%
+label: create-pep-load-data
+  |                                                                         |..............................                                   |  46%
+  ordinary text without R code
+
+  |                                                                         |................................                                 |  49%
+label: create-pep-RD
+  |                                                                         |.................................                                |  51%
+  ordinary text without R code
+
+  |                                                                         |...................................                              |  54%
+label: create-db
+  |                                                                         |.....................................                            |  57%
+  ordinary text without R code
+
+  |                                                                         |.......................................                          |  59%
+label: summarizePeptideSet
+  |                                                                         |........................................                         |  62%
+  ordinary text without R code
+
+  |                                                                         |..........................................                       |  65%
+label: normalizeArray
+  |                                                                         |............................................                     |  68%
+  ordinary text without R code
+
+  |                                                                         |..............................................                   |  70%
+label: slidingMean
+  |                                                                         |...............................................                  |  73%
+  ordinary text without R code
+
+  |                                                                         |.................................................                |  76%
+label: makeCalls
+  |                                                                         |...................................................              |  78%
+  ordinary text without R code
+
+  |                                                                         |.....................................................            |  81%
+label: plot-inter (with options) 
+List of 1
+ $ fig.height: num 4
+
+  |                                                                         |......................................................           |  84%
+  ordinary text without R code
+
+  |                                                                         |........................................................         |  86%
+label: plot-inra (with options) 
+List of 1
+ $ fig.height: num 4
+
+  |                                                                         |..........................................................       |  89%
+  ordinary text without R code
+
+  |                                                                         |............................................................     |  92%
+label: quick-analysis (with options) 
+List of 3
+ $ cache  : logi TRUE
+ $ warning: logi FALSE
+ $ results: chr "hide"
+
+  |                                                                         |.............................................................    |  95%
+  ordinary text without R code
+
+  |                                                                         |...............................................................  |  97%
+label: sessionInfo
+  |                                                                         |.................................................................| 100%
+  ordinary text without R code
+
+
+output file: full_knit.tex
+
+[1] "full_knit.pdf"
+> 
+> proc.time()
+   user  system elapsed 
+ 24.273   0.332  24.941 
