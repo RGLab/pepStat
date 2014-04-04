@@ -62,6 +62,7 @@ shinyUI( fluidPage(
           checkboxInputWithHelp("slidingMean_split_by_space", "Split by Space?", TRUE),
           checkboxInputWithHelp("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
           actionButton("do_summarizePeptides", "Normalize"),
+          HTML("<br />"),
           uiOutput("summarize_status")
         ),
         tabPanel("Positivity Calls",

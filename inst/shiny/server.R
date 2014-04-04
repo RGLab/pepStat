@@ -294,9 +294,7 @@ shinyServer( function(input, output, session) {
     ), {
     input$do_makeCalls
     if (!is.null(calls)) {
-      output <- data.frame(Antigen=rownames(calls))
-      output <- cbind(output, as.data.frame(calls))
-      rownames(output) <- NULL
+      output <- restab(psmSet, calls)
       return(output)
     } else {
       invisible(NULL)
@@ -320,12 +318,12 @@ shinyServer( function(input, output, session) {
   
   output$export_calls <- downloadHandler(
     filename = function() {
-      paste('calls-', Sys.Date(), ".csv", sep='')
+      paste('pepStat-calls-', Sys.Date(), ".csv", sep='')
     }, content = function(file) {
       if (is.null(calls)) {
         stop("No calls are available yet! Please navigate back to the Shiny application.")
       }
-      write.table(calls, file,
+      write.table( restab(psmSet, calls), file,
         sep="\t",
         row.names = FALSE,
         col.names = TRUE,
