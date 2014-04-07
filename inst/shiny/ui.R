@@ -11,12 +11,15 @@ source("common_functions.R")
 
 shinyUI( fluidPage(
   
-  includeCSS("styles.css"),
-  includeScript("scripts.js"),
   
   ## OpenTip
   includeScript("www/opentip/opentip-jquery.min.js"),
   includeCSS("www/opentip/opentip.css"),
+  
+  ## Own
+  includeCSS("styles.css"),
+  includeScript("scripts.js"),
+  includeScript("tooltips.js"),
   
   HTML( "<style>#controls + div { height: 520px; }</style>" ),
   
@@ -31,7 +34,12 @@ shinyUI( fluidPage(
         tabPanel("Read Data",
           fileInputWithHelp("gpr_files", "Upload GenePix .gpr Files", multiple=TRUE),
           fileInputWithHelp("mapping_file", "Upload a Mapping File", multiple=FALSE),
-          uiOutput("file_status")
+          h3("File Status"),
+          uiOutput("gpr_files_status"),
+          uiOutput("mapping_file_status"),
+          uiOutput("makePeptideSet"),
+          HTML("<br/>"),
+          uiOutput("pSet_status")
 #           addHelp(selectizeInput("makePeptideSet_bgCorrect.method", "Method to be used for background correction", 
 #             choices=c("normexp", "auto", "none", "subtract", "half", "min", "movingmin", "edwards")
 #           )),
@@ -53,15 +61,18 @@ shinyUI( fluidPage(
           numericInputWithHelp("slidingMean_width", "Sliding Mean Width", 5, 1, 100),
           checkboxInputWithHelp("slidingMean_split_by_space", "Split by Space?", TRUE),
           checkboxInputWithHelp("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
-          actionButton("do_summarizePeptides", "Normalize")
+          actionButton("do_summarizePeptides", "Normalize"),
+          HTML("<br />"),
+          uiOutput("summarize_status")
         ),
         tabPanel("Positivity Calls",
-          selectInput("makeCalls_method", "Method", list(
+          selectizeInputWithHelp("makeCalls_method", "Method", list(
             `Absolute`="absolute",
             `False Discovery Rate`="FDR"
           )),
-          numericInput("makeCalls_cutoff", "Cutoff", 0.1, 0, 10, 0.01),
-          selectInput("makeCalls_group", "Group", ""),
+          numericInputWithHelp("makeCalls_cutoff", "Cutoff", 1.2, 0, 10, 0.01),
+          HTML("<br />"),
+          selectizeInputWithHelp("makeCalls_group", "Group", ""),
           HTML("<br />"),
           actionButton("do_makeCalls", "Make Calls"),
           downloadButton("export_calls"),
@@ -74,8 +85,8 @@ shinyUI( fluidPage(
      tabsetPanel(
        tabPanel("Array Images",
          selectInput("arrayImageSelect", "Select an Array", ""),
-         plotOutput("arrayImage", height=220),
-         plotOutput("arrayResiduals", height=220)
+         plotOutput("arrayImage", height=250),
+         plotOutput("arrayResiduals", height=250)
        ),
        tabPanel("Calls",
          uiOutput("call_status"),

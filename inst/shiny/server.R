@@ -9,7 +9,7 @@ shinyServer( function(input, output, session) {
   library(PEP.db)
   source("common_functions.R")
   
-  onButtonPress <- function(buttonId, x, env = parent.frame(), quoted = FALSE) {
+  onClick <- function(buttonId, x, env = parent.frame(), quoted = FALSE) {
     fun <- exprToFunction(x, env, quoted)
     observe({
       if (length(input[[buttonId]]) && input[[buttonId]] > 0) {
@@ -21,6 +21,9 @@ shinyServer( function(input, output, session) {
   }
   
   ## Globals
+  gpr_files_ready <- FALSE
+  mapping_file_ready <- FALSE
+  
   pSet   <- NULL ## peptide set
   psSet  <- NULL ## summarized peptide set
   pnSet  <- NULL ## normalized peptide set
@@ -57,6 +60,61 @@ shinyServer( function(input, output, session) {
     
   })
   
+  ## Observer: make sure the GPR files are okay (TODO)
+  observe({
+    
+    gpr_files <- input$gpr_files
+    if (is.null(gpr_files)) {
+      output$gpr_files_status <- renderUI({
+        p("Please upload one or more GenePix .gpr files.")
+      })
+      return(NULL)
+    }
+    
+    output$gpr_files_status <- renderUI({
+      p( nrow(gpr_files), "GenePix .gpr files", if (nrow(gpr_files) == 1) "has" else "have", 
+        "been uploaded.")
+    })
+    
+    gpr_files_ready <<- TRUE
+    
+  })
+  
+  ## Observer: make sure the mapping file is of correct format
+  observe({
+    
+    mapping.file <- input$mapping_file
+    if (is.null(mapping.file)) {
+      output$mapping_file_status <- renderUI({
+        p("Please upload a mapping file.")
+      })
+      return(NULL)
+    }
+    
+    
+    mp <- tryCatch(read.csv(mapping.file$datapath, header = TRUE), error=function(e) {
+      output$mapping_file_status <- renderUI({
+        p(style="color: red;", "Error: could not read mapping file!")
+      })
+      return(NULL)
+    })
+    
+    if (!all( c("filename", "ptid", "visit") %in% names(mp))) {
+      output$mapping_file_status <- renderUI({
+        p(style="color: red;", "Error: the mapping file must include columns",
+        "'filename', 'ptid', and 'visit'.")
+      })
+      return(NULL)
+    }
+    
+    output$mapping_file_status <- renderUI({
+      p("Mapping file successfully uploaded.")
+    })
+    
+    mapping_file_ready <<- TRUE
+    
+  })
+  
   ## Observer: start over
   observe({
     if (is.null(input$start_over)) return(NULL)
@@ -68,7 +126,7 @@ shinyServer( function(input, output, session) {
     pSetSuccess <<- FALSE
   })
   
-  onButtonPress("do_summarizePeptides", {
+  onClick("do_makePeptideSet", {
     
     gpr_files <- input$gpr_files
     mapping_file <- input$mapping_file
@@ -95,15 +153,31 @@ shinyServer( function(input, output, session) {
     # log <- input$makePeptideSet_log ## apparently having this deselected breaks things
     check.row.order <- input$makePeptideSet_check_row_order
     
-    pSet <<- makePeptideSet(
-      path=gpr_folder, 
-      mapping.file=mapping.file,
-      rm.control.list=rm.control.list,
-      empty.control.list=empty.control.list,
-      bgCorrect.method=bgCorrect.method,
-      # log=log,
-      check.row.order=check.row.order
-    )
+    tryCatch({
+      pSet <<- makePeptideSet(
+        path=gpr_folder, 
+        mapping.file=mapping.file,
+        rm.control.list=rm.control.list,
+        empty.control.list=empty.control.list,
+        bgCorrect.method=bgCorrect.method,
+        # log=log,
+        check.row.order=check.row.order
+      )
+    }, error=function(e) {
+      output$gpr_files_status <- renderUI({
+        p(style="color: red;", "INTERNAL ERROR: Could not construct PeptideSet!")
+      })
+      output$mapping_file_status <- renderUI({
+        tagList(
+          pre( capture.output(e) )
+        )
+      })
+      return(NULL)
+    })
+    
+    if (is.null(pSet)) {
+      return(NULL)
+    }
     
     ## Update inputs
     updateSelectInput(session, "arrayImageSelect", "Select an Array",
@@ -114,6 +188,17 @@ shinyServer( function(input, output, session) {
       choices=sampleNames( phenoData(pSet) ),
       selected=sampleNames(phenoData(pSet))[1]
     )
+    
+    output$pSet_status <- renderUI({
+      p("PeptideSet successfully constructed.")
+    })
+    
+  })
+  
+  onClick("do_summarizePeptides", {
+    
+    summary <- input$summarizePeptides_summary
+    position <- input$summarizePeptides_position
     
     groups <- names(pData(pSet))
     groups <- setdiff(groups, c("filename", "ptid", "visit"))
@@ -130,9 +215,13 @@ shinyServer( function(input, output, session) {
     pnSet <<- normalizeArray(psSet)
     psmSet <<- slidingMean(pnSet, width=9)
     
+    output$summarize_status <- renderUI({
+      p("Peptide set successfully normalized.")
+    })
+    
   })
   
-  onButtonPress("do_makeCalls", {
+  onClick("do_makeCalls", {
     
     method <- input$makeCalls_method
     cutoff <- input$makeCalls_cutoff
@@ -193,11 +282,7 @@ shinyServer( function(input, output, session) {
     input$do_makeCalls
     if (is.null(calls)) 
       tagList(
-        p("No calls have been made yet."),
-        HTML("<br />"),
-        p("Please construct a peptide set from GenePix ",
-        ".gpr files with the 'Read Data' tab, and then make calls using the interface ",
-        "under the 'Make Calls' tab.")
+        p("No calls have been made yet.")
       )
     else invisible(NULL)
   })
@@ -209,9 +294,7 @@ shinyServer( function(input, output, session) {
     ), {
     input$do_makeCalls
     if (!is.null(calls)) {
-      output <- data.frame(Antigen=rownames(calls))
-      output <- cbind(output, as.data.frame(calls))
-      rownames(output) <- NULL
+      output <- restab(psmSet, calls)
       return(output)
     } else {
       invisible(NULL)
@@ -223,24 +306,24 @@ shinyServer( function(input, output, session) {
     if (is.null(calls)) {
       tagList(
         HTML("<br />"),
-        p("Could not make calls! Have you constructed a peptide set yet?")
+        p("Could not make calls! Have you constructed and normalized your peptide set yet?")
       )
     } else {
       tagList(
         HTML("<br />"),
-        p("Calls have been constructed.")
+        p("Calls have been made.")
       )
     }
   })
   
   output$export_calls <- downloadHandler(
     filename = function() {
-      paste('calls-', Sys.Date(), ".csv", sep='')
+      paste('pepStat-calls-', Sys.Date(), ".csv", sep='')
     }, content = function(file) {
       if (is.null(calls)) {
         stop("No calls are available yet! Please navigate back to the Shiny application.")
       }
-      write.table(calls, file,
+      write.table( restab(psmSet, calls), file,
         sep="\t",
         row.names = FALSE,
         col.names = TRUE,
@@ -263,26 +346,13 @@ shinyServer( function(input, output, session) {
     
   })
   
-  output$file_status <- renderUI({
+  output$makePeptideSet <- renderUI({
     gpr_files <- input$gpr_files
     mapping_file <- input$mapping_file
     
-    gpr_text <- if (is.null(gpr_files)) {
-      "No .gpr files have been uploaded."
-    } else {
-      paste(nrow(gpr_files), "files have been uploaded.")
-    }
-    
-    mapping_text <- if (is.null(mapping_file)) {
-      "No mapping file has been uploaded."
-    } else {
-      "A mapping file has been uploaded."
-    }
-    
-    tagList(
-      p(gpr_text),
-      p(mapping_text)
-    )
+    if (gpr_files_ready && mapping_file_ready) {
+      actionButton("do_makePeptideSet", "Construct a PeptideSet")
+    } 
     
   })
   
