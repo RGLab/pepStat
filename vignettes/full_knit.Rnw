@@ -116,7 +116,8 @@ The slides used in this example are the enveloppe of HIV-1 and peptide collectio
 However, we will pretend that this is not the case to show an example of how to build a custom peptide collection.
 
 \subsection{Creating a custom peptide collection}
-Here, we load a data.frame that contains the peptides used on the array as well as their start and end coordinates.
+Here, we load a data.frame that contains the peptides used on the array as well 
+as their start and end coordinates, and clade information.
 <<create-pep-load-data>>=
 peps <- read.csv(system.file("extdata/pep_info.csv", package = "PEP.db"))
 head(peps)
@@ -124,12 +125,12 @@ head(peps)
 We first create a RangedData object with the available information. The region of interest is the enveloppe of the virus so we add the space information to the object.
 
 <<create-pep-RD>>=
-rd <- RangedData(ranges=IRanges(start = peps$start, end=peps$end),
-                 peptide=peps$peptide, space="gp160")
+rd <- RangedData(ranges = IRanges(start = peps$start, end = peps$end),
+                 peptide = peps$peptide, clade = peps$clade, space = "gp160")
 @
 The z-scores are added afterward, using the create\_db fuction.
 <<create-db>>=
-pep_custom <- create_db(rd=rd)
+pep_custom <- create_db(rd = rd)
 @
 
 \subsection{Summarize the information}
@@ -189,29 +190,42 @@ V_calls <- makeCalls(psmSet, freq = TRUE, group = "treatment",
 The function automatically selected an appropriate FDR threshold.
 
 \section{Results}
-\texttt{pepStat} extends the visualisation package \texttt{Gviz} and adapts it 
-for peptide and protein sequences.
+\subsection{summary}
+To get a summary of the analysis, for each peptide, the package provides the 
+function \texttt{restab} that combines a \texttt{peptideSet} and the result of
+\texttt{makeCalls} into a single \texttt{data.frame} with one row per peptide.
+<<restab>>=
+summary <- restab(psmSet, V_calls)
+head(summary)
+@
+
+
+\subsection{Plots}
+As part of the pipeline for the analysis of peptide microarray data, the 
+\texttt{Pviz} package includes a track that can use the result of an experiment 
+(peptideSet and calls) to generate plots.
 
 The most simple plots can display an overview of the difference between groups. 
 In this case, comparing placebo and vaccine.
-<<plot-inter, fig.height=4>>=
-plot_inter(psmSet, V_calls)
+<<plot-inter, fig.height=4, message=FALSE>>=
+library(Pviz)
+plot_inter(summary)
 @
-However, this plot does not show differences that may exist within a group. Values
-are averaged for the group so this plot cannot detect when a single clade shows
-a much higher or lower frequency of binding than the others for a given group.
-
-To detect these changes, we plot all peptides individually. This is best visualised
-with a track for each group.
-<<plot-inra, fig.height=4>>=
-plot_clade(psmSet, V_calls, clade="M")
-@
+% However, this plot does not show differences that may exist within a group. Values
+% are averaged for the group so this plot cannot detect when a single clade shows
+% a much higher or lower frequency of binding than the others for a given group.
+% 
+% To detect these changes, we plot all peptides individually. This is best visualised
+% with a track for each group.
+% <<plot-inra, fig.height=4>>=
+% plot_clade(psmSet, V_calls, clade="M")
+% @
 
 %More advanced plots can be created using the classes extended from \texttt{Gviz}
 % for more information, see the vignette \textbf{Plotting peptide microarray data}.
 
 \newpage
-\section{Summary}
+\section{Quick analysis}
 Here we showcase a quick analysis of peptide microarray data for HIV-1 gp160. 
 This displays the minimal amount of code required to go from raw data file to 
 antibody binding positivity call.
@@ -225,7 +239,7 @@ data(pep_hxb2)
 ps <- summarizePeptides(ps, summary = "mean", position = pep_hxb2)
 ps <- normalizeArray(ps)
 ps <- slidingMean(ps, width = 9)
-V_calls <- makeCalls(ps, freq = TRUE, group = "treatment")
+calls <- makeCalls(ps, group = "treatment")
 @
 
 \newpage

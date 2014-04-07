@@ -20,6 +20,7 @@
 #'
 restab <- function(peptideSet, calls, long = FALSE){
   pep <- as.data.frame(ranges(peptideSet))
+  pep$position <- pepStat::position(peptideSet)
   if(long){
     ssc <- strsplit(pep$clade, ",")
     nrep <- sapply(ssc, length)
@@ -27,11 +28,11 @@ restab <- function(peptideSet, calls, long = FALSE){
     pep <- pep[rep(1:nrow(pep), nrep),]
     pep$clade <- uclade
   }
-  cn <- c("names", "space", "start", "end", "width", "clade")
+  cn <- c("names", "position", "space", "start", "end", "width", "clade")
   pep <- pep[, cn]
   calls <- data.frame(calls)
   calls$names <- rownames(calls)
   restab <- merge(pep, calls, by = "names")
-  restab <- restab[order(restab$start),]
+  restab <- restab[order(restab$position),]
   return(restab)
 }

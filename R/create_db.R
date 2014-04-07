@@ -42,5 +42,8 @@ create_db <- function(rd){
   rownames(zs) <- NULL
   pepZscore(rd) <- as.data.frame(zs)
   rownames(rd) <- as.character(rd$peptide)
+  if("clade" %in% colnames(rd) && class(rd$clade) != "character"){
+    rd$clade <- as.character(rd$clade)
+  }
   return(rd)
 }

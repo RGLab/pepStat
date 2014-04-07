@@ -128,16 +128,14 @@ getZpep = function(method, peptideSet)
   as.matrix(X)
 }
 
-computeZpep = function(AAstring, ztable)
-{
+computeZpep <- function(AAstring, ztable){
   if(AAstring == c("empty"))
     return(rep(0, 5))
   t = unlist(strsplit(AAstring, split = ""))
   colSums(ztable[t,])
 }
 
-makeZpepMatrix = function(Sequence)
-{
+makeZpepMatrix <- function(Sequence){
   Sequence = toupper(Sequence)
   let = unique(unlist(strsplit(Sequence, "")))
   AA = c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L",

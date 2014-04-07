@@ -8,22 +8,20 @@ Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends:
     R(>= 3.0.0),Biobase (>= 2.5.5),
-    IRanges,
-    data.table,
-    Gviz,
-    Pviz
-Suggests:
-    PEP.db,
-    HIV.db,
-    Pviz,
-    knitr,
-    methods
+    IRanges
 Imports:
     limma,
     fields,
     ggplot2,
     plyr,
-    tools
+    tools,
+    methods,
+    data.table
+Suggests:
+    PEP.db,
+    HIV.db,
+    Pviz,
+    knitr
 biocViews: Microarray, Preprocessing, Statistics
 URL: https://github.com/RGLab/pepStat
 VignetteBuilder: knitr

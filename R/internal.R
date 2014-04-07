@@ -1,6 +1,5 @@
 # This is a list of functions are simply used internaly, for now.
-.bgCorrect.pSet <- function(pSet,verbose=FALSE)
-{
+.bgCorrect.pSet <- function(pSet,verbose=FALSE){
     y <- exprs(pSet)
     ptid <- pData(pSet)$ptid
     t0 <- grepl("[Pp][Rr][Ee]", pData(pSet)$visit)
@@ -27,13 +26,13 @@
 	I
 }
 
- .reduce2hotspots<-function(pSet,ranges,summary="median")
- {
-     FUN <- match.fun(summary)
-     y<-.bgCorrect.pSet(pSet)
-     sy<-sapply(1:nrow(hotspots),function(i,pSet,y,hotspots){apply(y[position(pSet)>start(hotspots[i,]) & position(pSet)<end(hotspots[i,]),],2,FUN)},pSet,y,hotspots)
-     # do.call(cbind,sy)
-     colnames(sy)<-rownames(ranges)
-     sy
- }
- 
+#  .reduce2hotspots<-function(pSet,ranges,summary="median")
+#  {
+#      FUN <- match.fun(summary)
+#      y<-.bgCorrect.pSet(pSet)
+#      sy<-sapply(1:nrow(hotspots),function(i,pSet,y,hotspots){apply(y[position(pSet)>start(hotspots[i,]) & position(pSet)<end(hotspots[i,]),],2,FUN)},pSet,y,hotspots)
+#      # do.call(cbind,sy)
+#      colnames(sy)<-rownames(ranges)
+#      sy
+#  }
+#  
