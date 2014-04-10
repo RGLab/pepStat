@@ -236,6 +236,8 @@ shinyServer( function(input, output, session) {
       )
       restab_long <<- restab(psmSet, calls, long = TRUE)
       restab_wide <<- restab(psmSet, calls, long = FALSE)
+      clades <- sort(unique(restab_long$clade))
+      updateSelectInput(session, "clades", choices = clades, selected = NULL)
     }
     
   })
@@ -362,12 +364,26 @@ shinyServer( function(input, output, session) {
   
   output$Pviz_plot_inter <- renderPlot({
     
+    dmc <- input$do_makeCalls
+    
     if (is.null(restab_wide)) {
       grid.text("Please make calls before visualizing tracks")
       return(invisible(NULL))
     }
+  
+    Pviz::plot_inter(restab_long)
     
-    plot_inter(restab_wide)
+  })
+  
+  output$Pviz_plot_clade <- renderPlot({
+    
+    clades <- input$clades
+    
+    if (is.null(restab_wide)) {
+      return(invisible(NULL))
+    }
+      
+    Pviz::plot_clade(restab_long, clades)
     
   })
   

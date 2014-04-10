@@ -96,8 +96,8 @@ shinyUI( fluidPage(
          dataTableOutput("calls")
        ),
        tabPanel("Visualization",
-         selectizeInput("clades", "Clades", choices=NULL, selected=NULL),
-         plotOutput("Pviz_plot_inter")
+         selectizeInput("clades", "Clades", choices=NULL, selected=NULL, multiple=TRUE),
+         plotOutput("Pviz_plot_inter"),
          plotOutput("Pviz_plot_clade")
        ),
        tabPanel("Debug",
