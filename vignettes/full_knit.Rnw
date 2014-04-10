@@ -229,7 +229,7 @@ plot_inter(summary)
 Here we showcase a quick analysis of peptide microarray data for HIV-1 gp160. 
 This displays the minimal amount of code required to go from raw data file to 
 antibody binding positivity call.
-<<quick-analysis, cache=TRUE, results='hide', message=FALSE>>=
+<<quick-analysis, results='hide', message=FALSE>>=
 library(pepStat)
 library(PEP.db)
 mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
