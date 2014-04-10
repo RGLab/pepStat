@@ -3,6 +3,9 @@
 ## Run analysis
 ## Input for parameters
 
+library(shiny)
+tags <- shiny::tags
+
 opts <- list(
   placeholder="Please upload a set of .gpr files"
 )
@@ -91,6 +94,11 @@ shinyUI( fluidPage(
        tabPanel("Calls",
          uiOutput("call_status"),
          dataTableOutput("calls")
+       ),
+       tabPanel("Visualization",
+         selectizeInput("clades", "Clades", choices=NULL, selected=NULL),
+         plotOutput("Pviz_plot_inter")
+         plotOutput("Pviz_plot_clade")
        ),
        tabPanel("Debug",
          tags$div(

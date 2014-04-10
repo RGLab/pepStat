@@ -2,12 +2,12 @@
 ## Write calls matrix to file
 
 library(data.table)
+library(pepStat)
+library(Pviz)
+library(PEP.db)
+source("common_functions.R")
 
 shinyServer( function(input, output, session) {
-  
-  library(pepStat)
-  library(PEP.db)
-  source("common_functions.R")
   
   onClick <- function(buttonId, x, env = parent.frame(), quoted = FALSE) {
     fun <- exprToFunction(x, env, quoted)
@@ -30,6 +30,8 @@ shinyServer( function(input, output, session) {
   psmSet <- NULL ## smoothed data set
   calls  <- NULL ## output from makeCalls(ps)
   pSetSuccess <- FALSE
+  restab_long <- NULL ## results table
+  restab_wide <- NULL 
   
   ## Observer: updating the 'makePeptideSet_rm.control.list',
   ## 'makePeptideSet_empty.control.list' fields
@@ -232,6 +234,8 @@ shinyServer( function(input, output, session) {
       calls <<- as.matrix(
         makeCalls(psmSet, cutoff=cutoff, method=method, group=group)
       )
+      restab_long <<- restab(psmSet, calls, long = TRUE)
+      restab_wide <<- restab(psmSet, calls, long = FALSE)
     }
     
   })
@@ -353,6 +357,17 @@ shinyServer( function(input, output, session) {
     if (gpr_files_ready && mapping_file_ready) {
       actionButton("do_makePeptideSet", "Construct a PeptideSet")
     } 
+    
+  })
+  
+  output$Pviz_plot_inter <- renderPlot({
+    
+    if (is.null(restab_wide)) {
+      grid.text("Please make calls before visualizing tracks")
+      return(invisible(NULL))
+    }
+    
+    plot_inter(restab_wide)
     
   })
   
