@@ -12,7 +12,12 @@ track_list <- c(track_list, ProteinAxisTrack(addNC = addNC))
 
 if(length(sel_clade) > 0){
   for(clade in sel_clade){
-    track_list <- c(track_list, CladeTrack(rtl, clade, legend=TRUE, name = clade,
+    if(clade == sel_clade[length(sel_clade)]){
+      legend <- TRUE
+    } else{
+      legend <- FALSE
+    }
+    track_list <- c(track_list, CladeTrack(rtl, clade, legend=legend, name = clade,
                                            type = "l"))
   }
 }
