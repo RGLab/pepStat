@@ -3,7 +3,8 @@
 \alias{slidingMean}
 \title{Data smoothing for peptide microarray.}
 \usage{
-slidingMean(peptideSet, width = 5, verbose = FALSE, split.by.space = TRUE)
+slidingMean(peptideSet, width = 9, verbose = FALSE, split.by.space = TRUE,
+  split.by.clade = TRUE)
 }
 \arguments{
 \item{peptideSet}{A \code{peptideSet}. The expression data for the peptides as
@@ -13,7 +14,7 @@ well as annotations and ranges. The range information is required to run this fu
 
 \item{verbose}{A \code{logical}. If set to TRUE, progress information will be displayed.}
 
-\item{split.by.space}{A \code{logical}. If TRUE, the peptides will be smoothed by
+\item{split.by.clade}{A \code{logical}. If TRUE, the peptides will be smoothed by
 space (See details section below and \code{RangedData} for more information).}
 }
 \value{
@@ -33,10 +34,11 @@ position(peptideSet).
 A peptide's intensity is replaced by the mean of all peptide intensities within
 the peptide's sliding mean window.
 
-When split.by.space = TRUE, peptides are smoothed within groups defined by the
-space of the RangedData object occupying the featureRange slot of peptideSet.
-This is useful if, for example, spaces indicate peptides drawn from separate
-proteins that should not be smoothed together.
+When split.by.clade = TRUE, peptides are smoothed within clades defined by the
+clade column of the RangedData object occupying the featureRange slot of
+peptideSet. If set to FALSE, a peptide at a given position will borrow
+information from the neighboring peptides as well as the ones from other
+clades around this position.
 }
 \author{
 Gregory Imholte

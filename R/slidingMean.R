@@ -8,7 +8,7 @@
 #' well as annotations and ranges. The range information is required to run this function.
 #' @param width A \code{numeric}. The width of the sliding window.
 #' @param verbose A \code{logical}. If set to TRUE, progress information will be displayed.
-#' @param split.by.space A \code{logical}. If TRUE, the peptides will be smoothed by
+#' @param split.by.clade A \code{logical}. If TRUE, the peptides will be smoothed by
 #' space (See details section below and \code{RangedData} for more information).
 #' 
 #' @details
@@ -20,10 +20,11 @@
 #' A peptide's intensity is replaced by the mean of all peptide intensities within 
 #' the peptide's sliding mean window.
 #' 
-#' When split.by.space = TRUE, peptides are smoothed within groups defined by the 
-#' space of the RangedData object occupying the featureRange slot of peptideSet. 
-#' This is useful if, for example, spaces indicate peptides drawn from separate 
-#' proteins that should not be smoothed together.
+#' When split.by.clade = TRUE, peptides are smoothed within clades defined by the 
+#' clade column of the RangedData object occupying the featureRange slot of 
+#' peptideSet. If set to FALSE, a peptide at a given position will borrow 
+#' information from the neighboring peptides as well as the ones from other 
+#' clades around this position.
 #' 
 #' @return A \code{peptideSet} object with smoothed intensities.
 #' 
@@ -34,13 +35,8 @@
 #' @name slidingMean
 #' @rdname slidingMean
 #' @export
-slidingMean <-function(peptideSet, width=5, verbose=FALSE, 
-                       split.by.space=TRUE)
-{
-  if (class(peptideSet)!="peptideSet")
-  {
-    stop("peptideSet must be an object of class peptideSet")
-  }
+slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
+  .check_peptideSet(peptideSet)
   if (preproc(peptideSet@experimentData)$transformation!="log" &
        preproc(peptideSet@experimentData)$transformation!="vsn") {
     stop("The probe measurements need to be log/vsn transformed!")
@@ -49,39 +45,57 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE,
     warning("You should probably normalize your data before using this function")
   }
   
-  # Check whether user wishes to apply to multiple spaces 
-  if (split.by.space & length(names(ranges(peptideSet))) > 1){
-    oldrownames = rownames(ranges(peptideSet))
-    s <- space(ranges(peptideSet))
-    pSetList <- split(peptideSet, s)
-    smoothedpSetList <- lapply(pSetList, function(set)
-    {
-      p <- position(set)
-      o <- order(p)
-      
-      # reorder peptideSet by position order
-      set <- set[o,]
-      
-      y <- exprs(set)
-      p <- position(set)
-      ny <- applySlidingMean(y, width, p)
-      exprs(set) <- ny
-      rownames(exprs(set)) <- rownames(y)
-      
-      set
-    })
-    
-    # collect the sorted RangedData into a single RangedData object,
-    # put back into peptideSet
-    rdata = do.call("rbind", lapply(smoothedpSetList, ranges))
-    peptideSet@featureRange = rdata
-    
-    # collect the separate smoothed intensities into a single expression
-    # matrix, gather rownames
-    exprs(peptideSet) = do.call("rbind", lapply(smoothedpSetList, exprs))
-    rownames(exprs(peptideSet)) = do.call("c", 
-      lapply(smoothedpSetList, function(x) rownames(exprs(x))))
+  if(split.by.clade & ncol(clade(peptideSet)) > 1){
+    pSet_list <- split(peptideSet, clade(peptideSet))
+    #peptides need to be ordered the same in exprs and featureRange
+    for(i in 1:length(pSet_list)){
+      cur_clade <- names(which(
+        table(unlist(strsplit(ranges(pSet_list[[i]])$clade, ","))) == nrow(pSet_list[[i]])))
+      ranges(pSet_list[[i]])$clade <- cur_clade
+      exprs(pSet_list[[i]]) <- applySlidingMean(
+        exprs(pSet_list[[i]]), width, position(pSet_list[[i]]))
+      rownames(pSet_list[[i]]) <- paste(peptide(pSet_list[[i]]), cur_clade, sep="_")
+    }
+    ranges <- do.call("rbind", lapply(pSet_list, ranges))
+    exprs <- do.call("rbind", lapply(pSet_list, exprs))
+    ranges(peptideSet) <- ranges
+    exprs(peptideSet) <- exprs
+    preproc(peptideSet)$split.by.clade <- TRUE
+    return(peptideSet)
   }
+  
+#   # Check whether user wishes to apply to multiple spaces 
+#   if (split.by.space & length(names(ranges(peptideSet))) > 1){
+#     oldrownames = rownames(ranges(peptideSet))
+#     s <- space(ranges(peptideSet))
+#     pSetList <- split(peptideSet, s)
+#     smoothedpSetList <- lapply(pSetList, function(set){
+#       p <- position(set)
+#       o <- order(p)
+#       
+#       # reorder peptideSet by position order
+#       set <- set[o,]
+#       
+#       y <- exprs(set)
+#       p <- position(set)
+#       ny <- applySlidingMean(y, width, p)
+#       exprs(set) <- ny
+#       rownames(exprs(set)) <- rownames(y)
+#       
+#       set
+#     })
+#     
+#     # collect the sorted RangedData into a single RangedData object,
+#     # put back into peptideSet
+#     rdata = do.call("rbind", lapply(smoothedpSetList, ranges))
+#     peptideSet@featureRange = rdata
+#     
+#     # collect the separate smoothed intensities into a single expression
+#     # matrix, gather rownames
+#     exprs(peptideSet) = do.call("rbind", lapply(smoothedpSetList, exprs))
+#     rownames(exprs(peptideSet)) = do.call("c", 
+#       lapply(smoothedpSetList, function(x) rownames(exprs(x))))
+#   }
   
   else {
     if (length(names(ranges(peptideSet))) > 1)
@@ -104,8 +118,8 @@ slidingMean <-function(peptideSet, width=5, verbose=FALSE,
 }
 
 
-applySlidingMean <- function(y, width, position)
-{
+#return A matrix of the intensities ordered like y.
+applySlidingMean <- function(y, width, position){
   yn <- sapply(position, function(p) {
     p.window <- abs(position - p) <= width/2
     colMeans(y[p.window,,drop = FALSE])

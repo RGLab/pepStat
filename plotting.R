@@ -4,7 +4,8 @@ load("big_restab.rda")
 
 #opts
 addNC <- TRUE
-sel_clade <- LETTERS[1:3]
+sel_clade <- unique(rtl$clade)
+sel_clade <- c("A", "CRF01")
 
 #Tracks
 track_list <- list()
@@ -23,5 +24,5 @@ if(length(sel_clade) > 0){
 }
 
 #plot
-plotTracks(track_list, from = 0, to = max(rtl$end))
+plotTracks(track_list, from = 0, to = max(rtl$end), lwd=2)
 

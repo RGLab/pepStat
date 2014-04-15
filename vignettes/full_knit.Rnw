@@ -158,7 +158,7 @@ intensities is returned.
 
 \section{Data smoothing}
 The optional data smoothing step takes advantage of the overlapping nature of the
-peptides on the array to remove background noise caused byexperimental variation. 
+peptides on the array to remove background noise caused by experimental variation. 
 It is likely that two overlapping peptides will share common binding signal, when
 present. \texttt{pepStat} use a sliding mean technique technique to borrow strength
 across neighboring peptides and to reduce signal variability. This statistic 
@@ -238,7 +238,7 @@ ps <- makePeptideSet(files = NULL, path = dirToParse, mapping.file = mapFile)
 data(pep_hxb2)
 ps <- summarizePeptides(ps, summary = "mean", position = pep_hxb2)
 ps <- normalizeArray(ps)
-ps <- slidingMean(ps, width = 9)
+ps <- slidingMean(ps)
 calls <- makeCalls(ps, group = "treatment")
 @
 

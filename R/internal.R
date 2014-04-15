@@ -36,3 +36,18 @@
 #      sy
 #  }
 #  
+
+# Checks that a peptideSet is valid
+#   Order of samples
+#   Order of peptides
+.check_peptideSet <- function(peptideSet){
+  if (class(peptideSet)!="peptideSet"){
+    stop("peptideSet must be an object of class peptideSet")
+  }
+  if(any(colnames(exprs(peptideSet)) != rownames(pData(peptideSet)))){
+    stop("The samples in the phenoData and assayData slots are different")
+  }
+  if(any(rownames(exprs(peptideSet)) != rownames(ranges(peptideSet)))){
+    stop("The features in the featureRange and assayData slots are different")
+  }
+}

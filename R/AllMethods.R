@@ -229,7 +229,6 @@ setReplaceMethod("peptide", signature("peptideSet", "character"), function(objec
   ranges(object)[["peptide"]] <- value
   return(object)
 })
-    
 
 setGeneric("featureID", function(x, ...) standardGeneric("featureID"))
 setMethod("featureID", "peptideSet",
@@ -355,3 +354,9 @@ setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(ob
 
 setMethod("colnames", "peptideSet", function(x){ colnames(ranges(x)) })
 
+setReplaceMethod("rownames", signature("peptideSet", "character"), 
+                 function(x, value){
+                   rownames(ranges(x)) <- value
+                   rownames(exprs(x)) <- value
+                   return(x)
+                   })
