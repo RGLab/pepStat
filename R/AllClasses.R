@@ -19,7 +19,8 @@
 #'
 #' @seealso \code{\link{ExpressionSet}}, \code{\link{peptideSet-methods}}
 #'
-#' @importClassesFrom Biobase ExpressionSet
+#' @importFrom Biobase ExpressionSet
+#' @importClassesFrom Biobase Versioned VersionedBiobase eSet ExpressionSet
 #' @importClassesFrom IRanges RangedData
 #' @name peptideSet
 #' @rdname peptideSet

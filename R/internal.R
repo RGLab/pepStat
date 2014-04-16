@@ -26,8 +26,7 @@
 	I
 }
 
-#  .reduce2hotspots<-function(pSet,ranges,summary="median")
-#  {
+#  .reduce2hotspots<-function(pSet,ranges,summary="median"){
 #      FUN <- match.fun(summary)
 #      y<-.bgCorrect.pSet(pSet)
 #      sy<-sapply(1:nrow(hotspots),function(i,pSet,y,hotspots){apply(y[position(pSet)>start(hotspots[i,]) & position(pSet)<end(hotspots[i,]),],2,FUN)},pSet,y,hotspots)
@@ -50,4 +49,12 @@
   if(any(rownames(exprs(peptideSet)) != rownames(ranges(peptideSet)))){
     stop("The features in the featureRange and assayData slots are different")
   }
+}
+
+# Replace rownames in both featureRange and exprs slot
+#   setReplaceMethod("rownames", ....) fails
+.set_rownames <- function(x, value){
+  rownames(ranges(x)) <- value
+  rownames(exprs(x)) <- value
+  return(x)
 }

@@ -74,6 +74,8 @@
 #' @export
 #' @importFrom tools file_path_sans_ext file_ext
 #' @importFrom limma read.maimages backgroundCorrect
+#' @importFrom Biobase preproc preproc<- assayData phenoData experimentData
+#'   protocolData sampleNames sampleNames<- pData pData<- exprs exprs<-
 #' 
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL, empty.control.list=NULL,

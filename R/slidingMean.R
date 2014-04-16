@@ -54,50 +54,15 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
       ranges(pSet_list[[i]])$clade <- cur_clade
       exprs(pSet_list[[i]]) <- applySlidingMean(
         exprs(pSet_list[[i]]), width, position(pSet_list[[i]]))
-      rownames(pSet_list[[i]]) <- paste(peptide(pSet_list[[i]]), cur_clade, sep="_")
+      pSet_list[[i]] <- .set_rownames(pSet_list[[i]], 
+                                      paste(peptide(pSet_list[[i]]), cur_clade, sep="_"))
     }
     ranges <- do.call("rbind", lapply(pSet_list, ranges))
     exprs <- do.call("rbind", lapply(pSet_list, exprs))
     ranges(peptideSet) <- ranges
     exprs(peptideSet) <- exprs
     preproc(peptideSet)$split.by.clade <- TRUE
-    return(peptideSet)
-  }
-  
-#   # Check whether user wishes to apply to multiple spaces 
-#   if (split.by.space & length(names(ranges(peptideSet))) > 1){
-#     oldrownames = rownames(ranges(peptideSet))
-#     s <- space(ranges(peptideSet))
-#     pSetList <- split(peptideSet, s)
-#     smoothedpSetList <- lapply(pSetList, function(set){
-#       p <- position(set)
-#       o <- order(p)
-#       
-#       # reorder peptideSet by position order
-#       set <- set[o,]
-#       
-#       y <- exprs(set)
-#       p <- position(set)
-#       ny <- applySlidingMean(y, width, p)
-#       exprs(set) <- ny
-#       rownames(exprs(set)) <- rownames(y)
-#       
-#       set
-#     })
-#     
-#     # collect the sorted RangedData into a single RangedData object,
-#     # put back into peptideSet
-#     rdata = do.call("rbind", lapply(smoothedpSetList, ranges))
-#     peptideSet@featureRange = rdata
-#     
-#     # collect the separate smoothed intensities into a single expression
-#     # matrix, gather rownames
-#     exprs(peptideSet) = do.call("rbind", lapply(smoothedpSetList, exprs))
-#     rownames(exprs(peptideSet)) = do.call("c", 
-#       lapply(smoothedpSetList, function(x) rownames(exprs(x))))
-#   }
-  
-  else {
+  } else {
     if (length(names(ranges(peptideSet))) > 1)
       warning("smoothing multiple spaces together in peptideSet object")
     # This could be made more efficient with multicore

@@ -354,9 +354,9 @@ setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(ob
 
 setMethod("colnames", "peptideSet", function(x){ colnames(ranges(x)) })
 
-setReplaceMethod("rownames", signature("peptideSet", "character"), 
-                 function(x, value){
-                   rownames(ranges(x)) <- value
-                   rownames(exprs(x)) <- value
-                   return(x)
-                   })
+# setReplaceMethod("rownames", signature("peptideSet", "character"), 
+#                  function(x, value){
+#                    rownames(ranges(x)) <- value
+#                    rownames(exprs(x)) <- value
+#                    return(x)
+#                    })

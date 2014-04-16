@@ -3,8 +3,7 @@
 \alias{slidingMean}
 \title{Data smoothing for peptide microarray.}
 \usage{
-slidingMean(peptideSet, width = 9, verbose = FALSE, split.by.space = TRUE,
-  split.by.clade = TRUE)
+slidingMean(peptideSet, width = 9, verbose = FALSE, split.by.clade = TRUE)
 }
 \arguments{
 \item{peptideSet}{A \code{peptideSet}. The expression data for the peptides as
