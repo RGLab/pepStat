@@ -4,9 +4,6 @@
 #' 
 #' @param peptideSet A \code{peptideSet} object.
 #' @param calls A \code{matrix}, as returned by the \code{makeCalls} function.
-#' @param long A \code{boolean}. If set to TRUE, the result table will have one
-#' row per peptide/clade. If FALSE, one row per peptide and all clades are 
-#' listed together.
 #' 
 #' @details
 #' The peptideSet should be the one used in the function call to \code{makeCalls}
@@ -17,22 +14,21 @@
 #' calls.
 #' 
 #' @export
-#'
-restab <- function(peptideSet, calls, long = FALSE){
+restab <- function(peptideSet, calls){
   pep <- as.data.frame(ranges(peptideSet))
   pep$position <- pepStat::position(peptideSet)
-  if(long){
-    ssc <- strsplit(pep$clade, ",")
-    nrep <- sapply(ssc, length)
-    uclade <- unlist(ssc)
-    pep <- pep[rep(1:nrow(pep), nrep),]
-    pep$clade <- uclade
-  }
-  cn <- c("names", "position", "space", "start", "end", "width", "clade")
+  cn <- c("names", "peptide", "position", "space", "start", "end", "width", "clade")
   pep <- pep[, cn]
   calls <- data.frame(calls)
   calls$names <- rownames(calls)
   restab <- merge(pep, calls, by = "names")
   restab <- restab[order(restab$position),]
+  rownames(restab) <- restab$names
+  restab$names <- NULL
   return(restab)
 }
+
+#  @param long A \code{boolean}. If set to TRUE, the result table will have one
+#  row per peptide/clade. If FALSE, one row per peptide and all clades are 
+#  listed together. 
+# restab <- function(peptideSet, calls, long = FALSE){

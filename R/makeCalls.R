@@ -72,14 +72,12 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
 		t1 <- grepl("post", tolower(pData(peptideSet)$visit))
 		pd <- pData(peptideSet)[t1, ]
     
-        if (!group%in%colnames(pd)) {
-            stop("The grouping variable is not part of the pData object.")
-        } else {
-            factor<-factor(pd[,group])
-        }
-            
-            
-		if (nlevels(factor) > 1) {
+    if(!group%in%colnames(pd)){
+      stop("The grouping variable is not part of the pData object.")
+      } else {
+        factor<-factor(pd[,group])
+      }
+		if(nlevels(factor) > 1){
 			#split the ptid into groups
 			ptidGroups <- split(pd$ptid,factor)
 			#apply the rowMeans to each group
@@ -88,7 +86,7 @@ makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, grou
 		} else {
 			return(rowMeans(Calls)*100)
 		}
-		return(res*100)
+    return(res*100)
 	} else if(freq) {
         return(rowMeans(Calls)*100)
     } else {
@@ -160,8 +158,12 @@ baselineCorrect.pSet <- function(pSet, verbose=FALSE){
     }
   }
   colnames(I) <- ptid[t1]
-  rownames(I) <- peptide(pSet)
-  I
+  if(isTRUE(preproc(pSet)$split.by.clade)){
+    rownames(I) <- rownames(pSet)
+  } else{
+    rownames(I) <- peptide(pSet)
+  }
+  return(I)
 }
 
 #' Substract baseline intensities

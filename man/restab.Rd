@@ -3,16 +3,12 @@
 \alias{restab}
 \title{Result table}
 \usage{
-restab(peptideSet, calls, long = FALSE)
+restab(peptideSet, calls)
 }
 \arguments{
 \item{peptideSet}{A \code{peptideSet} object.}
 
 \item{calls}{A \code{matrix}, as returned by the \code{makeCalls} function.}
-
-\item{long}{A \code{boolean}. If set to TRUE, the result table will have one
-row per peptide/clade. If FALSE, one row per peptide and all clades are
-listed together.}
 }
 \value{
 A \code{data.frame} with the peptides and some information from the

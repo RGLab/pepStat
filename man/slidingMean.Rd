@@ -14,7 +14,7 @@ well as annotations and ranges. The range information is required to run this fu
 \item{verbose}{A \code{logical}. If set to TRUE, progress information will be displayed.}
 
 \item{split.by.clade}{A \code{logical}. If TRUE, the peptides will be smoothed by
-space (See details section below and \code{RangedData} for more information).}
+clade (See details section below for more information).}
 }
 \value{
 A \code{peptideSet} object with smoothed intensities.

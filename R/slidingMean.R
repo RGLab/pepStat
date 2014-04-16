@@ -9,7 +9,7 @@
 #' @param width A \code{numeric}. The width of the sliding window.
 #' @param verbose A \code{logical}. If set to TRUE, progress information will be displayed.
 #' @param split.by.clade A \code{logical}. If TRUE, the peptides will be smoothed by
-#' space (See details section below and \code{RangedData} for more information).
+#' clade (See details section below for more information).
 #' 
 #' @details
 #' Peptide membership in the sliding mean window is determined by its position and 
@@ -52,7 +52,7 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
       cur_clade <- names(which(
         table(unlist(strsplit(ranges(pSet_list[[i]])$clade, ","))) == nrow(pSet_list[[i]])))
       ranges(pSet_list[[i]])$clade <- cur_clade
-      exprs(pSet_list[[i]]) <- applySlidingMean(
+      exprs(pSet_list[[i]]) <- .applySlidingMean(
         exprs(pSet_list[[i]]), width, position(pSet_list[[i]]))
       pSet_list[[i]] <- .set_rownames(pSet_list[[i]], 
                                       paste(peptide(pSet_list[[i]]), cur_clade, sep="_"))
@@ -72,7 +72,7 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
     
     y <- exprs(peptideSet)[o,]
     p <- position(peptideSet)[o]
-    ny <- applySlidingMean(y, width, p)
+    ny <- .applySlidingMean(y, width, p)
     exprs(peptideSet) <- ny[ro,]
   }
   
@@ -84,7 +84,7 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
 
 
 #return A matrix of the intensities ordered like y.
-applySlidingMean <- function(y, width, position){
+.applySlidingMean <- function(y, width, position){
   yn <- sapply(position, function(p) {
     p.window <- abs(position - p) <= width/2
     colMeans(y[p.window,,drop = FALSE])
