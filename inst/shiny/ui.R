@@ -14,7 +14,6 @@ source("common_functions.R")
 
 shinyUI( fluidPage(
   
-  
   ## OpenTip
   includeScript("www/opentip/opentip-jquery.min.js"),
   includeCSS("www/opentip/opentip.css"),
@@ -61,8 +60,8 @@ shinyUI( fluidPage(
           selectizeInputWithHelp("summarizePeptides_position", "Position Database",
             choices=list("pep_hxb2", "pep_mac239", "pep_hxb2JPT", "pep_m239smE543")
           ),
-          numericInputWithHelp("slidingMean_width", "Sliding Mean Width", 5, 1, 100),
-          checkboxInputWithHelp("slidingMean_split_by_space", "Split by Space?", TRUE),
+          numericInputWithHelp("slidingMean_width", "Sliding Mean Width", 9, 1, 100),
+          checkboxInputWithHelp("slidingMean_split_by_clade", "Split by Clade?", TRUE),
           checkboxInputWithHelp("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
           actionButton("do_summarizePeptides", "Normalize"),
           HTML("<br />"),

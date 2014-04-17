@@ -1,6 +1,9 @@
 ## TODO
 ## Write calls matrix to file
 
+## if your peptideSet has been aggregated (not split by clade), then only
+## plot_inter
+
 library(data.table)
 library(pepStat)
 library(Pviz)
@@ -30,8 +33,7 @@ shinyServer( function(input, output, session) {
   psmSet <- NULL ## smoothed data set
   calls  <- NULL ## output from makeCalls(ps)
   pSetSuccess <- FALSE
-  restab_long <- NULL ## results table
-  restab_wide <- NULL 
+  restab <- NULL ## results table
   
   ## Observer: updating the 'makePeptideSet_rm.control.list',
   ## 'makePeptideSet_empty.control.list' fields
@@ -202,6 +204,9 @@ shinyServer( function(input, output, session) {
     summary <- input$summarizePeptides_summary
     position <- input$summarizePeptides_position
     
+    width <- input$slidingMean_width
+    split.by.clade <- input$slidingMean_split_by_clade
+    
     groups <- names(pData(pSet))
     groups <- setdiff(groups, c("filename", "ptid", "visit"))
     updateSelectInput(session, "makeCalls_group", "Group",
@@ -215,7 +220,7 @@ shinyServer( function(input, output, session) {
     
     psSet <<- summarizePeptides(pSet, summary=summary, position=get(position))
     pnSet <<- normalizeArray(psSet)
-    psmSet <<- slidingMean(pnSet, width=9)
+    psmSet <<- slidingMean(pnSet, width=width, split.by.clade=split.by.clade)
     
     output$summarize_status <- renderUI({
       p("Peptide set successfully normalized.")
@@ -234,9 +239,9 @@ shinyServer( function(input, output, session) {
       calls <<- as.matrix(
         makeCalls(psmSet, cutoff=cutoff, method=method, group=group)
       )
-      restab_long <<- restab(psmSet, calls, long = TRUE)
-      restab_wide <<- restab(psmSet, calls, long = FALSE)
-      clades <- sort(unique(restab_long$clade))
+      restab <<- restab(psmSet, calls)
+      browser()
+      clades <- sort(unique(unlist(strsplit(restab$clade, ",", fixed=TRUE))))
       updateSelectInput(session, "clades", choices = clades, selected = NULL)
     }
     
@@ -357,7 +362,7 @@ shinyServer( function(input, output, session) {
     mapping_file <- input$mapping_file
     
     if (gpr_files_ready && mapping_file_ready) {
-      actionButton("do_makePeptideSet", "Construct a PeptideSet")
+      actionButton("do_makePeptideSet", "Construct PeptideSet")
     } 
     
   })
@@ -366,12 +371,12 @@ shinyServer( function(input, output, session) {
     
     dmc <- input$do_makeCalls
     
-    if (is.null(restab_wide)) {
+    if (is.null(restab)) {
       grid.text("Please make calls before visualizing tracks")
       return(invisible(NULL))
     }
   
-    Pviz::plot_inter(restab_long)
+    Pviz::plot_inter(restab)
     
   })
   
@@ -379,11 +384,11 @@ shinyServer( function(input, output, session) {
     
     clades <- input$clades
     
-    if (is.null(restab_wide)) {
+    if (is.null(restab)) {
       return(invisible(NULL))
     }
       
-    Pviz::plot_clade(restab_long, clades)
+    Pviz::plot_clade(restab, clades)
     
   })
   
