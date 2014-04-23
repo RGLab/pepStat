@@ -8,7 +8,7 @@
 #                         #error = function(e){cat("'",AAstring, "' is not a valid peptide sequence.\n", sep=""); NULL})
 #         return(ret)
 # }
-# 
+#
 # makeZpepMatrix = function(Sequence){
 #   Sequence <- as.character(Sequence)
 #   z = c(0.24, 0.84, 3.98, 3.11, -4.22,
@@ -36,16 +36,16 @@
 #   AA <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L",
 #          "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y")
 #   rownames(z) <- AA
-#   
+#
 #   Z <- t(sapply(Sequence, computeZpep, ztable = z))
 #   colnames(Z) <- paste0("z", 1:5)
 #   rownames(Z) <- Sequence
 #   return(Z)
 # }
-# 
+#
 # computeZscores <- function(peptideSet){
 #   mat <- makeZpepMatrix(peptide(peptideSet))
 #   pepZscore(peptideSet) <- as.data.frame(mat)
 #   return(peptideSet)
 # }
-# 
+#

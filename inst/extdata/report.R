@@ -4,12 +4,12 @@ mk_project <- function(path="./", project_name="project", report_name="report"){
   invisible(sapply(paste0(path, "/", project_name,"/", c("reports","settings", paste0("data/", c("input", "output")))), dir.create, recursive=TRUE))
   #Add config.yaml, report.Rmd, README.txt
   file.copy(system.file("extdata/config.yaml", package="pepStat"), paste0(path, "/", project_name,"/settings/", report_name, ".yaml"))
-  file.copy(system.file("extdata/report.Rmd", package="pepStat"), paste0(path, "/", project_name,"/reports/", report_name, ".Rmd"))  
-  file.copy(system.file("extdata/README.txt", package="pepStat"), paste0(path, "/", project_name,"/"))  
+  file.copy(system.file("extdata/report.Rmd", package="pepStat"), paste0(path, "/", project_name,"/reports/", report_name, ".Rmd"))
+  file.copy(system.file("extdata/README.txt", package="pepStat"), paste0(path, "/", project_name,"/"))
   #TEMP dev
   file.copy(list.files(system.file("extdata/RVV/", package="pepStat"), full.names=TRUE), paste0(path, "/", project_name,"/data/input/"))
   file.copy(system.file("extdata/mapping.csv", package="pepStat"), paste0(path, "/", project_name,"/data/input/"))
-  
+
   invisible(1)
 }
 

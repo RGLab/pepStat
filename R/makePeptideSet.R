@@ -1,8 +1,8 @@
 #' peptideSet constructor
-#' 
+#'
 #' This function reads GenePix results (.gpr) files and creates a peptideSet object
 #' gathering experiment information.
-#' 
+#'
 #' @param files A \code{character} vector. If NULL, all files with a .gpr extension
 #' in the specified path will be read.
 #' @param path A \code{character} string. The directory where the .gpr files to
@@ -10,11 +10,11 @@
 #' @param mapping.file A \code{character} string or \code{data.frame}. A mapping file
 #' that gives information for each sample. See details section below for a list of
 #' required fields.
-#' @param use.flags A \code{logical}. Should spots with flag value -99 or lower 
+#' @param use.flags A \code{logical}. Should spots with flag value -99 or lower
 #' be excluded?
 #' @param rm.control.list A \code{character} vector. The name of the controls to
 #' be excluded from the peptideSet.
-#' @param empty.control.list A \code{character} vector. The name of the empty 
+#' @param empty.control.list A \code{character} vector. The name of the empty
 #' controls. If non NULL, the intensity of these empty spots will be substracted
 #' from remaining intensities.
 #' @param bgCorrect.method A \code{character} string. The name of the method used
@@ -25,31 +25,31 @@
 #' @param check.row.order A \code{logical}. Should slides be reduced to a common
 #' set of peptides?
 #' @param verbose A \code{logical}. Displays progress and additional information.
-#'  
+#'
 #' @details
-#' GenePix results files (.gpr) are read when found in either the files or path 
-#' arguments. By default, the foreground and background median intensities of the 
-#' "red" channels, "F635 Median" and "B635 Median", are read. The background 
-#' correction specified in bgCorrect.method is passed to the backgroundCorrect 
+#' GenePix results files (.gpr) are read when found in either the files or path
+#' arguments. By default, the foreground and background median intensities of the
+#' "red" channels, "F635 Median" and "B635 Median", are read. The background
+#' correction specified in bgCorrect.method is passed to the backgroundCorrect
 #' method in the limma package.
 #'
 #' The mapping.file can be either a filename or a data.frame. In any case, it should
-#' contain at least three columns labeled "filename", "ptid" and "visit". The 
-#' filenames given here should match those read from the path or files argument, 
+#' contain at least three columns labeled "filename", "ptid" and "visit". The
+#' filenames given here should match those read from the path or files argument,
 #' or be a subset of it. For each ptid (patient ID), the visit column should have at
 #' least one "pre" and  one "post" sample. Any additional column will be kept into
 #' the resulting \code{peptideSet} and can be used later on for groupping.
-#' 
+#'
 #' If check.row.order = TRUE, the final set of probes is taken to be those with
 #' IDs found in all arrays that were read.
-#' 
-#' Row, Column and Block spatial array position for each probe are stored in the 
+#'
+#' Row, Column and Block spatial array position for each probe are stored in the
 #' \code{featureRanges} slot of the returned object.
-#' 
+#'
 #'
 #' @return A \code{peptideSet} object that contain the intensities, peptide
 #' sequences and annotations available in the mapping file.
-#' 
+#'
 #' @examples
 #' # Read gpr files
 #' library(PEP.db)
@@ -57,42 +57,42 @@
 #' dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
 #' pSet <- makePeptideSet(files = NULL, path = dirToParse,
 #'                        mapping.file = mapFile, log=TRUE)
-#' 
+#'
 #' # Specify controls to be removed and empty controls
 #' # to be used for background correction.
 #' pSet <- makePeptideSet(files = NULL, path = dirToParse,
 #'                        mapping.file = mapFile, log = TRUE,
 #'                        rm.control.list = c("JPT-control", "Ig", "Cy3"),
 #'                        empty.control.list= c("empty", "blank control"))
-#' 
-#' @seealso \code{\link{peptideSet}}, \code{\link{read.maimages}}, 
+#'
+#' @seealso \code{\link{peptideSet}}, \code{\link{read.maimages}},
 #' \code{\link{backgroundCorrect}}
-#' 
+#'
 #' @author Raphael Gottardo, Gregory Imholte
-#' 
+#'
 #' @rdname makePeptideSet
 #' @export
 #' @importFrom tools file_path_sans_ext file_ext
 #' @importFrom limma read.maimages backgroundCorrect
 #' @importFrom Biobase preproc preproc<- assayData phenoData experimentData
 #'   protocolData sampleNames sampleNames<- pData pData<- exprs exprs<-
-#' 
+#'
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL, empty.control.list=NULL,
-                         bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE, 
+                         bgCorrect.method="normexp", log=TRUE, check.row.order=FALSE,
                          verbose=FALSE){
   # There is some ambiguity with respect to what is Name and ID
   # ID -> peptide
   # Name -> annotation
   f <- function(x) as.numeric(x$Flags > -99)
-  
+
   # before reading in files, check whether mapping.file is accessible,
   # to save user time in case they made a mistake.
   if (!is.null(mapping.file)){
     mapping.file<-.sanitize_mapping_file2(mapping.file)
     files <- file_path_sans_ext(mapping.file$filename)
   }
-  
+
   if (!check.row.order) { # Assume that the design is the same and don't check rows, order, etc.
     RG <- read.maimages(files=files,
                         source="genepix", path=path, ext="gpr",
@@ -106,14 +106,14 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     if(verbose){
       cat("Reordering all peptides\n")
     }
-    
+
     RG <- RG.list[[1]]
     # Find the common target
     target.id <- Reduce(intersect,lapply(RG.list,function(x){x$genes$ID}))
     if(length(target.id)==0){
       stop("No common features found across slides")
     }
-    
+
     # subset all
     RG.list <- lapply(RG.list,function(x, target){
       ind <- x$genes$ID%in%target;
@@ -122,7 +122,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
       x$E <- x$E[ind];
       x
     }, target.id)
-    
+
     # order all
     RG.list <- lapply(RG.list, function(x, target){
       ind <- order(x$genes$ID);
@@ -138,25 +138,25 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     colnames(RG$E) <- rownames(RG$targets)
     colnames(RG$Eb) <- rownames(RG$targets)
     RG$genes <- RG.list[[1]]$genes
-    
+
   }
-  
+
   offset <- 0.5
   if (bgCorrect.method=="half") offset <- .5 else offset <- 1
   RG <- try(backgroundCorrect(RG, method=bgCorrect.method, offset=offset, verbose=verbose))
-  
+
   myDesc <- new("MIAME")
-  
+
   ## Put NA instead of flags
   if (use.flags)
   {
     RG$E[RG$weights==0] <- NA
   }
-  
+
   # Keep track of printer and source
   preproc(myDesc)$source<-RG$source
   preproc(myDesc)$printer<-RG$printer
-  
+
   ## Fill in the details of the preprocessing
   if (log) {
     RG$E <- log2(RG$E)
@@ -164,7 +164,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   } else {
     preproc(myDesc) <- c(preproc(myDesc),list(transformation="none", normalization="none"))
   }
-  
+
   if(!is.null(empty.control.list)){
     norm.empty <- TRUE
   } else{
@@ -172,7 +172,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   }
   preproc(myDesc)$bgCorrect.method <- bgCorrect.method
   preproc(myDesc)$norm.empty <- norm.empty
-  
+
   if (norm.empty) {
     #Check both name and ID for the control list
     index <- RG$genes$Name%in%empty.control.list | RG$genes$ID%in%empty.control.list
@@ -183,30 +183,30 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
       if (verbose) {
         cat("** Background corrected using ", sum(index), " empty splots **\n")
       }
-      mean.empty <- matrix(colMeans(as.matrix(RG$E[index,])), 
-                           nrow=nrow(as.matrix(RG$E)), 
-                           ncol=ncol(as.matrix(RG$E)), 
+      mean.empty <- matrix(colMeans(as.matrix(RG$E[index,])),
+                           nrow=nrow(as.matrix(RG$E)),
+                           ncol=ncol(as.matrix(RG$E)),
                            byrow=TRUE)
     }
   } else {
     mean.empty <- rep(0, ncol(as.matrix(RG$E)))
   }
-  
+
   # Keep the layout
   layout <- lapply(RG$genes[, c("Block","Row","Column")],as.factor)
-  
+
   # Remove controls
   ind.keep <- rep(TRUE,nrow(RG$E))
   if (!is.null(rm.control.list)) {
-    ind.keep <- lapply(rm.control.list, 
+    ind.keep <- lapply(rm.control.list,
                        function(x, Name, ID){
-                         !grepl(x,Name) & !grepl(x,ID)}, 
-                       as.character(RG$genes$Name), 
+                         !grepl(x,Name) & !grepl(x,ID)},
+                       as.character(RG$genes$Name),
                        as.character(RG$genes$ID))
     ind.keep <- do.call(cbind,ind.keep)
     ind.keep <- apply(ind.keep,1,all)
   }
-  
+
   ## See note above about Name and ID
   # ID -> peptide
   # Name -> annotation
@@ -216,36 +216,36 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   # Positions are set to zero before the information is provided in summarize pSet
   pSet <- new('peptideSet',
               featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)), featureID,
-              peptide = featureSequence, block = layout$Block[ind.keep], 
-              row = layout$Row[ind.keep], column = layout$Column[ind.keep]), 
+              peptide = featureSequence, block = layout$Block[ind.keep],
+              row = layout$Row[ind.keep], column = layout$Column[ind.keep]),
               exprs = as.matrix(RG$E-mean.empty)[ind.keep, ],
               experimentData = myDesc)
-  
+
   # Make sure everything is stored as lower
   sampleNames(pSet)<-tolower(sampleNames(pSet))
-  
+
   if(!is.null(mapping.file)){
     pData(pSet) <- mapping.file[match(sampleNames(pSet), rownames(mapping.file)), ]
   }
   return(pSet)
 }
 
-.sanitize.mapping.file <- function(mapping.file){  
+.sanitize.mapping.file <- function(mapping.file){
   if (is.character(mapping.file)) {
     if (file.access(mapping.file, mode = 0) < 0)
       stop("mapping.file is not an accessible file path. Typo?")
-    
+
     # check whether mapping file is a ".csv" file
     ext <- file_ext(mapping.file)
     if (ext != "csv")
       stop("Mapping file must be a .csv file")
-    
+
     # ensure that mapping.file has a filename entry
     header <- scan(mapping.file, what = "character",
                            nlines = 1, sep = ",", quiet = TRUE)
     if( sum(c("filename","ptid","visit") %in% tolower(header)) != 3 )
       stop("mapping.file document header must include 3 mandatory columns: filename, ptid, visit")
-    
+
     j <- match("filename", tolower(header))
     mapping.file <- read.csv(mapping.file, row.names=header[j])
   } else {
@@ -255,7 +255,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     }
     header <- tolower(names(mapping.file))
     j <- match("filename", tolower(header))
-    
+
     if (!is.na(j)) {
       row.names(mapping.file) <- mapping.file[,j]
       # drop the filename now that we are using it as row names
@@ -266,13 +266,13 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     if( sum(c("ptid", "visit") %in% tolower(colnames(mapping.file))) < 2 )
       stop("mapping.file object must include mandatory columns: ptid, visit")
   }
-  
+
   rownames(mapping.file) <- tolower(rownames(mapping.file))
   colnames(mapping.file) <- tolower(colnames(mapping.file))
-  
+
   mapping.file$ptid <- tolower(mapping.file$ptid)
   mapping.file$visit <- tolower(mapping.file$visit)		
-  
+
   mapping.file
 }
 

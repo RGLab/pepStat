@@ -1,29 +1,29 @@
 #' Add information to a peptideSet and summarize peptides
-#' 
+#'
 #' This function merges the replicates and adds information from a peptide collection
-#' to a peptideSet. This collection can include coordinates, alignment information, 
+#' to a peptideSet. This collection can include coordinates, alignment information,
 #' Z-scales, and other peptide information.
-#'  
+#'
 #' @usage summarizePeptides(peptideSet, summary = "median", position = NULL)
-#' 
+#'
 #' @param peptideSet A \code{peptideSet}, as created by \code{makePeptideSet}
 #' @param summary A \code{character} string. The method used for merging replicates.
 #' Available are: "mean" and "median".
 #' @param position A \code{RangedData}. A peptide collection such as the ones
 #' available in \code{PEP.db}. See details below and vignettes for more information.
-#' 
+#'
 #' @return An object of class \code{peptideSet} with added columns and updated ranges.
-#' 
-#' @note For the position argument, some peptide collections can be found in the 
+#'
+#' @note For the position argument, some peptide collections can be found in the
 #' \code{PEP.db} package.
-#' 
+#'
 #' @seealso \code{\link{makePeptideSet}}, \code{\link{create_db}}
-#' 
+#'
 #' @author Raphael Gottardo, Greory Imholte
-#' 
+#'
 #' @rdname summarizePeptides
 #' @export
-#' 
+#'
 summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 	# Check arguments for conformity
 	check = .checkArgs_sumPeps(peptideSet, summary, position)
@@ -62,11 +62,11 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 
 
 	if(!is.null(position)){
-		# assume that rownames of position RangedData 
+		# assume that rownames of position RangedData
 		# object are peptide sequences in peptideSet,
-		# non-null rownames checked in checkArgs above 
+		# non-null rownames checked in checkArgs above
 
-		# remove elements of RangedData that aren't found in 
+		# remove elements of RangedData that aren't found in
 		# the array
 		sub1 <- rownames(position) %in% peptide(newSet)
 		position <- position[sub1,]
@@ -119,12 +119,12 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 		OK = FALSE
 		attr(OK, "ErrorString") = ("rownames of position RangedData object must be peptide sequences")
 	}
-  
+
   if(class(position) != "RangedData" & !is.null(position)){
     OK = FALSE
     attr(OK, "ErrorString") = ("if non-NULL, position argument must be a RangedData object")
   }
-  
+
   if(class(peptideSet) != "peptideSet"){
     OK = FALSE
     attr(OK, "ErrorString") = ("peptideSet argument must be an object of class peptideSet")

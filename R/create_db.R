@@ -8,9 +8,9 @@
 #' @details
 #'   rd can have additional columns. These columns will be kept in the peptide
 #'   collection.
-#' 
+#'
 #' @seealso \code{\link{RangedData}}
-#' 
+#'
 #' @examples
 #' #construct RangedData object
 #'    library(IRanges)
@@ -25,7 +25,7 @@
 #'    newRD <- RangedData(data)
 #' #create_db
 #'    new_pep <- create_db(newRD)
-#' 
+#'
 #'
 #' @export
 #' @importClassesFrom IRanges RangedData

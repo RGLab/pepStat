@@ -10,24 +10,24 @@ opts <- list(
 source("common_functions.R")
 
 shinyUI( fluidPage(
-  
+
   ## OpenTip
   includeScript("www/opentip/opentip-jquery.min.js"),
   includeCSS("www/opentip/opentip.css"),
-  
+
   ## Own
   includeCSS("styles.css"),
   includeScript("scripts.js"),
   includeScript("tooltips.js"),
-  
+
   HTML( "<style>#controls + div { height: 520px; }</style>" ),
-  
+
   titlePanel(""),
-  
+
   sidebarLayout(
-  
+
     sidebarPanel(
-      
+
       ## Names are of the form '<function>_<arg>'
       tabsetPanel(id = "controls",
         tabPanel("Read Data",
@@ -67,7 +67,7 @@ shinyUI( fluidPage(
         )
       )
     ),
-    
+
     mainPanel(
      tabsetPanel(
        tabPanel("Array Images",
@@ -100,5 +100,5 @@ shinyUI( fluidPage(
        )
      )
     )
-  
+
 ) ) )
