@@ -1,9 +1,9 @@
 #' peptideSet methods
-#' 
+#'
 #' Methods for handling peptideSet objects
 #' @name peptideSet-methods
 #' @rdname peptideSet-methods
-#' 
+#'
 #' @section Accessors:
 #' \describe{
 #'  \item{\code{nrow(x)}:}{The number of peptides in x.}
@@ -11,9 +11,9 @@
 #'  \item{\code{start(x)}:}{Get the starts of the peptides.}
 #'  \item{\code{end(x)}:}{Get the ends of the peptides.}
 #'  \item{\code{width(x)}:}{Get the widths of the peptides.}
-#'  \item{\code{position(x)}:}{Get the coordinates of the central amino-acid of 
+#'  \item{\code{position(x)}:}{Get the coordinates of the central amino-acid of
 #'  each peptide, given by: \code{round((start(x) + end(x))/2)}.}
-#'  \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains 
+#'  \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains
 #'  the annotations for the peptides.}
 #'  \item{\code{ranges(x)<- value}}{Set annotations for the peptides.}
 #'  \item{\code{values(x)}:}{Returns a \code{SplitDataFrameList}. Accessor for the
@@ -27,7 +27,7 @@
 #'  for each peptide.}
 #'  \item{\code{pepZscore(x) <- value}}{Set the zScores for each peptide}
 #' }
-#' 
+#'
 #' @aliases
 #' start,peptideSet-method
 #' end,peptideSet-method
@@ -56,7 +56,7 @@
 #' pepZscore,peptideSet-method
 #' pepZscore<-,peptideSet,data.frame-method
 #' pepZscore,RangedData-method
-#' pepZscore<-,RangedData,data.frame-method 
+#' pepZscore<-,RangedData,data.frame-method
 #' [,peptideSet,ANY,ANY,ANY-method
 #' subset,peptideSet-method
 #' show,peptideSet-method
@@ -75,25 +75,25 @@
 #' @exportMethod "featureID"
 #' @exportMethod "peptide<-"
 #' @exportMethod "pepZscore<-"
-#' 
+#'
 #' @section Display:
 #' \describe{
 #'  \item{\code{show(object)}:}{Display a peptideSet object.}
 #'  \item{\code{summary(object)}:}{Summarize a peptideSet object.}
 #' }
-#' 
+#'
 #' @exportMethod "show"
 #' @exportMethod "summary"
-#' 
+#'
 #' @section Subset:
 #' \describe{
 #'  \item{\code{x[i, j]}:}{Subset x by peptides (i), or samples (j).}
 #'  \item{\code{subset(x, subset, drop=FALSE)}:}{Subset x given an expression 'subset'.}
 #' }
-#' 
+#'
 #' @exportMethod "["
 #' @exportMethod "subset"
-#' 
+#'
 #' @importMethodsFrom IRanges lapply ranges ranges<- values values<- width cbind
 #' rbind
 NULL
@@ -121,7 +121,7 @@ setMethod("summary", signature("peptideSet"),
       cat("   The total number of probes is: ",length(peptide(object))," \n")
       cat("   Preprocessing Information \n")
       cat("     - Transformation:",preproc(object@experimentData)$transformation, "\n")
-      cat("     - Normalization:",preproc(object@experimentData)$normalization, "\n")      
+      cat("     - Normalization:",preproc(object@experimentData)$normalization, "\n")
     }
 )
 
@@ -131,35 +131,35 @@ setMethod("[", signature("peptideSet", i = "ANY", j = "ANY"),
             if (!missing(i)) {
               sdata <- exprs(x)[i, j, drop = drop]
               featureRange <- ranges(x)[i, ]
-            } 
+            }
             else {
               sdata <- exprs(x)[, j, drop = drop]
               featureRange <- ranges(x)
             }
-            
-            newSet<-new('peptideSet', 
-                        exprs = as.matrix(sdata), 
-                        featureRange = featureRange, 
+
+            newSet<-new('peptideSet',
+                        exprs = as.matrix(sdata),
+                        featureRange = featureRange,
                         experimentData = x@experimentData)
-            
+
             if (!missing(j)) {
              pData(newSet) <- pData(x)[j,]
              sampleNames(newSet) <- sampleNames(x)[j]
             } else {
               pData(newSet) <- pData(x)
-            }  
+            }
             newSet
           })
 
-setMethod("subset", signature(x = "peptideSet"), 
+setMethod("subset", signature(x = "peptideSet"),
           function (x, subset, drop = FALSE, ...) {
             if (missing(subset)){
-              r <- rep(TRUE,nrow(x)) 
-            } 
+              r <- rep(TRUE,nrow(x))
+            }
             else {
               e <- substitute(subset)#class(e) = call
               r <- eval(e, pData(x), parent.frame())
-              if (!is.logical(r)) 
+              if (!is.logical(r))
                 stop("'subset' must evaluate to logical")
               r <- r & !is.na(r)
               vars<-r
@@ -219,7 +219,7 @@ setMethod("peptide", "peptideSet",
 			
 			if (type%in%validTypes){
 				ranges(x)[[type]]	
-			} 
+			}
       else {
 				warning("'",type, "' is not valid types(",validTypes,")!")
 			}
@@ -246,7 +246,7 @@ setMethod("split", "peptideSet", function(x, f, byrow = TRUE){
     f <- as.factor(f)
     if(byrow)
     {
-      lapply(1:nlevels(f), 
+      lapply(1:nlevels(f),
              function(i, pSet, f){pSet[f == levels(f)[i],]}, x, f)
     }
     else
@@ -268,20 +268,20 @@ setMethod("cbind", "peptideSet", function(..., deparse.level=1){
  names <- unlist(sapply(args, function(x){sampleNames(x)}))
  pd.list <- lapply(args, function(x){pData(x)})
  pd<-do.call(rbind, pd.list)
- 
+
  eSet.list <- lapply(args, function(x){exprs(x)})
  eSet <- do.call(cbind, eSet.list)
- 
+
  newSet<-new('peptideSet',
              exprs = as.matrix(eSet),
              featureRange = args[[1]]@featureRange,
              experimentData = args[[1]]@experimentData)
  pData(newSet) <- pd
  sampleNames(newSet) <- names
- newSet 
+ newSet
 })
 
-setGeneric("write.pSet", 
+setGeneric("write.pSet",
            function(x, bg.correct=FALSE, ...) standardGeneric("write.pSet"))
 setMethod("write.pSet", "peptideSet", function(x, bg.correct=FALSE, ...){
   if (bg.correct) {
@@ -311,16 +311,16 @@ setMethod("clade",
             for(pepIdx in 1:len){
               tmpList <- cladeList %in% pepClades[[pepIdx]]
               retMatrix[pepIdx, ] <- tmpList
-            }   
+            }
             rownames(retMatrix) <- rownames(object)
             colnames(retMatrix) <- cladeList
             return(retMatrix)
-          })  
+          })
 
 setMethod("clade",
                 signature = signature(object="peptideSet"),
                 definition = function(object){ clade(object@featureRange)
-                }) 
+                })
 
 setGeneric("pepZscore", function(object) standardGeneric("pepZscore"))
 setMethod("pepZscore", signature("RangedData"), function(object){
@@ -354,7 +354,7 @@ setReplaceMethod("pepZscore", signature("peptideSet", "data.frame"), function(ob
 
 setMethod("colnames", "peptideSet", function(x){ colnames(ranges(x)) })
 
-# setReplaceMethod("rownames", signature("peptideSet", "character"), 
+# setReplaceMethod("rownames", signature("peptideSet", "character"),
 #                  function(x, value){
 #                    rownames(ranges(x)) <- value
 #                    rownames(exprs(x)) <- value

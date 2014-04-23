@@ -1,9 +1,6 @@
-## Give me a file
-## Select a mapping file
-## Run analysis
-## Input for parameters
-
 library(shiny)
+
+## Protect against masking from other packages defining tags
 tags <- shiny::tags
 
 opts <- list(
@@ -13,25 +10,24 @@ opts <- list(
 source("common_functions.R")
 
 shinyUI( fluidPage(
-  
-  
+
   ## OpenTip
   includeScript("www/opentip/opentip-jquery.min.js"),
   includeCSS("www/opentip/opentip.css"),
-  
+
   ## Own
   includeCSS("styles.css"),
   includeScript("scripts.js"),
   includeScript("tooltips.js"),
-  
+
   HTML( "<style>#controls + div { height: 520px; }</style>" ),
-  
+
   titlePanel(""),
-  
+
   sidebarLayout(
-  
+
     sidebarPanel(
-      
+
       ## Names are of the form '<function>_<arg>'
       tabsetPanel(id = "controls",
         tabPanel("Read Data",
@@ -43,26 +39,14 @@ shinyUI( fluidPage(
           uiOutput("makePeptideSet"),
           HTML("<br/>"),
           uiOutput("pSet_status")
-#           addHelp(selectizeInput("makePeptideSet_bgCorrect.method", "Method to be used for background correction", 
-#             choices=c("normexp", "auto", "none", "subtract", "half", "min", "movingmin", "edwards")
-#           )),
-#           selectizeInput("makePeptideSet_rm.control.list", "Names of controls to be excluded", 
-#             choices="", multiple=TRUE, options=opts),
-#           selectizeInput("makePeptideSet_empty.control.list", "Names of empty controls",
-#             choices="", multiple=TRUE, options=opts),
-          
-          # checkboxInput("makePeptideSet_log", "Perform a log2 transformation after BG correction?", TRUE),
-#           checkboxInput("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
-#           actionButton("do_makePeptideSet", "Construct Peptide Set"),
-#           uiOutput("do_makePeptideSet_status")
         ),
         tabPanel("Normalization",
           selectizeInputWithHelp("summarizePeptides_summary", "Summary Method", choices=list("median", "mean")),
           selectizeInputWithHelp("summarizePeptides_position", "Position Database",
             choices=list("pep_hxb2", "pep_mac239", "pep_hxb2JPT", "pep_m239smE543")
           ),
-          numericInputWithHelp("slidingMean_width", "Sliding Mean Width", 5, 1, 100),
-          checkboxInputWithHelp("slidingMean_split_by_space", "Split by Space?", TRUE),
+          numericInputWithHelp("slidingMean_width", "Sliding Mean Width", 9, 1, 100),
+          checkboxInputWithHelp("slidingMean_split_by_clade", "Split by Clade?", TRUE),
           checkboxInputWithHelp("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
           actionButton("do_summarizePeptides", "Normalize"),
           HTML("<br />"),
@@ -78,12 +62,12 @@ shinyUI( fluidPage(
           selectizeInputWithHelp("makeCalls_group", "Group", ""),
           HTML("<br />"),
           actionButton("do_makeCalls", "Make Calls"),
-          downloadButton("export_calls"),
+          downloadButton("download"),
           uiOutput("makeCalls_status")
         )
       )
     ),
-    
+
     mainPanel(
      tabsetPanel(
        tabPanel("Array Images",
@@ -96,9 +80,13 @@ shinyUI( fluidPage(
          dataTableOutput("calls")
        ),
        tabPanel("Visualization",
-         selectizeInput("clades", "Clades", choices=NULL, selected=NULL),
-         plotOutput("Pviz_plot_inter")
-         plotOutput("Pviz_plot_clade")
+         uiOutput("clades"),
+         tags$div(style="overflow: auto;",
+           tags$div(style="float: left;", numericInput("Pviz_from", "From", 0)),
+           tags$div(style="float: left; margin-left: 20px;", numericInput("Pviz_to", "To", 0)),
+           tags$div(style="float: left; margin-left: 20px;", actionButton("reset", "Reset"))
+         ),
+         plotOutput("Pviz_plot")
        ),
        tabPanel("Debug",
          tags$div(
@@ -112,5 +100,5 @@ shinyUI( fluidPage(
        )
      )
     )
-  
+
 ) ) )

@@ -1,18 +1,18 @@
 #' Result table
-#' 
+#'
 #' Tabulate the results of a peptide microarray analysis.
-#' 
+#'
 #' @param peptideSet A \code{peptideSet} object.
 #' @param calls A \code{matrix}, as returned by the \code{makeCalls} function.
-#' 
+#'
 #' @details
 #' The peptideSet should be the one used in the function call to \code{makeCalls}
 #' that generated the calls used. They should have identical peptides.
 #'
-#' @return A \code{data.frame} with the peptides and some information from the 
-#' \code{peptideSet} as well as the frequency of binding for each group of the 
+#' @return A \code{data.frame} with the peptides and some information from the
+#' \code{peptideSet} as well as the frequency of binding for each group of the
 #' calls.
-#' 
+#'
 #' @export
 restab <- function(peptideSet, calls){
   pep <- as.data.frame(ranges(peptideSet))
@@ -29,6 +29,6 @@ restab <- function(peptideSet, calls){
 }
 
 #  @param long A \code{boolean}. If set to TRUE, the result table will have one
-#  row per peptide/clade. If FALSE, one row per peptide and all clades are 
-#  listed together. 
+#  row per peptide/clade. If FALSE, one row per peptide and all clades are
+#  listed together.
 # restab <- function(peptideSet, calls, long = FALSE){

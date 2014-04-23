@@ -17,7 +17,7 @@
         } else {
 			if(verbose) {
 				message("You don't have paired PRE/POST samples\n")
-			}	  
+			}	
 			I <- as.matrix(y[,t1])-rowMeans(y[, t0, drop=FALSE], na.rm=TRUE)#the vector to be subtracted from matrix need to be the same length as nrow of the matrix  	
 		}
 	}
@@ -34,7 +34,7 @@
 #      colnames(sy)<-rownames(ranges)
 #      sy
 #  }
-#  
+#
 
 # Checks that a peptideSet is valid
 #   Order of samples

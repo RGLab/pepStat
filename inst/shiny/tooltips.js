@@ -45,15 +45,9 @@ $( function() {
       message: "The width of the sliding window used when smoothing intensities."
     },
     
-    "slidingMean_split_by_space-help": {
-      title: "Smooth over Space",
-      message: "If checked, the peptides will be smoothed by space. " +
-        "When checked, peptides are smoothed within groups defined by the space of the " +
-        "<tt>RangedData</tt> object occupying the <tt>FeatureRange</tt> slot of the " +
-        "constructed <tt>peptideSet</tt>." +
-        "<br/><br/>" +
-        "This is useful if, for example, spaces indicate peptides drawn from separate " +
-        "proteins should not be smoothed together."
+    "slidingMean_split_by_clade-help": {
+      title: "Split by Clade",
+      message: "If checked, peptides are smoothed within clades. Otherwise, a peptide at a given position will borrow information from the neighboring peptides as well as ones from other clades around this position."
     },
     
     "makePeptideSet_check_row_order-help": {
