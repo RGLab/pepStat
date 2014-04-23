@@ -1,9 +1,3 @@
-## TODO
-## Write calls matrix to file
-
-## if your peptideSet has been aggregated (not split by clade), then only
-## plot_inter
-
 library(data.table)
 library(pepStat)
 library(Pviz)
@@ -27,6 +21,7 @@ shinyServer( function(input, output, session) {
   gpr_files_ready <- FALSE
   mapping_file_ready <- FALSE
   
+  pos_db <- NULL ## the position database that gets loaded
   pSet   <- NULL ## peptide set
   psSet  <- NULL ## summarized peptide set
   pnSet  <- NULL ## normalized peptide set
@@ -34,6 +29,8 @@ shinyServer( function(input, output, session) {
   calls  <- NULL ## output from makeCalls(ps)
   pSetSuccess <- FALSE
   restab <- NULL ## results table
+  sbc    <- NULL ## did we split by clade?
+  clades <- NULL ## what are the clades?
   
   ## Observer: updating the 'makePeptideSet_rm.control.list',
   ## 'makePeptideSet_empty.control.list' fields
@@ -218,7 +215,8 @@ shinyServer( function(input, output, session) {
     call <- call("data", position)
     eval(call)
     
-    psSet <<- summarizePeptides(pSet, summary=summary, position=get(position))
+    pos_db <<- get(position)
+    psSet <<- summarizePeptides(pSet, summary=summary, position=pos_db)
     pnSet <<- normalizeArray(psSet)
     psmSet <<- slidingMean(pnSet, width=width, split.by.clade=split.by.clade)
     
@@ -240,9 +238,27 @@ shinyServer( function(input, output, session) {
         makeCalls(psmSet, cutoff=cutoff, method=method, group=group)
       )
       restab <<- restab(psmSet, calls)
-      browser()
-      clades <- sort(unique(unlist(strsplit(restab$clade, ",", fixed=TRUE))))
-      updateSelectInput(session, "clades", choices = clades, selected = NULL)
+      clades <<- sort(unique(unlist(strsplit(restab$clade, ",", fixed=TRUE))))
+      
+      ## Depending on whether we split by clade or not, we want to display
+      ## different plots
+      sbc <<- preproc(psmSet)$split.by.clade
+      
+      ## The 'split' case --> plot_clade
+      if (!is.null(sbc) && isTRUE(sbc)) {
+        
+        ## Clade selection UI
+        output$clades <- renderUI({
+          selectizeInput("clades", "Clades", choices=clades, selected=NULL, multiple=TRUE)
+        })
+        
+      } else {
+        
+        ## cleanup
+        output$clades <- renderUI("")
+        
+      }
+      
     }
     
   })
@@ -327,19 +343,65 @@ shinyServer( function(input, output, session) {
     }
   })
   
-  output$export_calls <- downloadHandler(
+  output$download <- downloadHandler(
+    
+    ## restab
+    ## exprs(psmSet)
+    
     filename = function() {
-      paste('pepStat-calls-', Sys.Date(), ".csv", sep='')
-    }, content = function(file) {
+      paste('pepStat-analysis-', Sys.Date(), ".zip", sep='')
+    }, 
+    
+    content = function(file) {
+      
       if (is.null(calls)) {
         stop("No calls are available yet! Please navigate back to the Shiny application.")
       }
-      write.table( restab(psmSet, calls), file,
+      
+      date <- Sys.Date()
+      dir <- file.path( tempdir(), "pepStat" )
+      if (!file.exists(dir) && !dir.create(dir)) {
+        stop("Couldn't create an output directory in your temporary directory.\nPlease check your permissions and confirm that you have access to the directory pointed at:\n", dir, ".")
+      }
+      
+      owd <- getwd()
+      on.exit(setwd(owd))
+      setwd(dir)
+      
+      ## write out restab
+      restab_file <- paste0("results-", date, ".txt")
+      
+      write.table(restab, file=restab_file,
         sep="\t",
-        row.names = FALSE,
-        col.names = TRUE,
-        quote = FALSE)
-    }, contentType="text/csv"
+        row.names=FALSE,
+        col.names=TRUE,
+        quote=FALSE
+      )
+      
+      ## write out expression matrix
+      exprs_file <- paste0("exprs-", date, ".txt")
+      exprs <- as.data.frame(exprs(psmSet))
+      exprs <- cbind(
+        peptide=gsub("_.*", "", rownames(exprs)),
+        clade=gsub(".*_", "", rownames(exprs)),
+        exprs,
+        stringsAsFactors=FALSE
+      )
+      write.table(exprs, file=exprs_file,
+        sep="\t",
+        row.names=FALSE,
+        col.names=TRUE,
+        quote=FALSE
+      )
+      
+      zipfile <- "results.zip"
+      zip(zipfile, c(restab_file, exprs_file))
+      file.rename("results.zip", file)
+      
+    },
+    
+    contentType = "application/zip"
+    
   )
   
   output$debug <- renderPrint({
@@ -367,29 +429,34 @@ shinyServer( function(input, output, session) {
     
   })
   
-  output$Pviz_plot_inter <- renderPlot({
+  output$Pviz_plot <- renderPlot({
     
     dmc <- input$do_makeCalls
+    clades <- input$clades
+    from <- input$Pviz_from
+    to <- input$Pviz_to
     
     if (is.null(restab)) {
       grid.text("Please make calls before visualizing tracks")
       return(invisible(NULL))
     }
-  
-    Pviz::plot_inter(restab)
+      
+    if (from == 0 && to == 0) to <- max(restab$position)
+    
+    if (!isTRUE(sbc)) {
+      Pviz::plot_inter(restab, sequence=metadata(pos_db)$sequence, from=from, to=to)
+    } else {
+      Pviz::plot_clade(restab, clades, sequence=metadata(pos_db)$sequence, from=from, to=to)
+    }
     
   })
   
-  output$Pviz_plot_clade <- renderPlot({
-    
-    clades <- input$clades
-    
-    if (is.null(restab)) {
-      return(invisible(NULL))
+  onClick("reset", {
+    updateNumericInput(session, "Pviz_from", "From", 0)
+    updateNumericInput(session, "Pviz_to", "To", 0)
+    if (!is.null(clades)) {
+      updateSelectInput(session, "clades", "Clades", choices=clades, selected=NULL)
     }
-      
-    Pviz::plot_clade(restab, clades)
-    
   })
   
 })

@@ -46,7 +46,7 @@ $( function() {
     },
     
     "slidingMean_split_by_clade-help": {
-      title: "Split byClade",
+      title: "Split by Clade",
       message: "If checked, peptides are smoothed within clades. Otherwise, a peptide at a given position will borrow information from the neighboring peptides as well as ones from other clades around this position."
     },
     

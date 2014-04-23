@@ -1,9 +1,6 @@
-## Give me a file
-## Select a mapping file
-## Run analysis
-## Input for parameters
-
 library(shiny)
+
+## Protect against masking from other packages defining tags
 tags <- shiny::tags
 
 opts <- list(
@@ -42,18 +39,6 @@ shinyUI( fluidPage(
           uiOutput("makePeptideSet"),
           HTML("<br/>"),
           uiOutput("pSet_status")
-#           addHelp(selectizeInput("makePeptideSet_bgCorrect.method", "Method to be used for background correction", 
-#             choices=c("normexp", "auto", "none", "subtract", "half", "min", "movingmin", "edwards")
-#           )),
-#           selectizeInput("makePeptideSet_rm.control.list", "Names of controls to be excluded", 
-#             choices="", multiple=TRUE, options=opts),
-#           selectizeInput("makePeptideSet_empty.control.list", "Names of empty controls",
-#             choices="", multiple=TRUE, options=opts),
-          
-          # checkboxInput("makePeptideSet_log", "Perform a log2 transformation after BG correction?", TRUE),
-#           checkboxInput("makePeptideSet_check_row_order", "Reduce slides to a common set of peptides?", TRUE),
-#           actionButton("do_makePeptideSet", "Construct Peptide Set"),
-#           uiOutput("do_makePeptideSet_status")
         ),
         tabPanel("Normalization",
           selectizeInputWithHelp("summarizePeptides_summary", "Summary Method", choices=list("median", "mean")),
@@ -77,7 +62,7 @@ shinyUI( fluidPage(
           selectizeInputWithHelp("makeCalls_group", "Group", ""),
           HTML("<br />"),
           actionButton("do_makeCalls", "Make Calls"),
-          downloadButton("export_calls"),
+          downloadButton("download"),
           uiOutput("makeCalls_status")
         )
       )
@@ -95,9 +80,13 @@ shinyUI( fluidPage(
          dataTableOutput("calls")
        ),
        tabPanel("Visualization",
-         selectizeInput("clades", "Clades", choices=NULL, selected=NULL, multiple=TRUE),
-         plotOutput("Pviz_plot_inter"),
-         plotOutput("Pviz_plot_clade")
+         uiOutput("clades"),
+         tags$div(style="overflow: auto;",
+           tags$div(style="float: left;", numericInput("Pviz_from", "From", 0)),
+           tags$div(style="float: left; margin-left: 20px;", numericInput("Pviz_to", "To", 0)),
+           tags$div(style="float: left; margin-left: 20px;", actionButton("reset", "Reset"))
+         ),
+         plotOutput("Pviz_plot")
        ),
        tabPanel("Debug",
          tags$div(
