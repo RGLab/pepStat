@@ -166,8 +166,29 @@ increases detection of binding \textit{hotspots} that noisy signals might otherw
 obscure. Peptides are smoothed according to their sequence alignment position, 
 taken from \texttt{position(psSet)}.
 
+\vspace{10pt}
+From here on, two types of analyses are possible. The peptides can be aggregated
+by position or split by clade. When aggregating by position, the sliding mean
+will get information from surrounding peptides as well as peptides located 
+around their coordinates in other clades. This increase the strength of calls but
+the clade specificity is lost.
+
+It is common to do a first run with aggregated clades to detect binding hotspots
+and then do a second run to look for clade specificity in the peaks found during
+the first run.
+
+\vspace{10pt}
+This is decided by the \texttt{split.by.clade} argument. By default it is set to
+TRUE for a clade specific analysis.
+
 <<slidingMean>>=
 psmSet <- slidingMean(pnSet, width = 9)
+@
+
+For the aggregated \texttt{peptideSet} we set it to FALSE.
+
+<<slidingMean-splitbyclade>>=
+psmSetAg <- slidingMean(pnSet, width = 9, split.by.clade = FALSE)
 @
 
 \section{Making calls}
@@ -184,45 +205,61 @@ against each peptide, or a matrix of subject specific call. When \texttt{freq} i
 on which we split the frequency calculation.
 
 <<makeCalls>>=
-V_calls <- makeCalls(psmSet, freq = TRUE, group = "treatment", 
+calls <- makeCalls(psmSet, freq = TRUE, group = "treatment", 
                      cutoff = .1, method = "FDR", verbose = TRUE)
 @
 The function automatically selected an appropriate FDR threshold.
+
+
+<<makeCalls-aggregate>>=
+callsAg <- makeCalls(psmSetAg, freq = TRUE, group = "treatment",
+                     cutoff = .1, method = "FDR")
+@
 
 \section{Results}
 \subsection{summary}
 To get a summary of the analysis, for each peptide, the package provides the 
 function \texttt{restab} that combines a \texttt{peptideSet} and the result of
-\texttt{makeCalls} into a single \texttt{data.frame} with one row per peptide.
+\texttt{makeCalls} into a single \texttt{data.frame} with one row per peptide 
+and per clade.
 <<restab>>=
-summary <- restab(psmSet, V_calls)
+summary <- restab(psmSet, calls)
 head(summary)
 @
+
+Note that if calls are made with a \texttt{peptideSet} that has been normalized
+with \texttt{split.by.clade} set to FALSE, the table will have one row per 
+peptide. Peptides that are identical accross clades will only have one entry.
 
 
 \subsection{Plots}
 As part of the pipeline for the analysis of peptide microarray data, the 
 \texttt{Pviz} package includes a track that can use the result of an experiment 
-(peptideSet and calls) to generate plots.
+to generate plots.
 
-The most simple plots can display an overview of the difference between groups. 
-In this case, comparing placebo and vaccine.
+
+When analysing all clades at once, the \texttt{plot\_inter} function can be used 
+to easily identify binding peaks. It gives an overview of the differences between
+the selected groups. In this case, comparing placebo and vaccine.
 <<plot-inter, fig.height=4, message=FALSE>>=
 library(Pviz)
-plot_inter(summary)
+summaryAg <- restab(psmSetAg, callsAg)
+plot_inter(summaryAg)
 @
-% However, this plot does not show differences that may exist within a group. Values
-% are averaged for the group so this plot cannot detect when a single clade shows
-% a much higher or lower frequency of binding than the others for a given group.
-% 
-% To detect these changes, we plot all peptides individually. This is best visualised
-% with a track for each group.
-% <<plot-inra, fig.height=4>>=
-% plot_clade(psmSet, V_calls, clade="M")
-% @
 
-%More advanced plots can be created using the classes extended from \texttt{Gviz}
-% for more information, see the vignette \textbf{Plotting peptide microarray data}.
+\vspace{10pt}
+When clade specific calls have been made, it is more interesting to plot each 
+clade on a separate track.
+<<plot-clade, fig.height=4>>=
+plot_clade(summary, clade=c("A", "M", "CRF01"), from = 300, to = 520)
+@
+
+\vspace{10pt}
+Much more complex plots can be made, custom tracks can be added and every 
+graphical parameter can be tweaked. Refer to the \texttt{Pviz} documentation as 
+well as the \texttt{Gviz} package for detailed information on all tracks and 
+display paramters.
+
 
 \newpage
 \section{Quick analysis}
@@ -240,6 +277,7 @@ ps <- summarizePeptides(ps, summary = "mean", position = pep_hxb2)
 ps <- normalizeArray(ps)
 ps <- slidingMean(ps)
 calls <- makeCalls(ps, group = "treatment")
+summary <- restab(ps, calls)
 @
 
 \newpage
