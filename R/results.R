@@ -14,6 +14,7 @@
 #' calls.
 #'
 #' @export
+#' @example examples/pipeline.R
 restab <- function(peptideSet, calls){
   pep <- as.data.frame(ranges(peptideSet))
   pep$position <- pepStat::position(peptideSet)

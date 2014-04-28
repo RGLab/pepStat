@@ -41,7 +41,7 @@
 #' @rdname normalizeArray
 #' @aliases NormalizeArray
 #' @export
-#'
+#' @example examples/pipeline.R
 normalizeArray <- function(peptideSet, method = "ZpepQuad", robust = TRUE, centered = TRUE){
   ### Sanity checks
   if (class(peptideSet)!="peptideSet") {

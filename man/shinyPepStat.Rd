@@ -11,4 +11,9 @@ interface for constructing peptide sets, normalizing intensities, generating
 calls. Quality control is also facilitated through interactive plotting
 features.
 }
+\examples{
+if (interactive()) {
+  shinyPepStat()
+}
+}
 

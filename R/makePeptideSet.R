@@ -75,7 +75,8 @@
 #' @importFrom tools file_path_sans_ext file_ext
 #' @importFrom limma read.maimages backgroundCorrect
 #' @importFrom Biobase preproc preproc<- assayData phenoData experimentData
-#'   protocolData sampleNames sampleNames<- pData pData<- exprs exprs<-
+#'   protocolData sampleNames sampleNames<- pData pData<- exprs exprs<- rowMedians
+#' @importFrom IRanges IRanges RangedData space
 #'
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL, empty.control.list=NULL,
@@ -128,7 +129,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
       ind <- order(x$genes$ID);
       x$genes <- x$genes[ind,];
       x$Eb <- x$Eb[ind];
-      x$E <- x$E[ind];	
+      x$E <- x$E[ind];
       x
     })
     RG$E <- do.call(cbind,lapply(RG.list,function(x){x$E}))
@@ -271,7 +272,7 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   colnames(mapping.file) <- tolower(colnames(mapping.file))
 
   mapping.file$ptid <- tolower(mapping.file$ptid)
-  mapping.file$visit <- tolower(mapping.file$visit)		
+  mapping.file$visit <- tolower(mapping.file$visit)
 
   mapping.file
 }

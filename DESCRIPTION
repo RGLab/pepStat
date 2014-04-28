@@ -24,6 +24,6 @@ Suggests:
     Pviz,
     knitr,
     shiny
-biocViews: Microarray, Preprocessing, Statistics
+biocViews: Microarray, Preprocessing
 URL: https://github.com/RGLab/pepStat
 VignetteBuilder: knitr
