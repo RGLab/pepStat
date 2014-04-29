@@ -5,6 +5,10 @@
 ##' calls. Quality control is also facilitated through interactive plotting
 ##' features.
 ##' @export
+##' @examples
+##' if (interactive()) {
+##'   shinyPepStat()
+##' }
 shinyPepStat <- function() {
   shinyDir <- system.file(package="pepStat", "shiny")
   shiny::runApp(shinyDir)

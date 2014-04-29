@@ -35,6 +35,7 @@
 #' @name slidingMean
 #' @rdname slidingMean
 #' @export
+#' @example examples/pipeline.R
 slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
   .check_peptideSet(peptideSet)
   if (preproc(peptideSet@experimentData)$transformation!="log" &

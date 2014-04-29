@@ -43,16 +43,16 @@
 #' @aliases makeCalls
 #' @author Greg Imholte
 #' @export
-#'
+#' @example examples/pipeline.R
 makeCalls <- function(peptideSet, cutoff=1.2, method="absolute", freq=TRUE, group=NULL, verbose=FALSE){
 	if (class(peptideSet)!="peptideSet") {
 		stop("peptideSet must be an object of class peptideSet")
 	}
-	
+
 	if (preproc(peptideSet@experimentData)$transformation!="log") {
 		warning("The probe measurements should be log transformed.")
 	}
-	
+
 	if (preproc(peptideSet@experimentData)$normalization=="none") {
 		warning("You should probably normalize your data before using this function.")
 	}
@@ -154,7 +154,7 @@ baselineCorrect.pSet <- function(pSet, verbose=FALSE){
       if(verbose) {
         message("You don't have paired PRE/POST samples\n")
       }
-      I <- as.matrix(y[,t1])-rowMeans(y[, t0, drop=FALSE], na.rm=TRUE)#the vector to be subtracted from matrix need to be the same length as nrow of the matrix  	
+      I <- as.matrix(y[,t1])-rowMeans(y[, t0, drop=FALSE], na.rm=TRUE)#the vector to be subtracted from matrix need to be the same length as nrow of the matrix
     }
   }
   colnames(I) <- ptid[t1]
@@ -182,9 +182,7 @@ baselineCorrect.pSet <- function(pSet, verbose=FALSE){
 #' with a POST and no PRE will use the average expression of all baseline samples.
 #' Subjects with baseline only will not be represented in the resulting matrix.
 #'
-#' @export
 #' @author Renan Sauteraud
-#'
 baseline_correct <- function(pSet, verbose=FALSE){
   exprs <- exprs(pSet)
   pd <- pData(pSet)

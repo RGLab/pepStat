@@ -34,7 +34,7 @@
 #' @importFrom plyr ddply
 #' @export
 #' @rdname plotArray
-#'
+#' @example examples/pipeline.R
 plotArrayImage <- function(peptideSet, array.index = NULL,
   low = "white", high = "steelblue",
   ask = dev.interactive(orNone = TRUE) & 1 < length(array.index)){
