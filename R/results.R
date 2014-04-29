@@ -27,8 +27,3 @@ restab <- function(peptideSet, calls){
   restab$names <- NULL
   return(restab)
 }
-
-#  @param long A \code{boolean}. If set to TRUE, the result table will have one
-#  row per peptide/clade. If FALSE, one row per peptide and all clades are
-#  listed together.
-# restab <- function(peptideSet, calls, long = FALSE){
