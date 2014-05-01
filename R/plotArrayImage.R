@@ -207,8 +207,8 @@ getPlotGrid <- function(peptideSet)
   sr <- layout$nspot.r
   sc <- layout$nspot.c
 
-  x <- (0:gr) * sc + .5
-  y <- (0:gc) * sr + .5
+  x <- (0:gr) * sr + .5
+  y <- (0:gc) * sc + .5
   A <- cbind(x, x, y[1], y[length(y)])
   B <- cbind(x[1], x[length(x)], y, y)
   D <- data.frame(rbind(A,B))
