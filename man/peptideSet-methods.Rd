@@ -2,7 +2,7 @@
 \name{peptideSet-methods}
 \alias{[,peptideSet,ANY,ANY,ANY-method}
 \alias{clade}
-\alias{clade,RangedData-method}
+\alias{clade,GRanges-method}
 \alias{clade,peptideSet-method}
 \alias{clade-methods}
 \alias{end,peptideSet-method}
@@ -10,11 +10,11 @@
 \alias{featureID,peptideSet-method}
 \alias{featureID-method}
 \alias{pepZscore}
-\alias{pepZscore,RangedData-method}
+\alias{pepZscore,GRanges-method}
 \alias{pepZscore,peptideSet-method}
 \alias{pepZscore-method}
 \alias{pepZscore<-}
-\alias{pepZscore<-,RangedData,data.frame-method}
+\alias{pepZscore<-,GRanges,data.frame-method}
 \alias{pepZscore<-,peptideSet,data.frame-method}
 \alias{peptide}
 \alias{peptide,peptideSet-method}
@@ -47,7 +47,7 @@ Methods for handling peptideSet objects
  \item{\code{width(x)}:}{Get the widths of the peptides.}
  \item{\code{position(x)}:}{Get the coordinates of the central amino-acid of
  each peptide, given by: \code{round((start(x) + end(x))/2)}.}
- \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains
+ \item{\code{ranges(x)}:}{Returns a \code{GRanges} object that contains
  the annotations for the peptides.}
  \item{\code{ranges(x)<- value}}{Set annotations for the peptides.}
  \item{\code{values(x)}:}{Returns a \code{SplitDataFrameList}. Accessor for the

@@ -71,9 +71,9 @@ Row, Column and Block spatial array position for each probe are stored in the
 }
 \examples{
 # Read gpr files
-library(PEP.db)
-mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
-dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+library(pepDat)
+mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
+dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
 pSet <- makePeptideSet(files = NULL, path = dirToParse,
                        mapping.file = mapFile, log=TRUE)
 

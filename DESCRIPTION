@@ -13,13 +13,14 @@ Depends:
 Imports:
     limma,
     fields,
+    GenomicRanges,
     ggplot2,
     plyr,
     tools,
     methods,
     data.table
 Suggests:
-    PEP.db,
+    pepDat,
     Pviz,
     knitr,
     shiny

@@ -14,11 +14,14 @@
 #' calls.
 #'
 #' @export
+#' @importMethodsFrom GenomicRanges as.data.frame
+#'
 #' @example examples/pipeline.R
 restab <- function(peptideSet, calls){
   pep <- as.data.frame(ranges(peptideSet))
+  pep$names <- rownames(pep)
   pep$position <- pepStat::position(peptideSet)
-  cn <- c("names", "peptide", "position", "space", "start", "end", "width", "clade")
+  cn <- c("names", "peptide", "position", "start", "end", "width", "clade")
   pep <- pep[, cn]
   calls <- data.frame(calls)
   calls$names <- rownames(calls)

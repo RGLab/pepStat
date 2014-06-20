@@ -13,7 +13,7 @@
 #'  \item{\code{width(x)}:}{Get the widths of the peptides.}
 #'  \item{\code{position(x)}:}{Get the coordinates of the central amino-acid of
 #'  each peptide, given by: \code{round((start(x) + end(x))/2)}.}
-#'  \item{\code{ranges(x)}:}{Returns a \code{RangedData} object that contains
+#'  \item{\code{ranges(x)}:}{Returns a \code{GRanges} object that contains
 #'  the annotations for the peptides.}
 #'  \item{\code{ranges(x)<- value}}{Set annotations for the peptides.}
 #'  \item{\code{values(x)}:}{Returns a \code{SplitDataFrameList}. Accessor for the
@@ -40,7 +40,7 @@
 #' values,peptideSet-method
 #' clade
 #' clade-methods
-#' clade,RangedData-method
+#' clade,GRanges-method
 #' clade,peptideSet-method
 #' peptide
 #' peptide<-
@@ -55,8 +55,8 @@
 #' pepZscore-method
 #' pepZscore,peptideSet-method
 #' pepZscore<-,peptideSet,data.frame-method
-#' pepZscore,RangedData-method
-#' pepZscore<-,RangedData,data.frame-method
+#' pepZscore,GRanges-method
+#' pepZscore<-,GRanges,data.frame-method
 #' [,peptideSet,ANY,ANY,ANY-method
 #' subset,peptideSet-method
 #' show,peptideSet-method
@@ -125,18 +125,16 @@ setMethod("summary", signature("peptideSet"),
     }
 )
 
-
+# Subset by peptide/sample
 setMethod("[", signature("peptideSet", i = "ANY", j = "ANY"),
           function(x, i, j, ..., drop = FALSE) {
             if (!missing(i)) {
               sdata <- exprs(x)[i, j, drop = drop]
               featureRange <- ranges(x)[i, ]
-            }
-            else {
+            } else {
               sdata <- exprs(x)[, j, drop = drop]
               featureRange <- ranges(x)
             }
-
             newSet<-new('peptideSet',
                         exprs = as.matrix(sdata),
                         featureRange = featureRange,
@@ -173,7 +171,6 @@ setMethod("position", "peptideSet", function(x){
 			round((start(ranges(x))+end(ranges(x)))/2)
 		})
 
-
 setMethod("start", "peptideSet", function(x){
 			start(ranges(x))
 		})
@@ -196,7 +193,7 @@ setMethod("values<-", "peptideSet", function(x, value){
 		})
 
 setReplaceMethod("ranges", "peptideSet",
-		function(x,value)
+		function(x, value)
 		{
 			x@featureRange <- value
 			x
@@ -216,17 +213,20 @@ setMethod("peptide", "peptideSet",
 			if (is.null(type)){
 				type <- "peptide"
 			}
-			
+
 			if (type%in%validTypes){
-				ranges(x)[[type]]	
+				peptides <- values(ranges(x))[, type]
 			}
       else {
-				warning("'",type, "' is not valid types(",validTypes,")!")
+				warning("'",type, "' is not a valid type! The accepted types are: ",
+                paste(validTypes, collapse =", "),".")
 			}
+      return(peptides)
 		})
+
 setGeneric("peptide<-", function(object, value) standardGeneric("peptide<-"))
 setReplaceMethod("peptide", signature("peptideSet", "character"), function(object, value){
-  ranges(object)[["peptide"]] <- value
+  values(ranges(object))[, "peptide"] <- value
   return(object)
 })
 
@@ -235,7 +235,7 @@ setMethod("featureID", "peptideSet",
 		function(x, type=NULL){
 			if (is.null(type))
 			{
-				ranges(x)[["featureID"]]
+				values(ranges(x))[["featureID"]]
 			}
 		})
 
@@ -293,7 +293,7 @@ setMethod("write.pSet", "peptideSet", function(x, bg.correct=FALSE, ...){
   colnames(y)[1:4] <- c("peptide", "start", "end", "annotation")
   write.csv(y, ...)
 })
-	
+
 
 #clade acessor
 setGeneric("clade",
@@ -301,21 +301,25 @@ setGeneric("clade",
                         standardGeneric("clade"))
 
 setMethod("clade",
-          signature = signature(object = "RangedData"),
+          signature = signature(object = "GRanges"),
           definition = function(object){
+            if(is.null(object$clade)){
+              stop("The object does not have clade information!")
+            }
             cladeList <- unique(unlist(
               strsplit(levels(as.factor(object$clade)), ","))) #List of all possible clades
-            len <- nrow(object)
+            len <- length(object)
             retMatrix <- matrix(FALSE, nrow = len, ncol = length(cladeList))
-            pepClades <- strsplit(object$clade, split = ",") #clades for each peptide
+            pepClades <- strsplit(as.character(object$clade), split = ",") #clades for each peptide
             for(pepIdx in 1:len){
               tmpList <- cladeList %in% pepClades[[pepIdx]]
               retMatrix[pepIdx, ] <- tmpList
             }
-            rownames(retMatrix) <- rownames(object)
+            rownames(retMatrix) <- names(object)
             colnames(retMatrix) <- cladeList
             return(retMatrix)
           })
+
 
 setMethod("clade",
                 signature = signature(object="peptideSet"),
@@ -323,7 +327,7 @@ setMethod("clade",
                 })
 
 setGeneric("pepZscore", function(object) standardGeneric("pepZscore"))
-setMethod("pepZscore", signature("RangedData"), function(object){
+setMethod("pepZscore", signature("GRanges"), function(object){
   vals <- as.data.frame(values(object))
   zs <- c("z1", "z2", "z3", "z4", "z5")
   zIns <- zs[zs %in% colnames(vals)]
@@ -335,7 +339,7 @@ setMethod("pepZscore", signature("peptideSet"), function(object){
 })
 
 setGeneric("pepZscore<-", function(object, value) standardGeneric("pepZscore<-"))
-setReplaceMethod("pepZscore", signature("RangedData", "data.frame"), function(object, value){
+setReplaceMethod("pepZscore", signature("GRanges", "data.frame"), function(object, value){
   zs <- c("z1", "z2", "z3", "z4", "z5")
   if(!all(zs %in% colnames(value))){
     stop("The given data.frame does not contain the required colum names: 'z1', 'z2', 'z3', 'z4', 'z5'")

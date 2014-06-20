@@ -14,7 +14,7 @@ with the class.
 \section{Slots}{
 
 \describe{
- \item{featureRange}{A \code{RangedData object}. The ranges and sequences of
+ \item{featureRange}{A \code{GRanges}object. The ranges and sequences of
 the peptides and their associated annotation.}
  \item{phenoData}{An \code{AnnotatedDataFrame}. Annotation for the samples.}
  \item{assayData}{}

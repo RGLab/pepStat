@@ -52,9 +52,9 @@
 #'
 #' @examples
 #' # Read gpr files
-#' library(PEP.db)
-#' mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
-#' dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+#' library(pepDat)
+#' mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
+#' dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
 #' pSet <- makePeptideSet(files = NULL, path = dirToParse,
 #'                        mapping.file = mapFile, log=TRUE)
 #'
@@ -76,7 +76,8 @@
 #' @importFrom limma read.maimages backgroundCorrect
 #' @importFrom Biobase preproc preproc<- assayData phenoData experimentData
 #'   protocolData sampleNames sampleNames<- pData pData<- exprs exprs<- rowMedians
-#' @importFrom IRanges IRanges RangedData space
+#' @importFrom IRanges IRanges space
+#' @importFrom GenomicRanges GRanges
 #'
 makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FALSE,
                          rm.control.list=NULL, empty.control.list=NULL,
@@ -159,6 +160,12 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   preproc(myDesc)$printer<-RG$printer
 
   ## Fill in the details of the preprocessing
+
+  ## Put NA instead of flags
+  if (use.flags)
+  {
+    RG$E[RG$weights==0] <- NA
+  }
   if (log) {
     RG$E <- log2(RG$E)
     preproc(myDesc) <- c(preproc(myDesc),list(transformation="log", normalization="none"))
@@ -216,7 +223,8 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
   nPep <- length(which(ind.keep))
   # Positions are set to zero before the information is provided in summarize pSet
   pSet <- new('peptideSet',
-              featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)), featureID,
+              featureRange = GRanges(seqnames = " ", strand = "*",
+              ranges = IRanges(rep(0,nPep),rep(0,nPep)), featureID,
               peptide = featureSequence, block = layout$Block[ind.keep],
               row = layout$Row[ind.keep], column = layout$Column[ind.keep]),
               exprs = as.matrix(RG$E-mean.empty)[ind.keep, ],
@@ -229,52 +237,6 @@ makePeptideSet<-function(files=NULL, path=NULL, mapping.file=NULL, use.flags=FAL
     pData(pSet) <- mapping.file[match(sampleNames(pSet), rownames(mapping.file)), ]
   }
   return(pSet)
-}
-
-.sanitize.mapping.file <- function(mapping.file){
-  if (is.character(mapping.file)) {
-    if (file.access(mapping.file, mode = 0) < 0)
-      stop("mapping.file is not an accessible file path. Typo?")
-
-    # check whether mapping file is a ".csv" file
-    ext <- file_ext(mapping.file)
-    if (ext != "csv")
-      stop("Mapping file must be a .csv file")
-
-    # ensure that mapping.file has a filename entry
-    header <- scan(mapping.file, what = "character",
-                           nlines = 1, sep = ",", quiet = TRUE)
-    if( sum(c("filename","ptid","visit") %in% tolower(header)) != 3 )
-      stop("mapping.file document header must include 3 mandatory columns: filename, ptid, visit")
-
-    j <- match("filename", tolower(header))
-    mapping.file <- read.csv(mapping.file, row.names=header[j])
-  } else {
-    if(!is.data.frame(mapping.file)){
-      warning("Mapping.file object coerced to data frame")
-      mapping.file <- as.data.frame(mapping.file)
-    }
-    header <- tolower(names(mapping.file))
-    j <- match("filename", tolower(header))
-
-    if (!is.na(j)) {
-      row.names(mapping.file) <- mapping.file[,j]
-      # drop the filename now that we are using it as row names
-      mapping.file <- subset(mapping.file, select = -j)
-    } else {
-      message("filename entry not found in mapping.file, using rownames as file names")
-    }
-    if( sum(c("ptid", "visit") %in% tolower(colnames(mapping.file))) < 2 )
-      stop("mapping.file object must include mandatory columns: ptid, visit")
-  }
-
-  rownames(mapping.file) <- tolower(rownames(mapping.file))
-  colnames(mapping.file) <- tolower(colnames(mapping.file))
-
-  mapping.file$ptid <- tolower(mapping.file$ptid)
-  mapping.file$visit <- tolower(mapping.file$visit)
-
-  mapping.file
 }
 
 .sanitize_mapping_file2 <- function(mapping.file){

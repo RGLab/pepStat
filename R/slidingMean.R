@@ -21,7 +21,7 @@
 #' the peptide's sliding mean window.
 #'
 #' When split.by.clade = TRUE, peptides are smoothed within clades defined by the
-#' clade column of the RangedData object occupying the featureRange slot of
+#' clade column of the GRanges object occupying the featureRange slot of
 #' peptideSet. If set to FALSE, a peptide at a given position will borrow
 #' information from the neighboring peptides as well as the ones from other
 #' clades around this position.
@@ -34,6 +34,10 @@
 #'
 #' @name slidingMean
 #' @rdname slidingMean
+#'
+#' @importFrom GenomicRanges GRangesList
+#' @importClassesFrom GenomicRanges GRangesList
+#' @importMethodsFrom IRanges unlist
 #' @export
 #' @example examples/pipeline.R
 slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
@@ -50,23 +54,23 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
     pSet_list <- split(peptideSet, clade(peptideSet))
     #peptides need to be ordered the same in exprs and featureRange
     for(i in 1:length(pSet_list)){
-      cur_clade <- names(which(
-        table(unlist(strsplit(ranges(pSet_list[[i]])$clade, ","))) == nrow(pSet_list[[i]])))
+      cur_clade <- colnames(clade(peptideSet))[i]
       ranges(pSet_list[[i]])$clade <- cur_clade
       exprs(pSet_list[[i]]) <- .applySlidingMean(
         exprs(pSet_list[[i]]), width, position(pSet_list[[i]]))
       pSet_list[[i]] <- .set_rownames(pSet_list[[i]],
                                       paste(peptide(pSet_list[[i]]), cur_clade, sep="_"))
     }
-    ranges <- do.call("rbind", lapply(pSet_list, ranges))
+    #ranges <- do.call("rbind", lapply(pSet_list, ranges))
+    ranges <- unlist(GRangesList(lapply(pSet_list, ranges)))
     exprs <- do.call("rbind", lapply(pSet_list, exprs))
     ranges(peptideSet) <- ranges
     exprs(peptideSet) <- exprs
     preproc(peptideSet)$split.by.clade <- TRUE
   } else {
-    if (length(names(ranges(peptideSet))) > 1)
-      warning("smoothing multiple spaces together in peptideSet object")
-    # This could be made more efficient with multicore
+#     if (length(names(ranges(peptideSet))) > 1)
+#       warning("smoothing multiple spaces together in peptideSet object")
+#     # This could be made more efficient with multicore
     p <- position(peptideSet)
     o <- order(p)
     ro <- order(o)

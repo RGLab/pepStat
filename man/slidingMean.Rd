@@ -34,7 +34,7 @@ A peptide's intensity is replaced by the mean of all peptide intensities within
 the peptide's sliding mean window.
 
 When split.by.clade = TRUE, peptides are smoothed within clades defined by the
-clade column of the RangedData object occupying the featureRange slot of
+clade column of the GRanges object occupying the featureRange slot of
 peptideSet. If set to FALSE, a peptide at a given position will borrow
 information from the neighboring peptides as well as the ones from other
 clades around this position.
@@ -42,11 +42,11 @@ clades around this position.
 \examples{
 ## This example curated from the vignette -- please see vignette("pepStat")
 ## for more information
-if (require("PEP.db")) {
+if (require("pepDat")) {
 
   ## Get example GPR files + associated mapping file
-  dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
-  mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+  dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
+  mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
 
   ## Make a peptide set
   pSet <- makePeptideSet(files = NULL, path = dirToParse,

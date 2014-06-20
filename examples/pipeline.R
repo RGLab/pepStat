@@ -1,10 +1,10 @@
 ## This example curated from the vignette -- please see vignette("pepStat")
 ## for more information
-if (require("PEP.db")) {
+if (require("pepDat")) {
 
   ## Get example GPR files + associated mapping file
-  dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
-  mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+  dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
+  mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
 
   ## Make a peptide set
   pSet <- makePeptideSet(files = NULL, path = dirToParse,

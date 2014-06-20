@@ -1,7 +1,7 @@
 library(data.table)
 library(pepStat)
 library(Pviz)
-library(PEP.db)
+library(pepDat)
 source("common_functions.R")
 
 shinyServer( function(input, output, session) {

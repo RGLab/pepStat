@@ -9,26 +9,36 @@
 #' @param peptideSet A \code{peptideSet}, as created by \code{makePeptideSet}
 #' @param summary A \code{character} string. The method used for merging replicates.
 #' Available are: "mean" and "median".
-#' @param position A \code{RangedData}. A peptide collection such as the ones
-#' available in \code{PEP.db}. See details below and vignettes for more information.
+#' @param position A \code{data.frame} or \code{GRanges} object. A peptide
+#' collection such as the ones available in \code{pepDat}. See details below
+#' and vignettes for more information.
 #'
 #' @return An object of class \code{peptideSet} with added columns and updated ranges.
 #'
-#' @note For the position argument, some peptide collections can be found in the
-#' \code{PEP.db} package.
+#' @details
+#' The object in the position argument will be passed to \code{create_db}, it
+#' can either be a \code{GRanges} object with a peptide as a metadata column, or
+#' a \code{data.frame} that can be used to create such \code{GRanges}.
 #'
-#' @seealso \code{\link{makePeptideSet}}, \code{\link{create_db}}
+#' Some peptide collections can be found in the \code{pepDat} package.
+#'
+#'
+#' @seealso \code{\link{makePeptideSet}}, \code{\link{create_db}},
+#' \code{\link{create_db}}
 #'
 #' @author Raphael Gottardo, Greory Imholte
 #'
 #' @rdname summarizePeptides
+#'
+#' @importFrom GenomicRanges seqnames
 #' @export
 #' @example examples/pipeline.R
 summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 	# Check arguments for conformity
 	check = .checkArgs_sumPeps(peptideSet, summary, position)
-	if(!check)
+	if(!check){
 		stop(attr(check, "ErrorString"))
+	}
 
 	df <- as.data.frame(exprs(peptideSet))
 	featureSequence <- peptide(peptideSet)
@@ -53,7 +63,8 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 	nPep <- length(featureID)
 
 	newSet<-new('peptideSet',
-			featureRange = RangedData(IRanges(rep(0,nPep),rep(0,nPep)),
+			featureRange = GRanges(seqnames = " ", strand = "*",
+                             ranges = IRanges(rep(0,nPep),rep(0,nPep)),
 					featureID, peptide = featureSequence),
 			exprs = as.matrix(sdata),
 			experimentData=peptideSet@experimentData)
@@ -62,44 +73,32 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 
 
 	if(!is.null(position)){
-		# assume that rownames of position RangedData
+    positiion <- create_db(position)
+		# assume that rownames of position GRanges
 		# object are peptide sequences in peptideSet,
 		# non-null rownames checked in checkArgs above
 
-		# remove elements of RangedData that aren't found in
+		# remove elements of GRanges that aren't found in
 		# the array
-		sub1 <- rownames(position) %in% peptide(newSet)
+		sub1 <- names(position) %in% peptide(newSet)
 		position <- position[sub1,]
 
 		# remove elements of peptideSet that aren't found in
-		# RangedData object!
-		sub2 <- peptide(newSet) %in% rownames(position)
+		# GRanges object!
+		sub2 <- peptide(newSet) %in% names(position)
 		newSet <- newSet[sub2,]
 
 		if(sum(!sub2) > 0){
-			message("Some peptides have no match in the RangedData object rownames and are removed from the peptideSet!")
+			message("Some peptides have no match in the GRanges object rownames and are removed from the peptideSet!")
 		}
 
 		# reorder peptideSet so that rows of expression matrix
-		# match the ordering in the RangedData object
-		ind1 <- match(rownames(position), peptide(newSet))
+		# match the ordering in the GRanges object
+		ind1 <- match(names(position), peptide(newSet))
 		newSet <- newSet[ind1,]
 
-		#split and reorder peptide info from newSet so that
-		# order of spaces matches position
-		DframeTmp <- split(values(ranges(newSet))[[1]], space(position))
-		ind2 <- match(names(values(position)), names(DframeTmp))
-
-		DframeTmp <- DframeTmp[ind2]
-		rownames(DframeTmp) <- rownames(values(position))
-
-		if(!all(names(DframeTmp) == names(values(position))))
-			stop("mismatched RangedData objects")
-
-		vdata <- cbind(DframeTmp, values(position))
-		rdata <- ranges(position)
-
-		newSet@featureRange <- RangedData(rdata, vdata)
+    ranges(ranges(newSet)) <- ranges(position)
+    values(newSet) <- cbind(values(newSet), values(position))
 	}
 	pData(newSet) <- pData(peptideSet)
 	preproc(newSet)$summary <- summary
@@ -114,17 +113,6 @@ summarizePeptides <- function(peptideSet, summary="median", position=NULL){
 		OK = FALSE
 		attr(OK, "ErrorString") = ("summary must be either median or mean")
 	}
-
-	if(class(position) == "RangedData" & is.null(rownames(position)) & !is.null(position)){
-		OK = FALSE
-		attr(OK, "ErrorString") = ("rownames of position RangedData object must be peptide sequences")
-	}
-
-  if(class(position) != "RangedData" & !is.null(position)){
-    OK = FALSE
-    attr(OK, "ErrorString") = ("if non-NULL, position argument must be a RangedData object")
-  }
-
   if(class(peptideSet) != "peptideSet"){
     OK = FALSE
     attr(OK, "ErrorString") = ("peptideSet argument must be an object of class peptideSet")

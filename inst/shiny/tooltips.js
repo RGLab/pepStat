@@ -36,8 +36,8 @@ $( function() {
     "summarizePeptides_position-help": {
       title: "Position Database",
       message: "A peptide collection -- currently, the collections available " +
-        "in <tt>PEP.db</tt>. Please consult the documentation available for the " +
-        "<tt>PEP.db</tt> package for more information.",
+        "in <tt>pepDat</tt>. Please consult the documentation available for the " +
+        "<tt>pepDat</tt> package for more information.",
     },
     
     "slidingMean_width-help": {

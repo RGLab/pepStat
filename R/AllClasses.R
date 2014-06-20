@@ -4,7 +4,7 @@
 #'
 #' @section Slots:
 #' \describe{
-#'  \item{featureRange}{A \code{RangedData object}. The ranges and sequences of
+#'  \item{featureRange}{A \code{GRanges}object. The ranges and sequences of
 #' the peptides and their associated annotation.}
 #'  \item{phenoData}{An \code{AnnotatedDataFrame}. Annotation for the samples.}
 #'  \item{assayData}{}
@@ -21,7 +21,7 @@
 #'
 #' @importFrom Biobase ExpressionSet
 #' @importClassesFrom Biobase Versioned VersionedBiobase eSet ExpressionSet
-#' @importClassesFrom IRanges RangedData
+#' @importClassesFrom GenomicRanges GRanges
 #' @name peptideSet
 #' @rdname peptideSet
 #' @aliases peptideSet-class
@@ -29,7 +29,6 @@
 #' @author Greg Imholte
 #'
 setClass("peptideSet",
-    contains=c("ExpressionSet"),
-    representation(featureRange="RangedData")
+         contains=c("ExpressionSet"),
+         representation(featureRange="GRanges")
 )
-

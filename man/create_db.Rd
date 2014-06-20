@@ -3,21 +3,30 @@
 \alias{create_db}
 \title{Create a peptide collection}
 \usage{
-create_db(rd)
+create_db(position)
 }
 \arguments{
-\item{rd}{A \code{RangedData} object. The object should have a peptide column.}
+\item{position}{A \code{data.frame} or \code{GRanges} object. If a
+\code{data.frame} is provided, it should contain 'start' and 'end' or 'width'
+columns as well as a peptide column. If position is a \code{GRanges} object,
+then it must either have peptide as names or contain a peptide metadata
+column.}
 }
 \description{
-Constructor to create peptide collection such as the datasets available in PEP.db.
+Constructor to create peptide collection to be used in
+\code{summarizePeptides}.
 }
 \details{
-rd can have additional columns. These columns will be kept in the peptide
-  collection.
+\code{position} can have additional columns. These columns will be kept in
+  the resulting peptide collection. This is especially useful to include
+  clades and grouping parameters for the \code{makeCalls} function.
+
+  If the input contains all the z-scores (z1 to z5), then they will not be
+  re-calculated. If some (but not all) z-scores are missing, a warning
+  message will be sent and the z-scores are re-calculated.
 }
 \examples{
-#construct RangedData object
-   library(IRanges)
+#construct data.frame object
    AA <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
    "Q","R", "S", "T", "V", "W", "Y")
    starts <- seq(1, 30, 3)
@@ -26,11 +35,15 @@ rd can have additional columns. These columns will be kept in the peptide
      paste0(AA[floor(runif(15, 1, 20))], collapse = "")
    })
    data <- data.frame(start = starts, end = ends, peptide = peptides)
-   newRD <- RangedData(data)
-#create_db
-   new_pep <- create_db(newRD)
+#from data.frame
+   new_pep <- create_db(data)
+#from GRanges
+   new_pep <- create_db(new_pep)
+}
+\author{
+Renan Sauteraud
 }
 \seealso{
-\code{\link{RangedData}}
+\code{\link{GRanges}}
 }
 

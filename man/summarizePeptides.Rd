@@ -11,8 +11,9 @@ summarizePeptides(peptideSet, summary = "median", position = NULL)
 \item{summary}{A \code{character} string. The method used for merging replicates.
 Available are: "mean" and "median".}
 
-\item{position}{A \code{RangedData}. A peptide collection such as the ones
-available in \code{PEP.db}. See details below and vignettes for more information.}
+\item{position}{A \code{data.frame} or \code{GRanges} object. A peptide
+collection such as the ones available in \code{pepDat}. See details below
+and vignettes for more information.}
 }
 \value{
 An object of class \code{peptideSet} with added columns and updated ranges.
@@ -22,18 +23,21 @@ This function merges the replicates and adds information from a peptide collecti
 to a peptideSet. This collection can include coordinates, alignment information,
 Z-scales, and other peptide information.
 }
-\note{
-For the position argument, some peptide collections can be found in the
-\code{PEP.db} package.
+\details{
+The object in the position argument will be passed to \code{create_db}, it
+can either be a \code{GRanges} object with a peptide as a metadata column, or
+a \code{data.frame} that can be used to create such \code{GRanges}.
+
+Some peptide collections can be found in the \code{pepDat} package.
 }
 \examples{
 ## This example curated from the vignette -- please see vignette("pepStat")
 ## for more information
-if (require("PEP.db")) {
+if (require("pepDat")) {
 
   ## Get example GPR files + associated mapping file
-  dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
-  mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+  dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
+  mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
 
   ## Make a peptide set
   pSet <- makePeptideSet(files = NULL, path = dirToParse,
@@ -66,6 +70,7 @@ if (require("PEP.db")) {
 Raphael Gottardo, Greory Imholte
 }
 \seealso{
-\code{\link{makePeptideSet}}, \code{\link{create_db}}
+\code{\link{makePeptideSet}}, \code{\link{create_db}},
+\code{\link{create_db}}
 }
 

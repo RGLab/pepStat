@@ -1,6 +1,6 @@
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Full peptide microarray analysis}
-%\VignetteDepends{PEP.db, knitr, Pviz}
+%\VignetteDepends{pepDat, knitr, Pviz}
 %\VignetteKeywords{Preprocessing, Affymetrix}
 %\VignettePackage{pepStat}
 \documentclass[11pt]{article}
@@ -21,72 +21,78 @@ opts_chunk$set(tidy=FALSE)
 
 \maketitle
 
-This document present a full analysis, from reading the data to displaying the 
+This document present a full analysis, from reading the data to displaying the
 results that makes use of all the packages we developped for peptide microarray.
 
 \tableofcontents
 
 \newpage
 \section{Introduction}
-The \texttt{pepStat} package offers a complete analytical framework for the 
+The \texttt{pepStat} package offers a complete analytical framework for the
 analysis of peptide microarray data. It includes a novel normalization method to
-remove non-specific peptide binding activity of antibodies, a data smoothing 
-reducing step to reduce background noise, and subject-specific positivity calls. 
+remove non-specific peptide binding activity of antibodies, a data smoothing
+reducing step to reduce background noise, and subject-specific positivity calls.
 
 \subsection{Requirements}
-The \texttt{pepStat} package requires GSL, an open source scientific computing 
+The \texttt{pepStat} package requires GSL, an open source scientific computing
 library. This library is freely available at \url{http://www.gnu.org/software/gsl/}.
 
-In this vignette, we make use of the samples and examples available in the data 
-package \texttt{PEP.db}.
+In this vignette, we make use of the samples and examples available in the data
+package \texttt{pepDat}.
 
 \section{Generating a peptideSet}
 
 <<loading-libraries, message=FALSE>>=
-library(PEP.db)
+library(pepDat)
 library(pepStat)
 @
 
 \subsection{Reading in \texttt{.gpr} files}
-The reading function, \texttt{makePeptideSet}, takes a path as its argument and 
-parses all the \textit{.gpr} files in the given directory. Alternatively, one may 
-specify a character vector of paths to individual 
-\textit{.gpr} files.
+The reading function, \texttt{makePeptideSet}, takes a path as its argument and
+parses all the \textit{.gpr} files in the given directory. Alternatively, one
+may specify a character vector of paths to individual \textit{.gpr} files.
 
 
 By default channels F635 Median and B635 Median are collected, and
-the \texttt{'normexp'} method of the \texttt{backgroundCorrect} function 
-in the \texttt{limma} package corrects probe intensities for background 
+the \texttt{'normexp'} method of the \texttt{backgroundCorrect} function
+in the \texttt{limma} package corrects probe intensities for background
 fluorescence. Other methods may be selected, see documentation.
 <<read-data>>=
-mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
-dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
+dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
 pSet <- makePeptideSet(files = NULL, path = dirToParse,
                        mapping.file = mapFile, log=TRUE)
 @
 
-While optional, it is strongly recommended to provide a \texttt{mapping.file} giving
-annotations data for each slide, such as treatment status or patient information.
-If provided, the mapping.file should be a \texttt{.csv} file. It must include columns labeled \texttt{filename}, \texttt{ptid}, and \texttt{visit}. Elements in column \texttt{filename} must correspond to the filenames of slides to be read in, without 
-the \texttt{.gpr} extension. Column \texttt{ptid} is a subject or slide identifier. Column \texttt{visit} indicates a case or control condition, such as pre/post 
-vaccination, pre/post infection, or healthy/infected status. Control conditions 
-must be labelled \textit{pre}, while case conditions must be labelled \textit{post}. Alternatively, one may input a \texttt{data.frame} satisfying the same requirements.
+While optional, it is strongly recommended to provide a \texttt{mapping.file}
+giving annotations data for each slide, such as treatment status or patient
+information. If provided, the mapping.file should be a \texttt{.csv} file. It
+must include columns labeled \texttt{filename}, \texttt{ptid}, and
+\texttt{visit}. Elements in column \texttt{filename} must correspond to the
+filenames of slides to be read in, without the \texttt{.gpr} extension. Column
+\texttt{ptid} is a subject or slide identifier. Column \texttt{visit} indicates
+a case or control condition, such as pre/post vaccination, pre/post infection,
+or healthy/infected status. Control conditions must be labelled \textit{pre},
+while case conditions must be labelled \textit{post}. Alternatively, one may
+input a \texttt{data.frame} satisfying the same requirements.
 
-This minimal information is required by \texttt{pepStat}'s functions further in 
-the analysis. Any additional information (column) will be retained and can be used
-as a grouping variable.
+This minimal information is required by \texttt{pepStat}'s functions further in
+the analysis. Any additional information (column) will be retained and can be
+used as a grouping variable.
 
-If no mapping file is included, the information will have to be added later on 
+If no mapping file is included, the information will have to be added later on
 to the \texttt{peptideSet} object.
 
-For our example, we use a toy dataset of 8 samples from 4 patients and we are 
+For our example, we use a toy dataset of 8 samples from 4 patients and we are
 interested in comparing the antibody binding in placebo versus vaccinated subjects.
 <<data-content>>=
 read.csv(mapFile)
 @
 
 \subsection{Additional arguments}
-The empty spots should be listed in order to background correct the intensities. It is also useful to remove the controls when reading the data. Here we have the JPT controls, human Ig (A, E and M) and dye controls.
+The empty spots should be listed in order to background correct the intensities.
+It is also useful to remove the controls when reading the data. Here we have the
+JPT controls, human Ig (A, E and M) and dye controls.
 <<read-data-ctrl>>=
 pSetNoCtrl <- makePeptideSet(files = NULL, path = dirToParse,
                        mapping.file = mapFile, log = TRUE,
@@ -96,9 +102,9 @@ pSetNoCtrl <- makePeptideSet(files = NULL, path = dirToParse,
 
 
 \subsection{Visualize slides}
-We include two plotting functions to detect possible spatial slide artifacts. Since
-the full plate is needed for this visualization, the functions will work best with 
-rm.contol.list and empty.control.list set to NULL in makePeptideSet.
+We include two plotting functions to detect possible spatial slide artifacts.
+Since the full plate is needed for this visualization, the functions will work
+best with rm.contol.list and empty.control.list set to NULL in makePeptideSet.
 
 <<plot-slide, include=TRUE, fig.width=7.48, fig.height=3>>=
 plotArrayImage(pSet, array.index = 1)
@@ -110,34 +116,46 @@ plotArrayResiduals(pSet, array.index = 1, smooth = TRUE)
 @
 
 \section{Adding peptide informations}
-At this point, the peptideSet contain only the peptide sequences and the associated background corrected intensities. To continue with the analysis, we need to add the position information, as well as physicochemical properties of the peptides summarized by their z-scales.
+At this point, the peptideSet contain only the peptide sequences and the
+associated background corrected intensities. To continue with the analysis, we
+need to add the position information, as well as physicochemical properties of
+the peptides summarized by their z-scales.
 
-The slides used in this example are the enveloppe of HIV-1 and peptide collections are available for this in our PEP.db package (please refere to the vignette and \texttt{?pep\_hxb2} for more information).
-However, we will pretend that this is not the case to show an example of how to build a custom peptide collection.
+The slides used in this example are the enveloppe of HIV-1 and peptide
+collections are available for this in our pepDat package (please refere to the
+vignette and \texttt{?pep\_hxb2} for more information).
+However, we will pretend that this is not the case to show an example of how
+to build a custom peptide collection.
 
 \subsection{Creating a custom peptide collection}
-Here, we load a data.frame that contains the peptides used on the array as well 
+Here, we load a data.frame that contains the peptides used on the array as well
 as their start and end coordinates, and clade information.
 <<create-pep-load-data>>=
-peps <- read.csv(system.file("extdata/pep_info.csv", package = "PEP.db"))
+peps <- read.csv(system.file("extdata/pep_info.csv", package = "pepDat"))
 head(peps)
 @
-We first create a RangedData object with the available information. The region of interest is the enveloppe of the virus so we add the space information to the object.
 
-<<create-pep-RD>>=
-rd <- RangedData(ranges = IRanges(start = peps$start, end = peps$end),
-                 peptide = peps$peptide, clade = peps$clade, space = "gp160")
-@
-The z-scores are added afterward, using the create\_db fuction.
+Then we call the constructor that will create the appropriate collection.
 <<create-db>>=
-pep_custom <- create_db(rd = rd)
+pep_custom <- create_db(peps)
+@
+pep\_custom is a \texttt{GRanges} object with the required "peptide" metadata
+column and the physiochemical properties of each peptide sequence summarized by
+z-scores.
+
+Note that the function will also accept \texttt{GRanges} input.
+<<create-db-GR>>=
+pep_custom <- create_db(pep_custom)
 @
 
 \subsection{Summarize the information}
-The function \texttt{summarizePeptides} summarizes within-slide replicates by 
-either their mean or median. Additionaly, with the newly constructed peptide 
+The function \texttt{summarizePeptides} summarizes within-slide replicates by
+either their mean or median. Additionaly, with the newly constructed peptide
 collection, peptides positions and annotations can be passed on to the existing
 peptideSet.
+Alternately, the function could be callled directly on the \texttt{data.frame}
+object. Internally, \texttt{summarizePeptides} will call \texttt{create\_db} to
+make sure the input is formatte appropriately.
 <<summarizePeptideSet>>=
 psSet <- summarizePeptides(pSet, summary = "mean", position = pep_custom)
 @
@@ -153,23 +171,23 @@ individual peptides to model non-specific antibody binding to arrays.
 pnSet <- normalizeArray(psSet)
 @
 
-An object of class \texttt{peptideSet} containing the corrected peptides 
+An object of class \texttt{peptideSet} containing the corrected peptides
 intensities is returned.
 
 \section{Data smoothing}
 The optional data smoothing step takes advantage of the overlapping nature of the
-peptides on the array to remove background noise caused by experimental variation. 
+peptides on the array to remove background noise caused by experimental variation.
 It is likely that two overlapping peptides will share common binding signal, when
 present. \texttt{pepStat} use a sliding mean technique technique to borrow strength
-across neighboring peptides and to reduce signal variability. This statistic 
+across neighboring peptides and to reduce signal variability. This statistic
 increases detection of binding \textit{hotspots} that noisy signals might otherwise
-obscure. Peptides are smoothed according to their sequence alignment position, 
+obscure. Peptides are smoothed according to their sequence alignment position,
 taken from \texttt{position(psSet)}.
 
 \vspace{10pt}
 From here on, two types of analyses are possible. The peptides can be aggregated
 by position or split by clade. When aggregating by position, the sliding mean
-will get information from surrounding peptides as well as peptides located 
+will get information from surrounding peptides as well as peptides located
 around their coordinates in other clades. This increase the strength of calls but
 the clade specificity is lost.
 
@@ -193,10 +211,10 @@ psmSetAg <- slidingMean(pnSet, width = 9, split.by.clade = FALSE)
 
 \section{Making calls}
 The final step is to make the positivity calls. The function \texttt{makeCalls}
-automatically uses information provided in the mapping file, accessed via 
-\texttt{pData(pSet)}. It detects whether samples are paired or not. If samples 
+automatically uses information provided in the mapping file, accessed via
+\texttt{pData(pSet)}. It detects whether samples are paired or not. If samples
 are paired, POST intensities are subtracted from PRE intensities, then thresholded.
-Otherwise, PRE samples are averaged, and then subtracted from POST intensities. 
+Otherwise, PRE samples are averaged, and then subtracted from POST intensities.
 These corrected POST intensities are thresholded.
 
 The \texttt{freq} argument controls whether we return the percentage of responders
@@ -205,7 +223,7 @@ against each peptide, or a matrix of subject specific call. When \texttt{freq} i
 on which we split the frequency calculation.
 
 <<makeCalls>>=
-calls <- makeCalls(psmSet, freq = TRUE, group = "treatment", 
+calls <- makeCalls(psmSet, freq = TRUE, group = "treatment",
                      cutoff = .1, method = "FDR", verbose = TRUE)
 @
 The function automatically selected an appropriate FDR threshold.
@@ -218,9 +236,9 @@ callsAg <- makeCalls(psmSetAg, freq = TRUE, group = "treatment",
 
 \section{Results}
 \subsection{summary}
-To get a summary of the analysis, for each peptide, the package provides the 
+To get a summary of the analysis, for each peptide, the package provides the
 function \texttt{restab} that combines a \texttt{peptideSet} and the result of
-\texttt{makeCalls} into a single \texttt{data.frame} with one row per peptide 
+\texttt{makeCalls} into a single \texttt{data.frame} with one row per peptide
 and per clade.
 <<restab>>=
 summary <- restab(psmSet, calls)
@@ -228,17 +246,17 @@ head(summary)
 @
 
 Note that if calls are made with a \texttt{peptideSet} that has been normalized
-with \texttt{split.by.clade} set to FALSE, the table will have one row per 
+with \texttt{split.by.clade} set to FALSE, the table will have one row per
 peptide. Peptides that are identical accross clades will only have one entry.
 
 
 \subsection{Plots}
-As part of the pipeline for the analysis of peptide microarray data, the 
-\texttt{Pviz} package includes a track that can use the result of an experiment 
+As part of the pipeline for the analysis of peptide microarray data, the
+\texttt{Pviz} package includes a track that can use the result of an experiment
 to generate plots.
 
 
-When analysing all clades at once, the \texttt{plot\_inter} function can be used 
+When analysing all clades at once, the \texttt{plot\_inter} function can be used
 to easily identify binding peaks. It gives an overview of the differences between
 the selected groups. In this case, comparing placebo and vaccine.
 <<plot-inter, fig.height=4, message=FALSE>>=
@@ -248,29 +266,39 @@ plot_inter(summaryAg)
 @
 
 \vspace{10pt}
-When clade specific calls have been made, it is more interesting to plot each 
+When clade specific calls have been made, it is more interesting to plot each
 clade on a separate track.
 <<plot-clade, fig.height=4>>=
 plot_clade(summary, clade=c("A", "M", "CRF01"), from = 300, to = 520)
 @
 
 \vspace{10pt}
-Much more complex plots can be made, custom tracks can be added and every 
-graphical parameter can be tweaked. Refer to the \texttt{Pviz} documentation as 
-well as the \texttt{Gviz} package for detailed information on all tracks and 
+Much more complex plots can be made, custom tracks can be added and every
+graphical parameter can be tweaked. Refer to the \texttt{Pviz} documentation as
+well as the \texttt{Gviz} package for detailed information on all tracks and
 display paramters.
 
+\section{shinyApp}
+As part of the package, a shinyApp provides a user interface for peptide
+microarray analysis. After making the calls, the results can be downloaded and
+the app displays plots as shown in the previous sections.
+
+The app can be started from the command line using the \texttt{shinyPepStat}
+function.
+<<shinyApp, eval = FALSE>>=
+shinyPepStat()
+@
 
 \newpage
 \section{Quick analysis}
-Here we showcase a quick analysis of peptide microarray data for HIV-1 gp160. 
-This displays the minimal amount of code required to go from raw data file to 
+Here we showcase a quick analysis of peptide microarray data for HIV-1 gp160.
+This displays the minimal amount of code required to go from raw data file to
 antibody binding positivity call.
 <<quick-analysis, results='hide', message=FALSE>>=
 library(pepStat)
-library(PEP.db)
-mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
-dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
+library(pepDat)
+mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
+dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
 ps <- makePeptideSet(files = NULL, path = dirToParse, mapping.file = mapFile)
 data(pep_hxb2)
 ps <- summarizePeptides(ps, summary = "mean", position = pep_hxb2)
@@ -279,6 +307,7 @@ ps <- slidingMean(ps)
 calls <- makeCalls(ps, group = "treatment")
 summary <- restab(ps, calls)
 @
+
 
 \newpage
 \section{sessionInfo}

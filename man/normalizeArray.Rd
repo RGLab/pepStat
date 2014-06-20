@@ -34,7 +34,7 @@ obtained by summing over the Z-scale values in Sandburg et al (1998) of the amin
 acids the peptide comprises.
 
 Peptide Z-scale scores may be provided in the featureRange slot of peptideSet.
-This slot is a \code{RangedData} object x, and the function will seek five columns
+This slot is a \code{GRanges} object x, and the function will seek five columns
 labelled z1 through z5 in values(x). If these are not found, the function attempts
 to calculate Z-scales from sequence information found in peptide(peptideSet)
 
@@ -45,11 +45,11 @@ centered = TRUE the fitted intercept term is added back to the residuals of the 
 \examples{
 ## This example curated from the vignette -- please see vignette("pepStat")
 ## for more information
-if (require("PEP.db")) {
+if (require("pepDat")) {
 
   ## Get example GPR files + associated mapping file
-  dirToParse <- system.file("extdata/gpr_samples", package = "PEP.db")
-  mapFile <- system.file("extdata/mapping.csv", package = "PEP.db")
+  dirToParse <- system.file("extdata/gpr_samples", package = "pepDat")
+  mapFile <- system.file("extdata/mapping.csv", package = "pepDat")
 
   ## Make a peptide set
   pSet <- makePeptideSet(files = NULL, path = dirToParse,
