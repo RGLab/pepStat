@@ -3,7 +3,7 @@ Type: Package
 Title: Statistical analysis of peptide microarrays
 Version: 0.99.0
 Author: Raphael Gottardo, Gregory C Imholte, Renan Sauteraud, Mike Jiang
-Maintainer: Gregory C Imholte <gimholte@uw.edu>
+Maintainer: Renan Sauteraud <rsautera@fhcrc.org>
 Description: Statistical analysis of peptide microarrays
 License: Artistic-2.0
 Depends:

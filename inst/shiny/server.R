@@ -32,34 +32,34 @@ shinyServer( function(input, output, session) {
   sbc    <- NULL ## did we split by clade?
   clades <- NULL ## what are the clades?
 
-  ## Observer: updating the 'makePeptideSet_rm.control.list',
-  ## 'makePeptideSet_empty.control.list' fields
-  observe({
-    gpr_files <- input$gpr_files
-
-    ## If this is non-NULL, we just got some new files!
-    if (is.null(gpr_files)) return(NULL)
-
-    data <- lapply(gpr_files$datapath, function(x) {
-      fread(x, skip=34)
-    })
-
-    ## The annotations are those not starting with a numeric value
-    annotations <- Reduce(union, lapply(data, function(df) {
-      unique(grep("^[^0-9]", df$Annotation, value=TRUE))
-    }))
-
-    updateSelectInput(session, "makePeptideSet_rm.control.list",
-      "Names of controls to be excluded",
-      choices=sort(annotations)
-    )
-
-    updateSelectInput(session, "makePeptideSet_empty.control.list",
-      "Names of empty controls",
-      choices=sort(annotations)
-    )
-
-  })
+#   ## Observer: updating the 'makePeptideSet_rm.control.list',
+#   ## 'makePeptideSet_empty.control.list' fields
+#   observe({
+#     gpr_files <- input$gpr_files
+#
+#     ## If this is non-NULL, we just got some new files!
+#     if (is.null(gpr_files)) return(NULL)
+#
+#     data <- lapply(gpr_files$datapath, function(x) {
+#       fread(x, skip=34)
+#     })
+#
+#     ## The annotations are those not starting with a numeric value
+#     annotations <- Reduce(union, lapply(data, function(df) {
+#       unique(grep("^[^0-9]", df$Annotation, value=TRUE))
+#     }))
+#
+#     updateSelectInput(session, "makePeptideSet_rm.control.list",
+#       "Names of controls to be excluded",
+#       choices=sort(annotations)
+#     )
+#
+#     updateSelectInput(session, "makePeptideSet_empty.control.list",
+#       "Names of empty controls",
+#       choices=sort(annotations)
+#     )
+#
+#   })
 
   ## Observer: make sure the GPR files are okay (TODO)
   observe({
