@@ -31,6 +31,8 @@ shinyServer( function(input, output, session) {
   restab <- NULL ## results table
   sbc    <- NULL ## did we split by clade?
   clades <- NULL ## what are the clades?
+  from   <- NULL ## Start of the plot
+  to     <- NULL ## End of the plot
 
   ## Observer: updating the 'makePeptideSet_rm.control.list',
   ## 'makePeptideSet_empty.control.list' fields
@@ -193,7 +195,7 @@ shinyServer( function(input, output, session) {
     output$pSet_status <- renderUI({
       p("PeptideSet successfully constructed.")
     })
-
+    updateTabsetPanel(session, "controls", selected = "Normalization")
   })
 
   onClick("do_summarizePeptides", {
@@ -223,7 +225,7 @@ shinyServer( function(input, output, session) {
     output$summarize_status <- renderUI({
       p("Peptide set successfully normalized.")
     })
-
+    updateTabsetPanel(session, "controls", selected = "Positivity Calls")
   })
 
   onClick("do_makeCalls", {
@@ -251,16 +253,20 @@ shinyServer( function(input, output, session) {
         output$clades <- renderUI({
           selectizeInput("clades", "Clades", choices=clades, selected=NULL, multiple=TRUE)
         })
+        output$rangeSlider <- renderUI({
+          sliderInput("rangeSlider", label = "Range", min = 0, max = max(restab$end),
+                      value = c(0, max(restab$end)), step = 1, round = TRUE)
+          })
+        #updateSliderInput(session, "rangeSlider", value = c(50, 100))
 
       } else {
-
         ## cleanup
         output$clades <- renderUI("")
-
+        output$rangeSlider <- renderUI("")
       }
 
     }
-
+    updateTabsetPanel(session, "main_panel", selected = "Calls")
   })
 
   output$do_makePeptideSet_status <- renderUI({
@@ -316,8 +322,8 @@ shinyServer( function(input, output, session) {
 
   output$calls <- renderDataTable(
     options=list(
-      iDisplayLength = 10,
-      iDisplayStart = 10
+      pageLength = 10,
+      displayStart = 10
     ), {
     input$do_makeCalls
     if (!is.null(calls)) {
@@ -433,8 +439,10 @@ shinyServer( function(input, output, session) {
 
     dmc <- input$do_makeCalls
     clades <- input$clades
-    from <- input$Pviz_from
-    to <- input$Pviz_to
+    #from <- input$Pviz_from
+    #to <- input$Pviz_to
+    from <- input$rangeSlider[1]
+    to <- input$rangeSlider[2]
 
     if (is.null(restab)) {
       grid.text("Please make calls before visualizing tracks")
@@ -452,8 +460,9 @@ shinyServer( function(input, output, session) {
   })
 
   onClick("reset", {
-    updateNumericInput(session, "Pviz_from", "From", 0)
-    updateNumericInput(session, "Pviz_to", "To", 0)
+    #updateNumericInput(session, "Pviz_from", "From", 0)
+    #updateNumericInput(session, "Pviz_to", "To", 0)
+    updateSliderInput(session, "rangeSlider", value = c(0, max(restab$end)))
     if (!is.null(clades)) {
       updateSelectInput(session, "clades", "Clades", choices=clades, selected=NULL)
     }
