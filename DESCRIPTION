@@ -1,7 +1,7 @@
 Package: pepStat
 Type: Package
 Title: Statistical analysis of peptide microarrays
-Version: 1.1.1
+Version: 1.2.0
 Author: Raphael Gottardo, Gregory C Imholte, Renan Sauteraud, Mike Jiang
 Maintainer: Gregory C Imholte <gimholte@uw.edu>
 Description: Statistical analysis of peptide microarrays
