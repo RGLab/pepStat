@@ -56,17 +56,23 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
     for(i in 1:length(pSet_list)){
       cur_clade <- colnames(clade(peptideSet))[i]
       ranges(pSet_list[[i]])$clade <- cur_clade
-      exprs(pSet_list[[i]]) <- .applySlidingMean(
-        exprs(pSet_list[[i]]), width, position(pSet_list[[i]]))
-      pSet_list[[i]] <- .set_rownames(pSet_list[[i]],
-                                      paste(peptide(pSet_list[[i]]), cur_clade, sep="_"))
+      exprs(pSet_list[[i]]) <- .applySlidingMean(exprs(pSet_list[[i]]), width, 
+              position(pSet_list[[i]]))
+      # update row names with clade-appended peptide strings
+      clade_rownames <- paste(peptide(pSet_list[[i]]), cur_clade, sep="_")
+      rownames(pSet_list[[i]]) <- clade_rownames
+      names(ranges(pSet_list[[i]])) <- clade_rownames
     }
     #ranges <- do.call("rbind", lapply(pSet_list, ranges))
-    ranges <- unlist(GRangesList(lapply(pSet_list, ranges)))
-    exprs <- do.call("rbind", lapply(pSet_list, exprs))
-    ranges(peptideSet) <- ranges
-    exprs(peptideSet) <- exprs
-    preproc(peptideSet)$split.by.clade <- TRUE
+    clade_ranges <- unlist(GRangesList(lapply(pSet_list, ranges)))
+    clade_exprs <- do.call("rbind", lapply(pSet_list, exprs))    
+    peptideSet_smoothed <- new("peptideSet",
+            exprs = clade_exprs,
+            featureRange = clade_ranges,
+            experimentData = peptideSet@experimentData,
+            phenoData = peptideSet@phenoData,
+            protocolData = peptideSet@protocolData)
+    preproc(peptideSet_smoothed)$split.by.clade <- TRUE
   } else {
 #     if (length(names(ranges(peptideSet))) > 1)
 #       warning("smoothing multiple spaces together in peptideSet object")
@@ -79,12 +85,14 @@ slidingMean <-function(peptideSet, width=9, verbose=FALSE, split.by.clade=TRUE){
     p <- position(peptideSet)[o]
     ny <- .applySlidingMean(y, width, p)
     exprs(peptideSet) <- ny[ro,]
+    peptideSet_smoothed <- peptideSet
   }
 
   if (verbose) {
-    cat("** Finished processing ",nrow(peptideSet)," probes on ",ncol(peptideSet)," arrays **\n");
+    cat("** Finished processing ", nrow(peptideSet_smoothed),
+            " probes on ", ncol(peptideSet_smoothed)," arrays **\n");
   }
-  peptideSet
+  peptideSet_smoothed
 }
 
 

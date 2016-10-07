@@ -54,6 +54,7 @@
 # Replace rownames in both featureRange and exprs slot
 #   setReplaceMethod("rownames", ....) fails
 .set_rownames <- function(x, value){
+  browser()
   names(ranges(x)) <- value
   rownames(exprs(x)) <- value
   return(x)
